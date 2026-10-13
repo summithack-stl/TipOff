@@ -1,0 +1,37 @@
+{
+  "source": "https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=30",
+  "downloaded": "2026-10-12",
+  "total_parcels": 10346,
+  "by_status": {
+    "Available": 9759,
+    "Unavailable": 587
+  },
+  "by_usage": {
+    "Vacant Lot": 8582,
+    "Residential": 1280,
+    "Unknown": 378,
+    "Mixed-Use": 35,
+    "Condo": 27,
+    "Commercial": 22,
+    "Alley": 10,
+    "Industrial": 5,
+    "Right Of Way": 2,
+    "Cemetery": 2,
+    "Garage": 1,
+    "Building": 1,
+    "Lot": 1
+  },
+  "side_lot_eligible": 931,
+  "top_neighborhoods": {
+    "Wells Goodfellow": 1410,
+    "Greater Ville": 1257,
+    "Walnut Park East": 784,
+    "The Ville": 621,
+    "Hamilton Heights": 554,
+    "Fairground Neighborhood": 544,
+    "College Hill": 538,
+    "Hyde Park": 525,
+    "O'Fallon": 468,
+    "Jeff Vanderlou": 368
+  }
+}

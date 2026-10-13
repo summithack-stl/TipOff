@@ -1,0 +1,11 @@
+# Sleipnir run state
+artifacts/
+proposals/
+plan.json
+results.jsonl
+run.lock
+orchestrate.log
+sleipnir.toml
+.env*.local
+.venv/
+__pycache__/
