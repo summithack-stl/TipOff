@@ -128,7 +128,7 @@
     @apply font-sans;
   }
 }
-/* Danger Radar: top-50 buildings get a soft pulse. */
+/* Radar: the worst hotspots get a soft pulse. */
 .radar-top {
   position: relative;
   display: block;
@@ -136,7 +136,7 @@
   height: 14px;
   border-radius: 9999px;
   background: var(--c);
-  box-shadow: 0 0 0 1.5px #fff;
+  box-shadow: 0 0 0 2px var(--cat, #fff);
 }
 .radar-top::after {
   content: "";

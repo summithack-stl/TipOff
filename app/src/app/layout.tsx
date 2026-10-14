@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="flex h-14 shrink-0 items-center gap-6 border-b px-4">
           <span className="font-semibold">StreetSense</span>
           <nav className="flex gap-4 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">Danger Radar</Link>
+            <Link href="/" className="hover:text-foreground">Hotspots</Link>
             <Link href="/watch" className="hover:text-foreground">Tracker</Link>
           </nav>
         </header>
