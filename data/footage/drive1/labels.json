@@ -1,0 +1,24 @@
+[
+  {
+    "file": "frame_000001.jpg",
+    "issues": []
+  },
+  {
+    "file": "frame_000012.jpg",
+    "issues": [
+      {
+        "category": "pothole",
+        "where": "bottom-right"
+      }
+    ]
+  },
+  {
+    "file": "frame_000025.jpg",
+    "issues": [
+      {
+        "category": "graffiti",
+        "where": "center-left"
+      }
+    ]
+  }
+]
