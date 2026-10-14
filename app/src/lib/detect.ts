@@ -12,15 +12,24 @@ export type Detection = {
   confirmed: boolean;
 };
 
-const PROMPT = `You inspect street-camera frames for city maintenance issues.
-Find every instance of:
+const PROMPT = `You inspect street-level photos of city blocks for a fire department and city maintenance crews.
+Find every visible instance of:
+Building hazards (vacant or damaged buildings):
+- open_entry: a doorway or window on a building that is open, broken or missing boards, so a person could get in
+- roof_damage: holes, missing sections, sagging or collapsed roof
+- wall_damage: cracked, bowing, leaning or partly collapsed exterior walls, missing bricks
+- fire_damage: scorch marks, charring or burned-out sections
+Street issues:
 - graffiti: spray paint or tags on walls, signs, poles (not commissioned murals)
 - pothole: holes or broken pavement in the road surface
 - dumping: piles of trash, bags, furniture, mattresses, tires, construction debris left outside
 - streetlight_out: a street lamp that is visibly dark at night
+Only report what is clearly visible. Boarded-up openings are NOT open_entry.
+Building hazards only apply to buildings that look vacant, abandoned or damaged (missing or broken glass, missing doors,
+overgrowth, collapse, charring). Normal doors, windows and storefronts on buildings in use are NOT hazards.
 Ignore people and vehicles entirely. Never describe people.
 Return JSON only, no reasoning:
-{"detections":[{"category":"graffiti|pothole|dumping|streetlight_out","box_2d":[ymin,xmin,ymax,xmax],"confidence":0.0-1.0,"severity":"low|medium|high","note":"under 10 words"}]}
+{"detections":[{"category":"open_entry|roof_damage|wall_damage|fire_damage|graffiti|pothole|dumping|streetlight_out","box_2d":[ymin,xmin,ymax,xmax],"confidence":0.0-1.0,"severity":"low|medium|high","note":"under 10 words"}]}
 box_2d uses a 0-1000 grid. If nothing is found return {"detections":[]}.`;
 
 const toDetection = (d: VisionDetection, confirmed: boolean): Detection => ({
