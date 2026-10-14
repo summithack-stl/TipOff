@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-export const STREET_CATEGORIES = ["graffiti", "pothole", "dumping", "streetlight_out"] as const;
+export const STREET_CATEGORIES = [
+  "graffiti",
+  "pothole",
+  "dumping",
+  "streetlight_out",
+  "broken_curb",
+  "sidewalk_damage",
+] as const;
 export const BUILDING_CATEGORIES = ["open_entry", "roof_damage", "wall_damage", "fire_damage"] as const;
 export const CATEGORIES = [...STREET_CATEGORIES, ...BUILDING_CATEGORIES] as const;
 export type Category = (typeof CATEGORIES)[number];
@@ -14,6 +21,8 @@ export const DEPARTMENT: Record<Category, string> = {
   graffiti: "Graffiti removal",
   dumping: "Refuse: illegal dumping",
   streetlight_out: "Street lighting",
+  broken_curb: "Street Department: curb repair",
+  sidewalk_damage: "Street Department: sidewalk repair",
   // Building hazards go to the Building Division (board-up / condemnation) and feed the Fire Department's vacant-building warnings.
   open_entry: "Building Division: board-up",
   roof_damage: "Building Division: inspection",
@@ -21,19 +30,25 @@ export const DEPARTMENT: Record<Category, string> = {
   fire_damage: "Building Division: inspection",
 };
 
-// What the vision models return. box_2d is [ymin, xmin, ymax, xmax] on a 0-1000 grid.
+// One detection as the vision models return it. box_2d is [ymin, xmin, ymax, xmax] on a 0-1000 grid.
+const detectionSchema = z.object({
+  category: z.enum(CATEGORIES),
+  box_2d: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+  confidence: z.number().min(0).max(1),
+  severity: z.enum(["low", "medium", "high"]).default("medium"),
+  note: z.string().default(""),
+});
+export type VisionDetection = z.infer<typeof detectionSchema>;
+
+// Models sometimes return one malformed item (unknown category, nested box). Drop that item, keep the rest of the frame.
 export const visionResultSchema = z.object({
-  detections: z.array(
-    z.object({
-      category: z.enum(CATEGORIES),
-      box_2d: z.tuple([z.number(), z.number(), z.number(), z.number()]),
-      confidence: z.number().min(0).max(1),
-      severity: z.enum(["low", "medium", "high"]).default("medium"),
-      note: z.string().default(""),
+  detections: z.array(z.unknown()).transform((items) =>
+    items.flatMap((item) => {
+      const parsed = detectionSchema.safeParse(item);
+      return parsed.success ? [parsed.data] : [];
     }),
   ),
 });
-export type VisionDetection = z.infer<typeof visionResultSchema>["detections"][number];
 
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 const round = (n: number) => Math.round(n * 1000) / 1000;
