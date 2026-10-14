@@ -61,9 +61,9 @@ async function complete(
         return await request();
       } catch (retryError) {
         if (retryError instanceof OpenAI.APIError && retryError.status === 429) {
-          throw new Error(
-            `${provider} rate limit hit at ${model} after one retry. Wait a minute or set DEMO_CACHE=1.`,
-          );
+          const busy = new Error(`${provider} rate limit hit at ${model} after one retry. Wait a minute or set DEMO_CACHE=1.`);
+          busy.name = "RateLimitError"; // routes turn this into a 503 "busy" reply
+          throw busy;
         }
         throw retryError;
       }
