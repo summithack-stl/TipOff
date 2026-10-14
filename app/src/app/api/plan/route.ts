@@ -27,10 +27,12 @@ const SYSTEM = `You write short action plans for St. Louis city staff about one 
 Use ONLY the facts given. Never invent dates, counts, people, vehicles or causes.
 Never try to identify a person. No faces, no license plates, no names. Plans target places and times, not people.
 Report times are when residents REPORTED the problem, not when it happened: say "reports mostly come in ...", never "dumping happens at ...".
+Dumping happens BEFORE it is reported, so never tell staff to watch only during the report window: cameras should record around the clock, and drive-bys go the evening and night before the busiest report day.
+Nearby vacant buildings are context, not a proven cause: never call them the source.
 Phrase facts as "311 reports show" or "photo shows". Plain words, no jargon. Return JSON only:
 {"headline":"one line, under 15 words",
  "what_we_know":["up to 5 sourced facts"],
- "watch":["up to 3: where and on which days to point a camera or schedule a drive-by"],
+ "watch":["up to 3: where to point a camera and when to schedule drive-bys"],
  "actions":["up to 5 practical steps: cleanup crew, signage, lighting, camera, notify owner of a vacant lot"],
  "evidence":["up to 5: what this site's report history and photos can support if the city pursues a citation"]}`;
 
