@@ -24,9 +24,11 @@ Street issues:
 - pothole: holes or broken pavement in the road surface
 - dumping: piles of trash, bags, furniture, mattresses, tires, construction debris left outside
 - streetlight_out: a street lamp that is visibly dark at night
-- broken_curb: the raised concrete or stone edge between the road and the sidewalk or grass is crumbling, chipped,
-  cracked through, missing chunks, or pushed up or out of line (often by tree roots or vehicles). Close-ups count.
-- sidewalk_damage: sidewalk slabs or pavers that are heaved, sunken, badly cracked, broken up or missing (trip hazards)
+- broken_curb: the raised concrete or stone edge between the road and the sidewalk or grass is crumbling,
+  missing chunks, or pushed up or out of line (often by tree roots or vehicles). Close-ups count.
+  Normal wear, hairline cracks and stains on a curb are NOT broken_curb.
+- sidewalk_damage: sidewalk slabs or pavers that are heaved, sunken, broken up or missing (trip hazards).
+  Hairline cracks, stains, patches and grass in the joints of an otherwise flat sidewalk are NOT sidewalk_damage.
 Only report what is clearly visible. Boarded-up, bricked-up or otherwise sealed openings are NOT open_entry.
 Report each distinct problem once; group a row of similar broken windows into one box instead of one box per window.
 Building hazards only apply to buildings that look vacant, abandoned or damaged (missing or broken glass, missing doors,

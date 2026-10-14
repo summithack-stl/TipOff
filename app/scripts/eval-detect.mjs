@@ -1,7 +1,7 @@
 // Measures how well /api/frames finds issues, against hand labels in eval/labels.json.
 // Each label lists categories that must be found (expect) and ones that are fine either way (allow).
 // Anything else the model reports counts as a false alarm.
-//   node scripts/eval-detect.mjs [--url http://localhost:3000] [--confirm 1] [--precise 0] [--every 15] [--only curb]
+//   node scripts/eval-detect.mjs [--url http://localhost:3000] [--confirm 1] [--precise 0] [--every 15] [--only 'curb|sidewalk']
 import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import { basename } from 'node:path';
@@ -52,7 +52,7 @@ async function detect(file) {
   }
 }
 
-const labels = JSON.parse(await readFile('eval/labels.json', 'utf8')).filter((l) => !args.only || l.file.includes(args.only));
+const labels = JSON.parse(await readFile('eval/labels.json', 'utf8')).filter((l) => !args.only || new RegExp(args.only).test(l.file));
 const rows = [];
 for (const [i, label] of labels.entries()) {
   if (i) await sleep(Number(args.every));
