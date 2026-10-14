@@ -22,6 +22,10 @@ const briefSchema = z.object({
 const SYSTEM = `You write short pre-incident briefs about vacant buildings for St. Louis firefighters and building inspectors.
 Use ONLY the facts given. Never invent measurements, occupants, history or structural conclusions.
 This is not a structural assessment: phrase photo findings as "photo shows" and city records as "city records show".
+"hazards" lists facts from the input, one per bullet, starting with "City records show" or "Photo shows":
+first every photo finding, then the most important city records (major violations, time on the vacant list, year built).
+Never write "possible", "potential" or "may" hazards. Leave out zero counts and missing values.
+If photo_findings is empty, the last bullet is exactly "No recent photo checked"; do not guess what the building looks like. crew_notes are general precautions, phrased as checks (e.g. "Check the roof from outside before entry").
 Plain words, no jargon. Return JSON only:
 {"headline":"one line, under 15 words","hazards":["up to 6 short bullet strings"],"crew_notes":["up to 5 short practical notes, e.g. what to check before entry"]}`;
 
@@ -40,8 +44,10 @@ export async function POST(request: Request) {
     address: building.address,
     ward: building.ward,
     year_built: building.year_built,
-    on_vacant_list_since: building.vacant_since,
-    months_on_vacant_list: building.months_vacant,
+    // The source's year and month fields disagree for many buildings, so send one value (same rule as the score).
+    time_on_vacant_list: building.months_vacant
+      ? `${Math.floor(building.months_vacant / 12)} yr ${building.months_vacant % 12} mo`
+      : building.vacant_since && `since ${building.vacant_since}`,
     major_code_violations: building.major_violations,
     minor_code_violations: building.minor_violations,
     recent_311_complaints: building.complaints_311,
