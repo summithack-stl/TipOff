@@ -23,10 +23,11 @@
 
 | Dataset | URL | How we use it |
 | --- | --- | --- |
-| Vacant Building List (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=108 | The 9,943 buildings on the city's vacant list, with code violations, unpaid vacant-building fees and time on the list. |
+| Citizens' Service Bureau (311) requests (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/distribution.cfm?id=2 | 40,426 reports of illegal dumping and debris, potholes and graffiti from 2024-2026, grouped into 2,925 repeat hotspots (`data/scripts/fetch_311.py`, `build_hotspots.py`). We keep location, type and time only, never the caller or free-text fields. Report times are when residents reported, not when dumping happened. |
+| Vacant Building List (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=108 | The 9,943 buildings on the city's vacant list, with code violations, unpaid vacant-building fees and time on the list. Used as context for hotspots (vacant buildings within 150 m). |
 | Parcels / assessor data (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=82 | Location, ward and year built for each vacant parcel (9,884 have a location). |
 | LRA inventory (Land Reutilization Authority) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=30 | Flags the 338 vacant buildings the city itself owns. |
-| Mapillary street-level imagery | https://www.mapillary.com | 2026 street photos of the riskiest buildings (CC BY-SA 4.0, credited in `app/public/photos/index.json`). |
+| Mapillary street-level imagery | https://www.mapillary.com | Street photos at the top 311 hotspots and the riskiest vacant buildings (CC BY-SA 4.0, credited in `app/public/photos/index.json`). |
 | Wikimedia Commons | https://commons.wikimedia.org | Street-issue test photos for the accuracy check (licenses in `app/eval/sources.json`). |
 
 Python scripts in `data/scripts/` download and clean the city data into `app/data/clean/`. The app only reads those files; it never calls city APIs live.
