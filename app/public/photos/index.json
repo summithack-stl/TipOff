@@ -1,0 +1,1524 @@
+[
+ {
+  "handle": "11144000070",
+  "address": "1221 HEBERT ST",
+  "lat": 38.653968,
+  "lon": -90.196225,
+  "ward": 14,
+  "risk_score": 90,
+  "risk_rank": 1,
+  "risk_reasons": [
+   "29 major code violations",
+   "on the vacant list 9 yr 4 mo",
+   "built 1890",
+   "$2,700 in unpaid vacant-building fees",
+   "18 minor code violations",
+   "1 recent 311 complaint"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "11144000070-2026.jpg",
+   "year": 2026,
+   "image_id": "1744731750288250",
+   "pano": true,
+   "meters": 19,
+   "link": "https://www.mapillary.com/app/?pKey=1744731750288250",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.64,
+      "y": 0.215,
+      "w": 0.06,
+      "h": 0.065
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Broken window with missing glass",
+     "confirmed": true
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.76,
+      "y": 0.225,
+      "w": 0.05,
+      "h": 0.065
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Broken window with missing glass",
+     "confirmed": true
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.6,
+      "y": 0.415,
+      "w": 0.09,
+      "h": 0.065
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Broken window with missing glass",
+     "confirmed": true
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.74,
+      "y": 0.425,
+      "w": 0.06,
+      "h": 0.06
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Broken window with missing glass",
+     "confirmed": true
+    }
+   ]
+  },
+  "featured": 2
+ },
+ {
+  "handle": "11179000010",
+  "address": "1528 SALISBURY ST",
+  "lat": 38.660415,
+  "lon": -90.201168,
+  "ward": 14,
+  "risk_score": 82,
+  "risk_rank": 8,
+  "risk_reasons": [
+   "24 major code violations",
+   "on the vacant list 9 yr 4 mo",
+   "built 1896",
+   "$2,900 in unpaid vacant-building fees",
+   "7 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "11179000010-2026.jpg",
+   "year": 2026,
+   "image_id": "1578275310419315",
+   "pano": true,
+   "meters": 24,
+   "link": "https://www.mapillary.com/app/?pKey=1578275310419315",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.715,
+      "y": 0.41,
+      "w": 0.045,
+      "h": 0.23
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Unboarded doorway open to interior",
+     "confirmed": false
+    }
+   ]
+  },
+  "featured": 3
+ },
+ {
+  "handle": "14389020260",
+  "address": "4051 SHREVE AV",
+  "lat": 38.677576,
+  "lon": -90.243345,
+  "ward": 12,
+  "risk_score": 70,
+  "risk_rank": 32,
+  "risk_reasons": [
+   "22 major code violations",
+   "on the vacant list 9 yr 0 mo",
+   "$3,550 in unpaid vacant-building fees",
+   "built 1925",
+   "5 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "14389020260-2026.jpg",
+   "year": 2026,
+   "image_id": "1272810898274557",
+   "pano": true,
+   "meters": 14,
+   "link": "https://www.mapillary.com/app/?pKey=1272810898274557",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.1,
+      "y": 0.33,
+      "w": 0.09,
+      "h": 0.05
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Broken window with missing glass",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.38,
+      "y": 0.45,
+      "w": 0.05,
+      "h": 0.05
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Open window opening",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.46,
+      "y": 0.45,
+      "w": 0.05,
+      "h": 0.05
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Open window opening",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.46,
+      "y": 0.85,
+      "w": 0.05,
+      "h": 0.05
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Open window opening",
+     "confirmed": false
+    }
+   ]
+  },
+  "featured": 4
+ },
+ {
+  "handle": "15549000310",
+  "address": "4765 PLOVER AV",
+  "lat": 38.69511,
+  "lon": -90.257406,
+  "ward": 13,
+  "risk_score": 69,
+  "risk_rank": 38,
+  "risk_reasons": [
+   "24 major code violations",
+   "30 minor code violations",
+   "$4,700 in unpaid vacant-building fees",
+   "on the vacant list 4 yr 5 mo",
+   "built 1923"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "15549000310-2026.jpg",
+   "year": 2026,
+   "image_id": "2490974881409903",
+   "pano": true,
+   "meters": 26,
+   "link": "https://www.mapillary.com/app/?pKey=2490974881409903"
+  }
+ },
+ {
+  "handle": "11893000080",
+  "address": "2700 N GRAND BLVD",
+  "lat": 38.65384,
+  "lon": -90.221546,
+  "ward": 11,
+  "risk_score": 66,
+  "risk_rank": 55,
+  "risk_reasons": [
+   "on the vacant list 11 yr 3 mo",
+   "11 major code violations",
+   "built 1883",
+   "$2,700 in unpaid vacant-building fees",
+   "3 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "11893000080-2026.jpg",
+   "year": 2026,
+   "image_id": "1594211135601895",
+   "pano": true,
+   "meters": 31,
+   "link": "https://www.mapillary.com/app/?pKey=1594211135601895",
+   "detections": [
+    {
+     "category": "roof_damage",
+     "box": {
+      "x": 0.14,
+      "y": 0.13,
+      "w": 0.2,
+      "h": 0.11
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Collapsed roof with large holes",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.16,
+      "y": 0.24,
+      "w": 0.18,
+      "h": 0.1
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Multiple open window openings",
+     "confirmed": false
+    },
+    {
+     "category": "graffiti",
+     "box": {
+      "x": 0.26,
+      "y": 0.45,
+      "w": 0.12,
+      "h": 0.06
+     },
+     "confidence": 0.9,
+     "severity": "low",
+     "note": "Tags on lower brick wall",
+     "confirmed": true
+    },
+    {
+     "category": "graffiti",
+     "box": {
+      "x": 0.85,
+      "y": 0.42,
+      "w": 0.13,
+      "h": 0.1
+     },
+     "confidence": 0.9,
+     "severity": "low",
+     "note": "Large white tags on wall",
+     "confirmed": true
+    }
+   ]
+  },
+  "featured": 1
+ },
+ {
+  "handle": "12782040260",
+  "address": "6317 CLAYTON AV",
+  "lat": 38.628805,
+  "lon": -90.291961,
+  "ward": 4,
+  "risk_score": 60,
+  "risk_rank": 109,
+  "risk_reasons": [
+   "12 major code violations",
+   "built 1898",
+   "$2,250 in unpaid vacant-building fees",
+   "on the vacant list 3 yr 6 mo",
+   "2 recent 311 complaints",
+   "6 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "12782040260-2026.jpg",
+   "year": 2026,
+   "image_id": "851453938056293",
+   "pano": true,
+   "meters": 32,
+   "link": "https://www.mapillary.com/app/?pKey=851453938056293",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.74,
+      "y": 0.54,
+      "w": 0.11,
+      "h": 0.1
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Storefront window boarded with plywood",
+     "confirmed": false
+    }
+   ]
+  }
+ },
+ {
+  "handle": "14389020330",
+  "address": "4815 FARLIN AV",
+  "lat": 38.677331,
+  "lon": -90.243945,
+  "ward": 12,
+  "risk_score": 59,
+  "risk_rank": 125,
+  "risk_reasons": [
+   "10 major code violations",
+   "on the vacant list 8 yr 5 mo",
+   "$3,150 in unpaid vacant-building fees",
+   "19 minor code violations",
+   "built 1925"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "14389020330-2026.jpg",
+   "year": 2026,
+   "image_id": "1638458024141972",
+   "pano": true,
+   "meters": 7,
+   "link": "https://www.mapillary.com/app/?pKey=1638458024141972",
+   "detections": [
+    {
+     "category": "roof_damage",
+     "box": {
+      "x": 0.3,
+      "y": 0.13,
+      "w": 0.25,
+      "h": 0.07
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Missing roof section",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.24,
+      "y": 0.14,
+      "w": 0.06,
+      "h": 0.14
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Broken window opening",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.24,
+      "y": 0.38,
+      "w": 0.06,
+      "h": 0.1
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Open doorway",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.3,
+      "y": 0.38,
+      "w": 0.08,
+      "h": 0.1
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Open doorway",
+     "confirmed": false
+    },
+    {
+     "category": "wall_damage",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 0.3,
+      "h": 0.5
+     },
+     "confidence": 0.8,
+     "severity": "medium",
+     "note": "Deteriorated brick wall",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "handle": "13357000385",
+  "address": "3859 W FLORISSANT AV",
+  "lat": 38.672541,
+  "lon": -90.215795,
+  "ward": 14,
+  "risk_score": 56,
+  "risk_rank": 212,
+  "risk_reasons": [
+   "on the vacant list 8 yr 4 mo",
+   "8 major code violations",
+   "built 1908",
+   "$3,350 in unpaid vacant-building fees",
+   "11 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "13357000385-2026.jpg",
+   "year": 2026,
+   "image_id": "1222579163331881",
+   "pano": true,
+   "meters": 24,
+   "link": "https://www.mapillary.com/app/?pKey=1222579163331881",
+   "detections": [
+    {
+     "category": "wall_damage",
+     "box": {
+      "x": 0,
+      "y": 0.1,
+      "w": 0.58,
+      "h": 0.4
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Severe brick deterioration and crumbling",
+     "confirmed": false
+    },
+    {
+     "category": "roof_damage",
+     "box": {
+      "x": 0.14,
+      "y": 0.1,
+      "w": 0.44,
+      "h": 0.06
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Collapsed and missing roof sections",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0,
+      "y": 0.46,
+      "w": 0.16,
+      "h": 0.08
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Broken window frames and openings",
+     "confirmed": true
+    }
+   ]
+  },
+  "featured": 8
+ },
+ {
+  "handle": "12062000090",
+  "address": "2911 GRAVOIS AV",
+  "lat": 38.601739,
+  "lon": -90.231265,
+  "ward": 7,
+  "risk_score": 56,
+  "risk_rank": 214,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "7 major code violations",
+   "built 1909",
+   "$6,050 in unpaid vacant-building fees",
+   "10 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "12062000090-2026.jpg",
+   "year": 2026,
+   "image_id": "1065261949267506",
+   "pano": true,
+   "meters": 29,
+   "link": "https://www.mapillary.com/app/?pKey=1065261949267506",
+   "detections": [
+    {
+     "category": "graffiti",
+     "box": {
+      "x": 0.48,
+      "y": 0.28,
+      "w": 0.2,
+      "h": 0.1
+     },
+     "confidence": 0.95,
+     "severity": "low",
+     "note": "Tags on brick wall",
+     "confirmed": true
+    },
+    {
+     "category": "graffiti",
+     "box": {
+      "x": 0.62,
+      "y": 0.44,
+      "w": 0.06,
+      "h": 0.05
+     },
+     "confidence": 0.9,
+     "severity": "low",
+     "note": "Tags on red door",
+     "confirmed": true
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.42,
+      "y": 0.27,
+      "w": 0.08,
+      "h": 0.11
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Broken window, open entry",
+     "confirmed": true
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.43,
+      "y": 0.42,
+      "w": 0.07,
+      "h": 0.06
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Open doorway, no door",
+     "confirmed": true
+    }
+   ]
+  },
+  "featured": 5
+ },
+ {
+  "handle": "11144000060",
+  "address": "1219 HEBERT ST",
+  "lat": 38.653982,
+  "lon": -90.196093,
+  "ward": 14,
+  "risk_score": 56,
+  "risk_rank": 225,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "built 1885",
+   "$2,500 in unpaid vacant-building fees",
+   "5 major code violations",
+   "4 minor code violations",
+   "1 recent 311 complaint"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "11144000060-2026.jpg",
+   "year": 2026,
+   "image_id": "2278568432549170",
+   "pano": true,
+   "meters": 29,
+   "link": "https://www.mapillary.com/app/?pKey=2278568432549170",
+   "detections": []
+  }
+ },
+ {
+  "handle": "12404000040",
+  "address": "3936 N FLORISSANT AV",
+  "lat": 38.662642,
+  "lon": -90.206241,
+  "ward": 14,
+  "risk_score": 54,
+  "risk_rank": 277,
+  "risk_reasons": [
+   "on the vacant list 9 yr 0 mo",
+   "built 1895",
+   "8 major code violations",
+   "$1,350 in unpaid vacant-building fees",
+   "3 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "12404000040-2026.jpg",
+   "year": 2026,
+   "image_id": "1066463132390686",
+   "pano": true,
+   "meters": 31,
+   "link": "https://www.mapillary.com/app/?pKey=1066463132390686",
+   "detections": []
+  }
+ },
+ {
+  "handle": "13541000020",
+  "address": "2150 HARRIS AV",
+  "lat": 38.676465,
+  "lon": -90.220924,
+  "ward": 11,
+  "risk_score": 53,
+  "risk_rank": 316,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "6 major code violations",
+   "built 1908",
+   "$5,850 in unpaid vacant-building fees",
+   "8 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "13541000020-2026.jpg",
+   "year": 2026,
+   "image_id": "4058072574327061",
+   "pano": true,
+   "meters": 36,
+   "link": "https://www.mapillary.com/app/?pKey=4058072574327061",
+   "detections": [
+    {
+     "category": "roof_damage",
+     "box": {
+      "x": 0.22,
+      "y": 0.3,
+      "w": 0.13,
+      "h": 0.06
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Collapsed and missing roof sections",
+     "confirmed": false
+    },
+    {
+     "category": "wall_damage",
+     "box": {
+      "x": 0.38,
+      "y": 0.42,
+      "w": 0.06,
+      "h": 0.14
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Partly collapsed exterior wall",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.4,
+      "y": 0.44,
+      "w": 0.04,
+      "h": 0.1
+     },
+     "confidence": 0.85,
+     "severity": "high",
+     "note": "Open doorway in damaged wall",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.44,
+      "y": 0.24,
+      "w": 0.06,
+      "h": 0.2
+     },
+     "confidence": 0.8,
+     "severity": "medium",
+     "note": "Row of broken windows",
+     "confirmed": true
+    },
+    {
+     "category": "fire_damage",
+     "box": {
+      "x": 0.4,
+      "y": 0.44,
+      "w": 0.04,
+      "h": 0.1
+     },
+     "confidence": 0.75,
+     "severity": "high",
+     "note": "Charring on collapsed wall section",
+     "confirmed": false
+    }
+   ]
+  },
+  "featured": 7
+ },
+ {
+  "handle": "15450000010",
+  "address": "8826 N BROADWAY",
+  "lat": 38.724635,
+  "lon": -90.22783,
+  "ward": 13,
+  "risk_score": 52,
+  "risk_rank": 339,
+  "risk_reasons": [
+   "13 major code violations",
+   "$4,500 in unpaid vacant-building fees",
+   "on the vacant list 4 yr 8 mo",
+   "built 1924",
+   "2 recent 311 complaints",
+   "1 minor code violation"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "15450000010-2026.jpg",
+   "year": 2026,
+   "image_id": "1020364517644936",
+   "pano": true,
+   "meters": 32,
+   "link": "https://www.mapillary.com/app/?pKey=1020364517644936",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.38,
+      "y": 0.44,
+      "w": 0.18,
+      "h": 0.12
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Open doorway on vacant building",
+     "confirmed": false
+    }
+   ]
+  }
+ },
+ {
+  "handle": "15142000270",
+  "address": "5471 N KINGSHIGHWAY BLVD",
+  "lat": 38.691415,
+  "lon": -90.236915,
+  "ward": 12,
+  "risk_score": 52,
+  "risk_rank": 351,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "7 major code violations",
+   "$4,950 in unpaid vacant-building fees",
+   "built 1925",
+   "8 minor code violations",
+   "1 recent 311 complaint"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "15142000270-2026.jpg",
+   "year": 2026,
+   "image_id": "1716121852958169",
+   "pano": true,
+   "meters": 54,
+   "link": "https://www.mapillary.com/app/?pKey=1716121852958169",
+   "detections": []
+  }
+ },
+ {
+  "handle": "14239010121",
+  "address": "8035 N BROADWAY",
+  "lat": 38.710132,
+  "lon": -90.230705,
+  "ward": 12,
+  "risk_score": 50,
+  "risk_rank": 434,
+  "risk_reasons": [
+   "16 major code violations",
+   "built 1850",
+   "14 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "14239010121-2026.jpg",
+   "year": 2026,
+   "image_id": "1346475977665827",
+   "pano": true,
+   "meters": 35,
+   "link": "https://www.mapillary.com/app/?pKey=1346475977665827",
+   "detections": [
+    {
+     "category": "dumping",
+     "box": {
+      "x": 0.15,
+      "y": 0.555,
+      "w": 0.1,
+      "h": 0.045
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Debris pile on sidewalk",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "handle": "15637000240",
+  "address": "8537 N BROADWAY",
+  "lat": 38.718159,
+  "lon": -90.229675,
+  "ward": 13,
+  "risk_score": 50,
+  "risk_rank": 453,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "6 major code violations",
+   "built 1914",
+   "$4,950 in unpaid vacant-building fees",
+   "1 minor code violation"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "15637000240-2026.jpg",
+   "year": 2026,
+   "image_id": "1678644273368788",
+   "pano": true,
+   "meters": 30,
+   "link": "https://www.mapillary.com/app/?pKey=1678644273368788",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.338,
+      "y": 0.438,
+      "w": 0.03,
+      "h": 0.04
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Missing window glass on vacant house",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "handle": "15397000430",
+  "address": "4933 THRUSH AV",
+  "lat": 38.69514,
+  "lon": -90.255216,
+  "ward": 13,
+  "risk_score": 50,
+  "risk_rank": 473,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "built 1910",
+   "$3,150 in unpaid vacant-building fees",
+   "4 major code violations",
+   "5 minor code violations",
+   "1 recent 311 complaint"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "15397000430-2026.jpg",
+   "year": 2026,
+   "image_id": "1682669823050497",
+   "pano": true,
+   "meters": 25,
+   "link": "https://www.mapillary.com/app/?pKey=1682669823050497",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.56,
+      "y": 0.33,
+      "w": 0.04,
+      "h": 0.04
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Broken window in gable",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.64,
+      "y": 0.43,
+      "w": 0.04,
+      "h": 0.05
+     },
+     "confidence": 0.85,
+     "severity": "high",
+     "note": "Open doorway on porch",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.53,
+      "y": 0.44,
+      "w": 0.05,
+      "h": 0.04
+     },
+     "confidence": 0.8,
+     "severity": "medium",
+     "note": "Broken window on porch",
+     "confirmed": true
+    },
+    {
+     "category": "wall_damage",
+     "box": {
+      "x": 0.48,
+      "y": 0.42,
+      "w": 0.1,
+      "h": 0.08
+     },
+     "confidence": 0.75,
+     "severity": "medium",
+     "note": "Vines covering wall, possible decay",
+     "confirmed": false
+    }
+   ]
+  }
+ },
+ {
+  "handle": "10409000070",
+  "address": "1719 S TUCKER BLVD",
+  "lat": 38.612405,
+  "lon": -90.206991,
+  "ward": 8,
+  "risk_score": 50,
+  "risk_rank": 499,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "built 1895",
+   "$4,950 in unpaid vacant-building fees",
+   "2 major code violations",
+   "5 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "10409000070-2026.jpg",
+   "year": 2026,
+   "image_id": "1034441332509447",
+   "pano": true,
+   "meters": 30,
+   "link": "https://www.mapillary.com/app/?pKey=1034441332509447",
+   "detections": []
+  }
+ },
+ {
+  "handle": "13546000240",
+  "address": "4020 W FLORISSANT AV",
+  "lat": 38.673461,
+  "lon": -90.219314,
+  "ward": 11,
+  "risk_score": 49,
+  "risk_rank": 532,
+  "risk_reasons": [
+   "on the vacant list 8 yr 11 mo",
+   "built 1907",
+   "$5,650 in unpaid vacant-building fees",
+   "5 major code violations",
+   "4 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "13546000240-2026.jpg",
+   "year": 2026,
+   "image_id": "1335367108765799",
+   "pano": true,
+   "meters": 40,
+   "link": "https://www.mapillary.com/app/?pKey=1335367108765799",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.22,
+      "y": 0.37,
+      "w": 0.09,
+      "h": 0.05
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Broken windows and missing doors",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.37,
+      "y": 0.36,
+      "w": 0.07,
+      "h": 0.06
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Broken upper floor windows",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.85,
+      "y": 0.36,
+      "w": 0.1,
+      "h": 0.06
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Broken windows on vacant building",
+     "confirmed": false
+    },
+    {
+     "category": "wall_damage",
+     "box": {
+      "x": 0.85,
+      "y": 0.36,
+      "w": 0.1,
+      "h": 0.06
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Deteriorated brick facade",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "handle": "10639000020",
+  "address": "1220 NORTH MARKET ST",
+  "lat": 38.648327,
+  "lon": -90.194407,
+  "ward": 14,
+  "risk_score": 49,
+  "risk_rank": 554,
+  "risk_reasons": [
+   "on the vacant list 8 yr 4 mo",
+   "built 1885",
+   "$5,850 in unpaid vacant-building fees",
+   "3 major code violations",
+   "4 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "10639000020-2026.jpg",
+   "year": 2026,
+   "image_id": "1672683953837454",
+   "pano": true,
+   "meters": 34,
+   "link": "https://www.mapillary.com/app/?pKey=1672683953837454",
+   "detections": []
+  }
+ },
+ {
+  "handle": "11122000160",
+  "address": "1311 ST LOUIS AV",
+  "lat": 38.651673,
+  "lon": -90.197113,
+  "ward": 14,
+  "risk_score": 49,
+  "risk_rank": 566,
+  "risk_reasons": [
+   "on the vacant list 11 yr 1 mo",
+   "built 1883",
+   "$3,850 in unpaid vacant-building fees",
+   "1 recent 311 complaint",
+   "1 major code violation"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "11122000160-2026.jpg",
+   "year": 2026,
+   "image_id": "4458329134386583",
+   "pano": true,
+   "meters": 48,
+   "link": "https://www.mapillary.com/app/?pKey=4458329134386583",
+   "detections": []
+  },
+  "before": {
+   "file": "11122000160-2018.jpg",
+   "year": 2018,
+   "image_id": "826951827907122",
+   "pano": false,
+   "meters": 36,
+   "link": "https://www.mapillary.com/app/?pKey=826951827907122"
+  }
+ },
+ {
+  "handle": "11191000050",
+  "address": "3628 N 14TH ST",
+  "lat": 38.661402,
+  "lon": -90.198516,
+  "ward": 14,
+  "risk_score": 49,
+  "risk_rank": 567,
+  "risk_reasons": [
+   "on the vacant list 9 yr 7 mo",
+   "built 1885",
+   "$3,100 in unpaid vacant-building fees",
+   "1 recent 311 complaint",
+   "1 major code violation",
+   "3 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "11191000050-2026.jpg",
+   "year": 2026,
+   "image_id": "1355045489476908",
+   "pano": true,
+   "meters": 16,
+   "link": "https://www.mapillary.com/app/?pKey=1355045489476908",
+   "detections": [
+    {
+     "category": "dumping",
+     "box": {
+      "x": 0.4,
+      "y": 0.58,
+      "w": 0.06,
+      "h": 0.06
+     },
+     "confidence": 0.95,
+     "severity": "medium",
+     "note": "Trash bags on sidewalk",
+     "confirmed": true
+    },
+    {
+     "category": "dumping",
+     "box": {
+      "x": 0.51,
+      "y": 0.5,
+      "w": 0.09,
+      "h": 0.1
+     },
+     "confidence": 0.95,
+     "severity": "medium",
+     "note": "Trash bags on steps",
+     "confirmed": true
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.51,
+      "y": 0.36,
+      "w": 0.09,
+      "h": 0.16
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Open doorway on vacant building",
+     "confirmed": true
+    },
+    {
+     "category": "graffiti",
+     "box": {
+      "x": 0,
+      "y": 0.4,
+      "w": 0.15,
+      "h": 0.12
+     },
+     "confidence": 0.9,
+     "severity": "low",
+     "note": "Tags on wall and door",
+     "confirmed": true
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.29,
+      "y": 0.34,
+      "w": 0.2,
+      "h": 0.15
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Open window with missing glass",
+     "confirmed": true
+    }
+   ]
+  },
+  "featured": 6
+ },
+ {
+  "handle": "14390310280",
+  "address": "4239 SHREVE AV",
+  "lat": 38.680176,
+  "lon": -90.241455,
+  "ward": 12,
+  "risk_score": 48,
+  "risk_rank": 588,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "6 major code violations",
+   "$4,700 in unpaid vacant-building fees",
+   "built 1936",
+   "7 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "14390310280-2026.jpg",
+   "year": 2026,
+   "image_id": "1279265614177125",
+   "pano": true,
+   "meters": 30,
+   "link": "https://www.mapillary.com/app/?pKey=1279265614177125",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.43,
+      "y": 0.42,
+      "w": 0.03,
+      "h": 0.06
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Broken window opening",
+     "confirmed": false
+    }
+   ]
+  }
+ },
+ {
+  "handle": "13551000230",
+  "address": "4248 W FLORISSANT AV",
+  "lat": 38.677576,
+  "lon": -90.222919,
+  "ward": 11,
+  "risk_score": 48,
+  "risk_rank": 607,
+  "risk_reasons": [
+   "on the vacant list 9 yr 4 mo",
+   "built 1910",
+   "$2,700 in unpaid vacant-building fees",
+   "4 major code violations",
+   "5 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "13551000230-2026.jpg",
+   "year": 2026,
+   "image_id": "3176984339356964",
+   "pano": true,
+   "meters": 36,
+   "link": "https://www.mapillary.com/app/?pKey=3176984339356964",
+   "detections": []
+  }
+ },
+ {
+  "handle": "15493000210",
+  "address": "4952 W FLORISSANT AV",
+  "lat": 38.69053,
+  "lon": -90.235975,
+  "ward": 12,
+  "risk_score": 48,
+  "risk_rank": 626,
+  "risk_reasons": [
+   "built 1895",
+   "on the vacant list 7 yr 2 mo",
+   "$3,800 in unpaid vacant-building fees",
+   "3 major code violations",
+   "1 recent 311 complaint",
+   "3 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "15493000210-2026.jpg",
+   "year": 2026,
+   "image_id": "1743336240423177",
+   "pano": true,
+   "meters": 43,
+   "link": "https://www.mapillary.com/app/?pKey=1743336240423177",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.578,
+      "y": 0.408,
+      "w": 0.04,
+      "h": 0.04
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Broken window glass",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.638,
+      "y": 0.408,
+      "w": 0.04,
+      "h": 0.04
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Broken window glass",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.518,
+      "y": 0.408,
+      "w": 0.04,
+      "h": 0.04
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Broken window glass",
+     "confirmed": false
+    },
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.458,
+      "y": 0.408,
+      "w": 0.04,
+      "h": 0.04
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Broken window glass",
+     "confirmed": false
+    }
+   ]
+  }
+ },
+ {
+  "handle": "15524000210",
+  "address": "5531 GENEVIEVE AV",
+  "lat": 38.699781,
+  "lon": -90.244742,
+  "ward": 13,
+  "risk_score": 47,
+  "risk_rank": 640,
+  "risk_reasons": [
+   "13 major code violations",
+   "$3,150 in unpaid vacant-building fees",
+   "on the vacant list 4 yr 6 mo",
+   "built 1924"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "15524000210-2026.jpg",
+   "year": 2026,
+   "image_id": "1485018676058472",
+   "pano": true,
+   "meters": 22,
+   "link": "https://www.mapillary.com/app/?pKey=1485018676058472",
+   "detections": [
+    {
+     "category": "dumping",
+     "box": {
+      "x": 0,
+      "y": 0.62,
+      "w": 0.35,
+      "h": 0.16
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Pile of trash and debris on ground",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "handle": "15672010140",
+  "address": "4726 THRUSH AV",
+  "lat": 38.693266,
+  "lon": -90.257457,
+  "ward": 13,
+  "risk_score": 47,
+  "risk_rank": 644,
+  "risk_reasons": [
+   "10 major code violations",
+   "on the vacant list 5 yr 2 mo",
+   "$2,250 in unpaid vacant-building fees",
+   "built 1921",
+   "8 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "15672010140-2026.jpg",
+   "year": 2026,
+   "image_id": "1311167987829940",
+   "pano": true,
+   "meters": 16,
+   "link": "https://www.mapillary.com/app/?pKey=1311167987829940",
+   "detections": []
+  }
+ },
+ {
+  "handle": "13548000210",
+  "address": "4566 FAIR AV",
+  "lat": 38.675193,
+  "lon": -90.221053,
+  "ward": 11,
+  "risk_score": 47,
+  "risk_rank": 657,
+  "risk_reasons": [
+   "on the vacant list 10 yr 0 mo",
+   "built 1914",
+   "5 major code violations",
+   "$1,800 in unpaid vacant-building fees",
+   "7 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "13548000210-2026.jpg",
+   "year": 2026,
+   "image_id": "1337029815208010",
+   "pano": true,
+   "meters": 54,
+   "link": "https://www.mapillary.com/app/?pKey=1337029815208010",
+   "detections": []
+  }
+ },
+ {
+  "handle": "13551000220",
+  "address": "4256 W FLORISSANT AV",
+  "lat": 38.67773,
+  "lon": -90.223048,
+  "ward": 11,
+  "risk_score": 47,
+  "risk_rank": 680,
+  "risk_reasons": [
+   "on the vacant list 9 yr 10 mo",
+   "built 1900",
+   "$6,750 in unpaid vacant-building fees",
+   "3 major code violations",
+   "5 minor code violations"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "13551000220-2026.jpg",
+   "year": 2026,
+   "image_id": "983536884723937",
+   "pano": true,
+   "meters": 35,
+   "link": "https://www.mapillary.com/app/?pKey=983536884723937",
+   "detections": []
+  }
+ },
+ {
+  "handle": "11128000170",
+  "address": "1215 WRIGHT ST",
+  "lat": 38.65285,
+  "lon": -90.196305,
+  "ward": 14,
+  "risk_score": 47,
+  "risk_rank": 698,
+  "risk_reasons": [
+   "on the vacant list 11 yr 6 mo",
+   "built 1904",
+   "$3,150 in unpaid vacant-building fees",
+   "7 minor code violations",
+   "1 recent 311 complaint",
+   "1 major code violation"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "11128000170-2026.jpg",
+   "year": 2026,
+   "image_id": "1531865884907928",
+   "pano": true,
+   "meters": 42,
+   "link": "https://www.mapillary.com/app/?pKey=1531865884907928",
+   "detections": [
+    {
+     "category": "roof_damage",
+     "box": {
+      "x": 0.5,
+      "y": 0.2,
+      "w": 0.45,
+      "h": 0.08
+     },
+     "confidence": 0.95,
+     "severity": "high",
+     "note": "Building is missing its roof",
+     "confirmed": false
+    }
+   ]
+  }
+ }
+]

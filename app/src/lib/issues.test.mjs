@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { assignIds, distanceMeters, dropOverlaps, findDuplicate, needsConfirm, toBox } from './issues.ts';
+import { assignIds, capPerCategory, distanceMeters, dropOverlaps, findDuplicate, needsConfirm, toBox } from './issues.ts';
 
 test('toBox converts Gemini box_2d (ymin,xmin,ymax,xmax 0-1000) to 0-1 x/y/w/h', () => {
   assert.deepEqual(toBox([100, 200, 500, 600]), { x: 0.2, y: 0.1, w: 0.4, h: 0.4 });
@@ -59,4 +59,12 @@ test('dropOverlaps removes a near-identical box of the same category, keeps the 
     { category: 'graffiti', confidence: 0.8, box },
   ]);
   assert.deepEqual(out.map((d) => [d.category, d.confidence]), [['dumping', 0.96], ['graffiti', 0.8]]);
+});
+
+test('capPerCategory keeps the most confident few per category', () => {
+  const box = { x: 0, y: 0, w: 0.1, h: 0.1 };
+  const many = [0.5, 0.9, 0.7, 0.8, 0.6, 0.95].map((confidence) => ({ category: 'open_entry', confidence, box }));
+  const out = capPerCategory([...many, { category: 'graffiti', confidence: 0.4, box }], 4);
+  assert.deepEqual(out.filter((d) => d.category === 'open_entry').map((d) => d.confidence), [0.95, 0.9, 0.8, 0.7]);
+  assert.equal(out.filter((d) => d.category === 'graffiti').length, 1);
 });
