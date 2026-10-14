@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "StreetSense",
-  description: "Ranks St. Louis vacant buildings by danger and flags visible hazards in street photos.",
+  description: "Finds repeat illegal-dumping hotspots in St. Louis 311 reports, confirms them in street photos, and plans where and when to act.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
