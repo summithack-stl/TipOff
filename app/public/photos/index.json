@@ -128,7 +128,7 @@
   "lon": -90.243345,
   "ward": 12,
   "risk_score": 70,
-  "risk_rank": 32,
+  "risk_rank": 33,
   "risk_reasons": [
    "22 major code violations",
    "on the vacant list 9 yr 0 mo",
@@ -208,7 +208,7 @@
   "lon": -90.257406,
   "ward": 13,
   "risk_score": 69,
-  "risk_rank": 38,
+  "risk_rank": 39,
   "risk_reasons": [
    "24 major code violations",
    "30 minor code violations",
@@ -233,7 +233,7 @@
   "lon": -90.221546,
   "ward": 11,
   "risk_score": 66,
-  "risk_rank": 55,
+  "risk_rank": 58,
   "risk_reasons": [
    "on the vacant list 11 yr 3 mo",
    "11 major code violations",
@@ -313,7 +313,7 @@
   "lon": -90.291961,
   "ward": 4,
   "risk_score": 60,
-  "risk_rank": 109,
+  "risk_rank": 117,
   "risk_reasons": [
    "12 major code violations",
    "built 1898",
@@ -354,7 +354,7 @@
   "lon": -90.243945,
   "ward": 12,
   "risk_score": 59,
-  "risk_rank": 125,
+  "risk_rank": 134,
   "risk_reasons": [
    "10 major code violations",
    "on the vacant list 8 yr 5 mo",
@@ -446,7 +446,7 @@
   "lon": -90.215795,
   "ward": 14,
   "risk_score": 56,
-  "risk_rank": 212,
+  "risk_rank": 222,
   "risk_reasons": [
    "on the vacant list 8 yr 4 mo",
    "8 major code violations",
@@ -513,7 +513,7 @@
   "lon": -90.231265,
   "ward": 7,
   "risk_score": 56,
-  "risk_rank": 214,
+  "risk_rank": 225,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "7 major code violations",
@@ -593,7 +593,7 @@
   "lon": -90.196093,
   "ward": 14,
   "risk_score": 56,
-  "risk_rank": 225,
+  "risk_rank": 236,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "built 1885",
@@ -620,7 +620,7 @@
   "lon": -90.206241,
   "ward": 14,
   "risk_score": 54,
-  "risk_rank": 277,
+  "risk_rank": 287,
   "risk_reasons": [
    "on the vacant list 9 yr 0 mo",
    "built 1895",
@@ -646,7 +646,7 @@
   "lon": -90.220924,
   "ward": 11,
   "risk_score": 53,
-  "risk_rank": 316,
+  "risk_rank": 326,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "6 major code violations",
@@ -739,7 +739,7 @@
   "lon": -90.22783,
   "ward": 13,
   "risk_score": 52,
-  "risk_rank": 339,
+  "risk_rank": 349,
   "risk_reasons": [
    "13 major code violations",
    "$4,500 in unpaid vacant-building fees",
@@ -780,7 +780,7 @@
   "lon": -90.236915,
   "ward": 12,
   "risk_score": 52,
-  "risk_rank": 351,
+  "risk_rank": 363,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "7 major code violations",
@@ -807,7 +807,7 @@
   "lon": -90.230705,
   "ward": 12,
   "risk_score": 50,
-  "risk_rank": 434,
+  "risk_rank": 449,
   "risk_reasons": [
    "16 major code violations",
    "built 1850",
@@ -845,7 +845,7 @@
   "lon": -90.229675,
   "ward": 13,
   "risk_score": 50,
-  "risk_rank": 453,
+  "risk_rank": 470,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "6 major code violations",
@@ -885,7 +885,7 @@
   "lon": -90.255216,
   "ward": 13,
   "risk_score": 50,
-  "risk_rank": 473,
+  "risk_rank": 490,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "built 1910",
@@ -965,7 +965,7 @@
   "lon": -90.206991,
   "ward": 8,
   "risk_score": 50,
-  "risk_rank": 499,
+  "risk_rank": 516,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "built 1895",
@@ -991,7 +991,7 @@
   "lon": -90.219314,
   "ward": 11,
   "risk_score": 49,
-  "risk_rank": 532,
+  "risk_rank": 554,
   "risk_reasons": [
    "on the vacant list 8 yr 11 mo",
    "built 1907",
@@ -1070,7 +1070,7 @@
   "lon": -90.194407,
   "ward": 14,
   "risk_score": 49,
-  "risk_rank": 554,
+  "risk_rank": 576,
   "risk_reasons": [
    "on the vacant list 8 yr 4 mo",
    "built 1885",
@@ -1096,7 +1096,7 @@
   "lon": -90.197113,
   "ward": 14,
   "risk_score": 49,
-  "risk_rank": 566,
+  "risk_rank": 588,
   "risk_reasons": [
    "on the vacant list 11 yr 1 mo",
    "built 1883",
@@ -1130,7 +1130,7 @@
   "lon": -90.198516,
   "ward": 14,
   "risk_score": 49,
-  "risk_rank": 567,
+  "risk_rank": 589,
   "risk_reasons": [
    "on the vacant list 9 yr 7 mo",
    "built 1885",
@@ -1224,7 +1224,7 @@
   "lon": -90.241455,
   "ward": 12,
   "risk_score": 48,
-  "risk_rank": 588,
+  "risk_rank": 614,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "6 major code violations",
@@ -1264,7 +1264,7 @@
   "lon": -90.222919,
   "ward": 11,
   "risk_score": 48,
-  "risk_rank": 607,
+  "risk_rank": 635,
   "risk_reasons": [
    "on the vacant list 9 yr 4 mo",
    "built 1910",
@@ -1290,7 +1290,7 @@
   "lon": -90.235975,
   "ward": 12,
   "risk_score": 48,
-  "risk_rank": 626,
+  "risk_rank": 654,
   "risk_reasons": [
    "built 1895",
    "on the vacant list 7 yr 2 mo",
@@ -1370,7 +1370,7 @@
   "lon": -90.244742,
   "ward": 13,
   "risk_score": 47,
-  "risk_rank": 640,
+  "risk_rank": 668,
   "risk_reasons": [
    "13 major code violations",
    "$3,150 in unpaid vacant-building fees",
@@ -1409,7 +1409,7 @@
   "lon": -90.257457,
   "ward": 13,
   "risk_score": 47,
-  "risk_rank": 644,
+  "risk_rank": 672,
   "risk_reasons": [
    "10 major code violations",
    "on the vacant list 5 yr 2 mo",
@@ -1435,7 +1435,7 @@
   "lon": -90.221053,
   "ward": 11,
   "risk_score": 47,
-  "risk_rank": 657,
+  "risk_rank": 687,
   "risk_reasons": [
    "on the vacant list 10 yr 0 mo",
    "built 1914",
@@ -1461,7 +1461,7 @@
   "lon": -90.223048,
   "ward": 11,
   "risk_score": 47,
-  "risk_rank": 680,
+  "risk_rank": 711,
   "risk_reasons": [
    "on the vacant list 9 yr 10 mo",
    "built 1900",
@@ -1487,7 +1487,7 @@
   "lon": -90.196305,
   "ward": 14,
   "risk_score": 47,
-  "risk_rank": 698,
+  "risk_rank": 729,
   "risk_reasons": [
    "on the vacant list 11 yr 6 mo",
    "built 1904",

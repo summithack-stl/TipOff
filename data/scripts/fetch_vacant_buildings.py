@@ -123,7 +123,18 @@ def clean(overview: pd.DataFrame, parcels: pd.DataFrame) -> pd.DataFrame:
     # The year fields use 0 for "unknown".
     for col in ["year_built", "vacant_since"]:
         out.loc[out[col] == 0, col] = pd.NA
-    return out.sort_values(["major_violations", "months_vacant"], ascending=False).reset_index(drop=True)
+    return fill_months(out).sort_values(["major_violations", "months_vacant"], ascending=False).reset_index(drop=True)
+
+
+def fill_months(out: pd.DataFrame, this_year: int | None = None) -> pd.DataFrame:
+    """About 1,500 buildings have a vacant-list year but mo = 0 in the source, which would score them as brand new.
+
+    Fall back to whole years since that year. ponytail: year precision only; use the listing date if the city adds one.
+    """
+    years = (this_year or date.today().year) - out["vacant_since"]
+    missing = (out["months_vacant"] == 0) & out["vacant_since"].notna()
+    out.loc[missing, "months_vacant"] = (years[missing] * 12).astype(int)
+    return out
 
 
 def score(b: dict) -> tuple[int, list[str]]:
@@ -156,6 +167,11 @@ def score(b: dict) -> tuple[int, list[str]]:
     total = round(sum(p for p, _ in parts))
     reasons = [r for _, r in sorted(parts, key=lambda p: -p[0])]
     return min(total, 100), reasons
+
+
+def check_months() -> None:
+    df = pd.DataFrame({"vacant_since": pd.array([1998, None, 2018], dtype="Int64"), "months_vacant": [0, 0, 112]})
+    assert fill_months(df, this_year=2026)["months_vacant"].tolist() == [336, 0, 112]
 
 
 def check_scoring() -> None:
@@ -209,6 +225,7 @@ def main() -> None:
     parcels = download_parcels(overview["handle"].tolist())
 
     check_scoring()
+    check_months()
     df = add_scores(clean(overview, parcels))
     check(df, len(overview))
 
