@@ -1,4 +1,4 @@
-// Repeat 311 hotspots. ponytail: shape guessed until Arjun's hotspots.json lands; adjust here only.
+// Repeat 311 hotspots, one per ~155 m cell and issue type.
 export const HOTSPOT_CATEGORIES = ["dumping", "pothole", "graffiti"] as const;
 export type HotspotCategory = (typeof HOTSPOT_CATEGORIES)[number];
 
@@ -18,6 +18,18 @@ export type Hotspot = {
   by_dow: number[]; // 7 counts, Sun first
   by_hour: number[]; // 24 counts
   monthly: { month: string; count: number }[]; // "2025-03"
+  // From data/scripts/build_hotspots.py, used by the panel and /api/plan.
+  rank: number; // within its category
+  reports_12m: number;
+  reports_prev_12m: number;
+  active_weeks_12m: number;
+  report_window: string; // busiest 3-hour block of REPORT times, e.g. "2pm-5pm"
+  median_days_to_close: number | null;
+  top_address: string;
+  vacant_within_150m: number;
+  nearest_vacant_m: number | null;
+  recent: { opened: string; code: string; address: string }[];
+  reasons: string[];
 };
 
 // Hour blocks for the time filter: [label, first hour, last hour].
