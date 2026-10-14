@@ -251,55 +251,68 @@
    "link": "https://www.mapillary.com/app/?pKey=1594211135601895",
    "detections": [
     {
-     "category": "roof_damage",
+     "category": "open_entry",
      "box": {
-      "x": 0.14,
-      "y": 0.13,
-      "w": 0.2,
-      "h": 0.11
+      "x": 0.169,
+      "y": 0.181,
+      "w": 0.128,
+      "h": 0.096
      },
-     "confidence": 0.95,
+     "confidence": 0.9,
      "severity": "high",
-     "note": "Collapsed roof with large holes",
-     "confirmed": false
+     "note": "Open damaged roof windows",
+     "confirmed": true
     },
     {
      "category": "open_entry",
      "box": {
-      "x": 0.16,
-      "y": 0.24,
-      "w": 0.18,
-      "h": 0.1
-     },
-     "confidence": 0.95,
-     "severity": "high",
-     "note": "Multiple open window openings",
-     "confirmed": false
-    },
-    {
-     "category": "graffiti",
-     "box": {
-      "x": 0.26,
-      "y": 0.45,
-      "w": 0.12,
-      "h": 0.06
+      "x": 0.297,
+      "y": 0.308,
+      "w": 0.043,
+      "h": 0.115
      },
      "confidence": 0.9,
-     "severity": "low",
-     "note": "Tags on lower brick wall",
+     "severity": "high",
+     "note": "Unboarded missing window",
+     "confirmed": true
+    },
+    {
+     "category": "roof_damage",
+     "box": {
+      "x": 0.139,
+      "y": 0.14,
+      "w": 0.257,
+      "h": 0.17
+     },
+     "confidence": 0.9,
+     "severity": "high",
+     "note": "Sagging and damaged mansard roof",
      "confirmed": true
     },
     {
      "category": "graffiti",
      "box": {
-      "x": 0.85,
-      "y": 0.42,
-      "w": 0.13,
-      "h": 0.1
+      "x": 0.269,
+      "y": 0.538,
+      "w": 0.086,
+      "h": 0.075
      },
      "confidence": 0.9,
-     "severity": "low",
-     "note": "Large white tags on wall",
+     "severity": "medium",
+     "note": "Blue spray paint graffiti on building",
+     "confirmed": true
+    },
+    {
+     "category": "graffiti",
+     "box": {
+      "x": 0.853,
+      "y": 0.521,
+      "w": 0.146,
+      "h": 0.087
+     },
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Graffiti on brick wall to the right",
      "confirmed": true
     }
    ]
@@ -466,40 +479,27 @@
     {
      "category": "wall_damage",
      "box": {
-      "x": 0,
-      "y": 0.1,
-      "w": 0.58,
-      "h": 0.4
+      "x": 0.001,
+      "y": 0.152,
+      "w": 0.583,
+      "h": 0.595
      },
-     "confidence": 0.95,
-     "severity": "high",
-     "note": "Severe brick deterioration and crumbling",
-     "confirmed": false
+     "confidence": 0.9,
+     "severity": "medium",
+     "note": "Deteriorating brick wall with missing mortar",
+     "confirmed": true
     },
     {
      "category": "roof_damage",
      "box": {
-      "x": 0.14,
-      "y": 0.1,
-      "w": 0.44,
-      "h": 0.06
-     },
-     "confidence": 0.9,
-     "severity": "high",
-     "note": "Collapsed and missing roof sections",
-     "confirmed": false
-    },
-    {
-     "category": "open_entry",
-     "box": {
       "x": 0,
-      "y": 0.46,
+      "y": 0.108,
       "w": 0.16,
-      "h": 0.08
+      "h": 0.084
      },
      "confidence": 0.85,
      "severity": "medium",
-     "note": "Broken window frames and openings",
+     "note": "Damaged or missing roof section",
      "confirmed": true
     }
    ]
@@ -533,53 +533,53 @@
     {
      "category": "graffiti",
      "box": {
-      "x": 0.48,
-      "y": 0.28,
-      "w": 0.2,
-      "h": 0.1
+      "x": 0.049,
+      "y": 0.468,
+      "w": 0.307,
+      "h": 0.095
      },
      "confidence": 0.95,
-     "severity": "low",
-     "note": "Tags on brick wall",
+     "severity": "high",
+     "note": "Large graffiti on brick building",
      "confirmed": true
     },
     {
      "category": "graffiti",
      "box": {
-      "x": 0.62,
-      "y": 0.44,
-      "w": 0.06,
-      "h": 0.05
+      "x": 0.492,
+      "y": 0.363,
+      "w": 0.025,
+      "h": 0.124
      },
-     "confidence": 0.9,
-     "severity": "low",
-     "note": "Tags on red door",
+     "confidence": 0.93,
+     "severity": "medium",
+     "note": "Spray paint on building facade",
      "confirmed": true
     },
     {
-     "category": "open_entry",
+     "category": "graffiti",
      "box": {
-      "x": 0.42,
-      "y": 0.27,
-      "w": 0.08,
+      "x": 0.565,
+      "y": 0.386,
+      "w": 0.038,
       "h": 0.11
      },
-     "confidence": 0.9,
+     "confidence": 0.93,
      "severity": "medium",
-     "note": "Broken window, open entry",
+     "note": "Spray paint on building facade",
      "confirmed": true
     },
     {
-     "category": "open_entry",
+     "category": "graffiti",
      "box": {
-      "x": 0.43,
-      "y": 0.42,
-      "w": 0.07,
-      "h": 0.06
+      "x": 0.663,
+      "y": 0.399,
+      "w": 0.037,
+      "h": 0.082
      },
-     "confidence": 0.85,
+     "confidence": 0.91,
      "severity": "medium",
-     "note": "Open doorway, no door",
+     "note": "Graffiti on upper right brick wall",
      "confirmed": true
     }
    ]
@@ -666,67 +666,28 @@
     {
      "category": "roof_damage",
      "box": {
-      "x": 0.22,
-      "y": 0.3,
-      "w": 0.13,
-      "h": 0.06
+      "x": 0.185,
+      "y": 0.397,
+      "w": 0.395,
+      "h": 0.111
      },
-     "confidence": 0.95,
+     "confidence": 0.92,
      "severity": "high",
-     "note": "Collapsed and missing roof sections",
-     "confirmed": false
+     "note": "Collapsed and damaged roof sections on the building",
+     "confirmed": true
     },
     {
      "category": "wall_damage",
      "box": {
-      "x": 0.38,
-      "y": 0.42,
-      "w": 0.06,
-      "h": 0.14
-     },
-     "confidence": 0.9,
-     "severity": "high",
-     "note": "Partly collapsed exterior wall",
-     "confirmed": false
-    },
-    {
-     "category": "open_entry",
-     "box": {
-      "x": 0.4,
-      "y": 0.44,
-      "w": 0.04,
-      "h": 0.1
+      "x": 0.455,
+      "y": 0.408,
+      "w": 0.415,
+      "h": 0.256
      },
      "confidence": 0.85,
      "severity": "high",
-     "note": "Open doorway in damaged wall",
-     "confirmed": false
-    },
-    {
-     "category": "open_entry",
-     "box": {
-      "x": 0.44,
-      "y": 0.24,
-      "w": 0.06,
-      "h": 0.2
-     },
-     "confidence": 0.8,
-     "severity": "medium",
-     "note": "Row of broken windows",
+     "note": "Damaged exterior walls and structure of the storefront",
      "confirmed": true
-    },
-    {
-     "category": "fire_damage",
-     "box": {
-      "x": 0.4,
-      "y": 0.44,
-      "w": 0.04,
-      "h": 0.1
-     },
-     "confidence": 0.75,
-     "severity": "high",
-     "note": "Charring on collapsed wall section",
-     "confirmed": false
     }
    ]
   },
