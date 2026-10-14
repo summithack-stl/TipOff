@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { rateLimit, upstreamError } from "@/lib/guard";
 import { getHotspot } from "@/lib/hotspot-store";
 import { CATEGORIES } from "@/lib/issues";
 import { chatJSON } from "@/lib/llm";
@@ -33,8 +34,13 @@ Phrase facts as "311 reports show" or "photo shows". Plain words, no jargon. Ret
  "actions":["up to 5 practical steps: cleanup crew, signage, lighting, camera, notify owner of a vacant lot"],
  "evidence":["up to 5: what this site's report history and photos can support if the city pursues a citation"]}`;
 
+export const maxDuration = 30;
+
 // One hotspot + latest photo findings in, a short camera/cleanup plan out.
 export async function POST(request: Request) {
+  const limited = rateLimit(request, "plan", 20);
+  if (limited) return limited;
+
   const parsed = requestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: z.prettifyError(parsed.error) }, { status: 400 });
@@ -54,7 +60,6 @@ export async function POST(request: Request) {
     );
     return NextResponse.json({ id: hotspot.id, ...plan });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: message }, { status: 502 });
+    return upstreamError("plan", error);
   }
 }
