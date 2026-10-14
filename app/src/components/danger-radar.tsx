@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { BuildingPanel } from "@/components/building-panel";
 
 export type RadarPoint = [handle: string, lat: number, lon: number, risk: number, ward: number | null];
 
@@ -17,6 +18,7 @@ export function DangerRadar({ buildings }: { buildings: RadarPoint[] }) {
   const [ward, setWard] = useState("all");
   const [minRisk, setMinRisk] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
+  const close = useCallback(() => setSelected(null), []);
 
   const wards = useMemo(() => [...new Set(buildings.map((b) => b[4]).filter((w) => w !== null))].sort((a, b) => a - b), [buildings]);
   const top = useMemo(() => new Set(buildings.slice(0, TOP).map((b) => b[0])), [buildings]);
@@ -28,6 +30,7 @@ export function DangerRadar({ buildings }: { buildings: RadarPoint[] }) {
   return (
     <div className="relative h-[calc(100dvh-3.5rem)] w-full">
       <RadarMap points={shown} top={top} selected={selected} onSelect={setSelected} />
+      {selected && <BuildingPanel key={selected} handle={selected} onClose={close} />}
 
       <div className="absolute top-3 left-3 z-[1000] flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-3 rounded-lg border bg-background/90 px-3 py-2 text-sm shadow-lg backdrop-blur">
         <div>
