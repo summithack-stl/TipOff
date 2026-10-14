@@ -18,6 +18,12 @@ export function llmInfo(): { provider: string; model: string } {
   };
 }
 
+// Worth trying another model: rate limited, overloaded (5xx), timed out or unreachable.
+const unavailable = (error: unknown) =>
+  (error instanceof Error && error.name === "RateLimitError") ||
+  error instanceof OpenAI.APIConnectionError ||
+  (error instanceof OpenAI.APIError && (error.status === 429 || (error.status ?? 0) >= 500));
+
 async function complete(
   messages: Message[],
   json: boolean,
@@ -27,9 +33,29 @@ async function complete(
   const apiKey = process.env[`${provider}_API_KEY`];
   if (!apiKey) throw new Error(`${provider}_API_KEY is not set`);
 
-  const model = process.env[`${provider}_MODEL`];
-  if (!model) throw new Error(`${provider}_MODEL is not set`);
+  // A comma-separated list (e.g. "gemini-3.5-flash,gemini-3.5-flash-lite") is tried in order when a model is unavailable.
+  const models = (process.env[`${provider}_MODEL`] ?? "").split(",").map((m) => m.trim()).filter(Boolean);
+  if (!models.length) throw new Error(`${provider}_MODEL is not set`);
 
+  for (const [i, model] of models.entries()) {
+    try {
+      return await completeWith(model, apiKey, messages, json, opts, provider);
+    } catch (error) {
+      if (i === models.length - 1 || !unavailable(error)) throw error;
+      console.warn(`${provider} ${model} unavailable, trying ${models[i + 1]}:`, (error as Error).message);
+    }
+  }
+  throw new Error(`${provider}: no model answered`);
+}
+
+async function completeWith(
+  model: string,
+  apiKey: string,
+  messages: Message[],
+  json: boolean,
+  opts: ChatOptions | undefined,
+  provider: Provider,
+): Promise<string> {
   return cached({ model, messages, json, opts }, async () => {
     const client = new OpenAI({
       apiKey,
