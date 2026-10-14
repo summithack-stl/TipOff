@@ -128,3 +128,31 @@
     @apply font-sans;
   }
 }
+/* Danger Radar: top-50 buildings get a soft pulse. */
+.radar-top {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--c);
+  box-shadow: 0 0 0 1.5px #fff;
+}
+.radar-top::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--c);
+  animation: radar-pulse 1.8s ease-out infinite;
+}
+@keyframes radar-pulse {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(3); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .radar-top::after { animation: none; }
+}
+.radar-tiles {
+  filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.85) saturate(0.4);
+}

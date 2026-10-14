@@ -1,14 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import lite from "../../data/clean/vacant_buildings_lite.json";
+import { DangerRadar, type RadarPoint } from "@/components/danger-radar";
+
+// [handle, lat, lon, risk_score, ward], sorted by risk_rank (index 0 = rank 1).
+const buildings = lite as RadarPoint[];
 
 export default function Home() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>SummitHack starter</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>Check the service status at <a className="underline" href="/api/health">/api/health</a>.</p>
-      </CardContent>
-    </Card>
-  );
+  return <DangerRadar buildings={buildings} />;
 }
