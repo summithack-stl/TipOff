@@ -44,12 +44,13 @@ Data the city points to: CSB/311 requests, `PROBLEMCODE` = illegal dumping.
 | `data/scripts/fetch_311.py` (new) | Arjun | Download CSB zip, keep 3 issue types for 2024–2026, convert coords, write `street_reports.json` |
 | `data/scripts/build_hotspots.py` (new) | Arjun | Group reports into ~155 m cells, score, write `hotspots.json`, `hotspots_lite.json`, `hotspots_summary.json` |
 | `.gitignore` (modify) | Arjun | Ignore `data/raw/` (the 128 MB zip cache) |
-| `app/src/lib/hotspots.ts` (new) | Prahlad | Server-only loader: `Hotspot` type, `getHotspot(id)` |
+| `app/src/lib/hotspots.ts` (from PR #22) | Vedant, then Prahlad | Shared `Hotspot` type + map helpers; Task 3 adds the plan fields |
+| `app/src/lib/hotspot-store.ts` (new) | Prahlad | Server-only loader: `getHotspot(id)` |
 | `app/src/lib/plan.ts` (new) | Prahlad | Pure `planFacts()` that builds the LLM fact sheet (testable without server-only) |
 | `app/src/lib/plan.test.mjs` (new) | Prahlad | node:test for `planFacts()` |
 | `app/src/app/api/plan/route.ts` (new) | Prahlad | POST `{id, detections}` returns a camera/cleanup plan |
 | `app/scripts/fetch-building-photos.mjs` (modify) | Prahlad | `--source hotspots` to fetch photos at top hotspots |
-| Map + side panel (PRs #20, #21) | Vedant | Hotspot layer, type filter, hotspot panel |
+| Map + side panel (PR #22, contains #20 and #21) | Vedant | Hotspot layer, filters, hotspot panel (built; Task 6 lists the fixes) |
 | Crew view | Sarthak | "Today's hotspots" list |
 | `docs/demo-script.md` (PR #15) | Sarthak | 2-minute video script for dumping |
 
@@ -58,7 +59,7 @@ Data the city points to: CSB/311 requests, `PROBLEMCODE` = illegal dumping.
 ### Task 0: Clean up the open PRs (Prahlad, 15 min, no code)
 
 - [ ] **Step 1: Merge the PRs that carry over unchanged:** #11 (Gemini fallback list), #12 (README tech), #14 (curb/sidewalk categories), #16 (featured boxes), #18 (tracker overlay), #19 (/watch).
-- [ ] **Step 2: Leave #20 and #21 (Vedant's map and panel) open.** Vedant retargets them in Task 6.
+- [ ] **Step 2: Close #20 and #21 without merging.** Their commits are already inside #22 (#22 stacks #20 → #21 → hotspot map). Merge #22 after the Task 6 fixes. #22 carries an identical copy of the #18 overlay file, so merging #18 first is conflict-free.
 - [ ] **Step 3: Park the firefighter-only PRs:** #13 (vacancy months), #17 (brief facts). Close #15 or let Sarthak rewrite it in Task 8.
 - [ ] **Step 4:** `git pull` on `main` and run `cd app && npm run typecheck && npm run lint && npm run build`. Expected: all pass.
 
@@ -229,9 +230,11 @@ If `street_reports.json` is over ~20 MB, commit the script only, open the PR, an
 
 **Interfaces:**
 - Consumes: `app/data/clean/street_reports.json` (Task 1), `app/data/clean/vacant_buildings_lite.json` (rows are `[handle, lat, lon, risk_score, ward]`).
-- Produces:
-  - `app/data/clean/hotspots.json`, a list sorted by score, each item: `{id: str, type, lat, lon, score: int 0-100, rank: int (within type), reports_total: int, reports_12m: int, reports_prev_12m: int, active_weeks_12m: int, peak_weekday: str, report_window: str, median_days_to_close: float|null, top_address: str, vacant_within_150m: int, nearest_vacant_m: int|null, recent: [{opened, code, address}] (last 10), reasons: [str]}`
-  - `app/data/clean/hotspots_lite.json`, rows `[id, type, lat, lon, score, reports_12m]` (browser map)
+- Produces (the field names match the `Hotspot` type Vedant already ships in PR #22, `app/src/lib/hotspots.ts`; keep them exactly):
+  - `app/data/clean/hotspots.json`, a list sorted by score, each item:
+    - Vedant's fields: `{id: str, category: "dumping"|"pothole"|"graffiti", lat, lon, ward: int|null, score: int 0-100, report_count: int (all years), trend: float (last 12 months vs the 12 before, 0.25 = +25%), peak_day: "Sun".."Sat", peak_hour: int 0-23, by_dow: int[7] (Sun first), by_hour: int[24], monthly: [{month: "YYYY-MM", count}] (last 24 months)}`
+    - Plus plan fields: `{rank: int (within category), reports_12m: int, reports_prev_12m: int, active_weeks_12m: int, report_window: str, median_days_to_close: float|null, top_address: str, vacant_within_150m: int, nearest_vacant_m: int|null, recent: [{opened, code, address}] (last 10), reasons: [str]}`
+  - `app/data/clean/hotspots_lite.json`, rows `[id, category, lat, lon, score, reports_12m]` (browser map)
   - `app/data/clean/hotspots_summary.json`: `{generated, window_end, counts: {type: n}, top: {type: [id...10]}}`
 
 - [ ] **Step 1: Write the script with its self-check**
@@ -257,7 +260,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CLEAN = ROOT / "app" / "data" / "clean"
 CELL_LAT, CELL_LON = 0.0014, 0.0018  # ~156 m x ~157 m at St. Louis latitude
 MIN_REPORTS = 5  # a cell needs at least this many reports (all years) to count as a hotspot
-WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]  # Sun first, same as DAYS in app/src/lib/hotspots.ts
 
 
 def peak_window(hours: list[int]) -> str:
@@ -289,6 +292,8 @@ def main():
     r["in_12m"] = r["opened"] > end - pd.Timedelta(days=365)
     r["in_prev_12m"] = (r["opened"] <= end - pd.Timedelta(days=365)) & (r["opened"] > end - pd.Timedelta(days=730))
     r["week"] = r["opened"].dt.to_period("W").astype(str)
+    r["month"] = r["opened"].dt.strftime("%Y-%m")
+    months = pd.period_range(end=end.to_period("M"), periods=24, freq="M").strftime("%Y-%m").tolist()
     r["cell"] = (r["lat"] // CELL_LAT).astype(int).astype(str) + "_" + (r["lon"] // CELL_LON).astype(int).astype(str)
 
     vac = np.array(json.loads((CLEAN / "vacant_buildings_lite.json").read_text()), dtype=object)
@@ -301,16 +306,26 @@ def main():
         lat, lon = round(g["lat"].mean(), 5), round(g["lon"].mean(), 5)
         d = meters(lat, lon, vlat, vlon)
         recent = g.sort_values("opened", ascending=False).head(10)
+        by_dow = g["weekday"].value_counts().reindex(DAYS, fill_value=0).astype(int).tolist()
+        by_hour = np.bincount(g["hour"].astype(int), minlength=24).tolist()
+        per_month = g["month"].value_counts()
+        r12, prev = int(g["in_12m"].sum()), int(g["in_prev_12m"].sum())
         rows.append({
             "id": f"{kind}-{cell}",
-            "type": kind,
+            "category": kind,
             "lat": lat,
             "lon": lon,
-            "reports_total": len(g),
-            "reports_12m": int(g["in_12m"].sum()),
-            "reports_prev_12m": int(g["in_prev_12m"].sum()),
+            "ward": None if g["ward"].isna().all() else int(g["ward"].mode().iat[0]),
+            "report_count": len(g),
+            "trend": round((r12 - prev) / max(prev, 1), 2),
+            "peak_day": DAYS[int(np.argmax(by_dow))],
+            "peak_hour": int(np.argmax(by_hour)),
+            "by_dow": by_dow,
+            "by_hour": by_hour,
+            "monthly": [{"month": m, "count": int(per_month.get(m, 0))} for m in months],
+            "reports_12m": r12,
+            "reports_prev_12m": prev,
             "active_weeks_12m": int(g.loc[g["in_12m"], "week"].nunique()),
-            "peak_weekday": g["weekday"].mode().iat[0],
             "report_window": peak_window(g["hour"].tolist()),
             "median_days_to_close": None if g["days_to_close"].isna().all() else round(float(g["days_to_close"].median()), 1),
             "top_address": g["address"].mode().iat[0] if g["address"].str.len().gt(0).any() else "",
@@ -323,14 +338,14 @@ def main():
         })
     h = pd.DataFrame(rows)
 
-    # Score within each type, so potholes don't drown out dumping.
-    volume = h.groupby("type")["reports_12m"].rank(pct=True)
+    # Score within each category, so potholes don't drown out dumping.
+    volume = h.groupby("category")["reports_12m"].rank(pct=True)
     repeat = (h["active_weeks_12m"] / 52).clip(upper=1)
-    trend = ((h["reports_12m"] - h["reports_prev_12m"]) / h["reports_prev_12m"].clip(lower=1)).clip(-1, 1)
+    trend = h["trend"].clip(-1, 1)
     vacant = (h["vacant_within_150m"] / 3).clip(upper=1)
     h["score"] = (100 * (0.4 * volume + 0.3 * repeat + 0.15 * (trend + 1) / 2 + 0.15 * vacant)).round().astype(int)
     h = h.sort_values(["score", "reports_12m"], ascending=False)
-    h["rank"] = h.groupby("type").cumcount() + 1
+    h["rank"] = h.groupby("category").cumcount() + 1
 
     def reasons(x) -> list[str]:
         out = [f"{x.reports_12m} reports in the last 12 months"]
@@ -340,22 +355,23 @@ def main():
             out.append(f"up from {x.reports_prev_12m} the year before")
         if x.vacant_within_150m:
             out.append(f"{x.vacant_within_150m} vacant buildings within 150 m")
-        out.append(f"most reports on {x.peak_weekday}, mostly reported {x.report_window}")
+        out.append(f"most reports on {x.peak_day}, mostly reported {x.report_window}")
         return out
 
     h["reasons"] = [reasons(x) for x in h.itertuples()]
     assert h["score"].between(0, 100).all()
-    assert not h.duplicated(["type", "rank"]).any()
+    assert not h.duplicated(["category", "rank"]).any()
+    assert all(len(d) == 7 for d in h["by_dow"]) and all(len(x) == 24 for x in h["by_hour"])
 
     records = json.loads(h.to_json(orient="records"))
     (CLEAN / "hotspots.json").write_text(json.dumps(records, separators=(",", ":")))
-    lite = h[["id", "type", "lat", "lon", "score", "reports_12m"]].values.tolist()
+    lite = h[["id", "category", "lat", "lon", "score", "reports_12m"]].values.tolist()
     (CLEAN / "hotspots_lite.json").write_text(json.dumps(lite, separators=(",", ":")))
     summary = {
         "generated": date.today().isoformat(),
         "window_end": end.strftime("%Y-%m-%d"),
-        "counts": h.groupby("type").size().to_dict(),
-        "top": {k: g.head(10)["id"].tolist() for k, g in h.groupby("type")},
+        "counts": h.groupby("category").size().to_dict(),
+        "top": {k: g.head(10)["id"].tolist() for k, g in h.groupby("category")},
     }
     (CLEAN / "hotspots_summary.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary["counts"]), "hotspots")
@@ -386,16 +402,17 @@ Open a PR from `arjun/street-reports` and tell Vedant the lite format is live.
 
 ### Task 3: Hotspot loader + `planFacts()` with a test (Prahlad)
 
-**Files:**
-- Create: `app/src/lib/hotspots.ts`
+**Files** (build on top of PR #22, which already adds `app/src/lib/hotspots.ts`. Merge #22 first or branch from it):
+- Modify: `app/src/lib/hotspots.ts` (add the plan fields to Vedant's `Hotspot` type)
+- Create: `app/src/lib/hotspot-store.ts` (server-only loader)
 - Create: `app/src/lib/plan.ts`
 - Test: `app/src/lib/plan.test.mjs`
 
 **Interfaces:**
-- Consumes: `hotspots.json` (Task 2 shape).
+- Consumes: `hotspots.json` (Task 2 shape); Vedant's `Hotspot`, `HotspotCategory`, `DAYS` from `@/lib/hotspots`.
 - Produces:
-  - `type Hotspot` (fields exactly as in Task 2), `getHotspot(id: string): Hotspot | undefined` (server-only)
-  - `planFacts(h: HotspotFacts, detections: PlanDetection[]): Record<string, unknown>` in `plan.ts` (no server-only import, so node:test can load it)
+  - `type Hotspot` gains the plan fields; `getHotspot(id: string): Hotspot | undefined` in `hotspot-store.ts` (server-only)
+  - `planFacts(h: Hotspot, detections: PlanDetection[]): Record<string, unknown>` in `plan.ts` (only a type import, so node:test can load it)
 
 - [ ] **Step 1: Write the failing test** `app/src/lib/plan.test.mjs`
 
@@ -405,9 +422,11 @@ import { test } from 'node:test';
 import { planFacts } from './plan.ts';
 
 const h = {
-  id: 'dumping-27593_-50111', type: 'dumping', lat: 38.6612, lon: -90.2011, score: 91, rank: 1,
-  reports_total: 40, reports_12m: 22, reports_prev_12m: 9, active_weeks_12m: 15,
-  peak_weekday: 'Mon', report_window: '2pm-5pm', median_days_to_close: 6.5,
+  id: 'dumping-27593_-50111', category: 'dumping', lat: 38.6612, lon: -90.2011, ward: 14, score: 91, rank: 1,
+  report_count: 40, trend: 1.44, peak_day: 'Mon', peak_hour: 14,
+  by_dow: [2, 12, 6, 5, 6, 5, 4], by_hour: Array(24).fill(0), monthly: [],
+  reports_12m: 22, reports_prev_12m: 9, active_weeks_12m: 15,
+  report_window: '2pm-5pm', median_days_to_close: 6.5,
   top_address: '2700 N GRAND BLVD', vacant_within_150m: 4, nearest_vacant_m: 35,
   recent: [{ opened: '2026-10-01', code: 'Illegal dumpg report', address: '2700 N GRAND BLVD' }],
   reasons: ['22 reports in the last 12 months'],
@@ -435,33 +454,20 @@ Expected: FAIL, cannot find module `./plan.ts`.
 - [ ] **Step 3: Write `app/src/lib/plan.ts`**
 
 ```ts
-// Builds the fact sheet the LLM sees for one hotspot. No server-only import so node:test can load it.
-export type HotspotFacts = {
-  id: string;
-  type: "dumping" | "pothole" | "graffiti";
-  score: number;
-  rank: number;
-  reports_12m: number;
-  reports_prev_12m: number;
-  active_weeks_12m: number;
-  peak_weekday: string;
-  report_window: string;
-  median_days_to_close: number | null;
-  top_address: string;
-  vacant_within_150m: number;
-  recent: { opened: string; code: string; address: string }[];
-};
+import type { Hotspot } from "@/lib/hotspots";
+
+// Builds the fact sheet the LLM sees for one hotspot. Type-only import, so node:test can load this file.
 export type PlanDetection = { category: string; severity: "low" | "medium" | "high"; note: string };
 
-export function planFacts(h: HotspotFacts, detections: PlanDetection[]): Record<string, unknown> {
+export function planFacts(h: Hotspot, detections: PlanDetection[]): Record<string, unknown> {
   return {
-    issue_type: h.type,
+    issue_type: h.category,
     near_address: h.top_address,
-    priority: `${h.score}/100 (#${h.rank} of ${h.type} hotspots)`,
+    priority: `${h.score}/100 (#${h.rank} of ${h.category} hotspots)`,
     reports_last_12_months: h.reports_12m,
     reports_year_before: h.reports_prev_12m,
     weeks_with_reports_this_year: h.active_weeks_12m,
-    most_reports_on: h.peak_weekday,
+    most_reports_on: h.peak_day,
     reports_mostly_come_in: h.report_window,
     median_days_to_close: h.median_days_to_close,
     vacant_buildings_within_150m: h.vacant_within_150m,
@@ -471,25 +477,33 @@ export function planFacts(h: HotspotFacts, detections: PlanDetection[]): Record<
 }
 ```
 
-- [ ] **Step 4: Write `app/src/lib/hotspots.ts`**
+- [ ] **Step 4: Add the plan fields to Vedant's `Hotspot` type** in `app/src/lib/hotspots.ts`. Insert after `monthly: …;` and drop his "shape guessed" ponytail comment:
+
+```ts
+  // From data/scripts/build_hotspots.py, used by the panel and /api/plan.
+  rank: number; // within its category
+  reports_12m: number;
+  reports_prev_12m: number;
+  active_weeks_12m: number;
+  report_window: string; // busiest 3-hour block of REPORT times, e.g. "2pm-5pm"
+  median_days_to_close: number | null;
+  top_address: string;
+  vacant_within_150m: number;
+  nearest_vacant_m: number | null;
+  recent: { opened: string; code: string; address: string }[];
+  reasons: string[];
+```
+
+Then write `app/src/lib/hotspot-store.ts`:
 
 ```ts
 import "server-only";
 
 import data from "../../data/clean/hotspots.json";
-import type { HotspotFacts } from "@/lib/plan";
+import type { Hotspot } from "@/lib/hotspots";
 
-// One record per hotspot cell, written by data/scripts/build_hotspots.py.
-export type Hotspot = HotspotFacts & {
-  lat: number;
-  lon: number;
-  reports_total: number;
-  nearest_vacant_m: number | null;
-  reasons: string[];
-};
-
-const hotspots = data as Hotspot[];
-const byId = new Map(hotspots.map((h) => [h.id, h]));
+// Server-side lookup for /api/plan. The browser gets hotspots via the page, never this file.
+const byId = new Map((data as unknown as Hotspot[]).map((h) => [h.id, h]));
 
 export function getHotspot(id: string): Hotspot | undefined {
   return byId.get(id);
@@ -499,13 +513,13 @@ export function getHotspot(id: string): Hotspot | undefined {
 - [ ] **Step 5: Run the test and typecheck**
 
 Run: `cd app && node --test src/lib/plan.test.mjs && npm run typecheck`
-Expected: 2 tests pass, typecheck clean. If `data as Hotspot[]` errors because the JSON's inferred type doesn't overlap, use `data as unknown as Hotspot[]`, the same trick for a generated file.
+Expected: 2 tests pass, typecheck clean. Vedant's sample file (`app/data/sample/hotspots.sample.json`) lacks the plan fields. That's fine: `page.tsx` only uses it until the real file exists.
 
 - [ ] **Step 6: Commit** (needs Task 2's `hotspots.json` on the branch: rebase on Arjun's branch or merge his PR first)
 
 ```bash
 git checkout -b prahlad/hotspot-lib
-git add app/src/lib/plan.ts app/src/lib/plan.test.mjs app/src/lib/hotspots.ts
+git add app/src/lib/plan.ts app/src/lib/plan.test.mjs app/src/lib/hotspots.ts app/src/lib/hotspot-store.ts
 git commit -m "feat: hotspot loader and plan fact sheet"
 ```
 
@@ -525,7 +539,7 @@ git commit -m "feat: hotspot loader and plan fact sheet"
 ```ts
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getHotspot } from "@/lib/hotspots";
+import { getHotspot } from "@/lib/hotspot-store";
 import { CATEGORIES } from "@/lib/issues";
 import { chatJSON } from "@/lib/llm";
 import { planFacts } from "@/lib/plan";
@@ -619,29 +633,33 @@ git push -u origin prahlad/hotspot-lib
 - Consumes: `hotspots.json` (Task 2). `MAPILLARY_TOKEN` comes from `~/.config/summithack/keys.env` (Aarnav's token; the user's own token returns no photos).
 - Produces: entries in `app/public/photos/index.json` with `hotspot_id` instead of a building handle, same `after.detections` box format (0–1 x/y/w/h).
 
-- [ ] **Step 1:** Add a `source` option (`'buildings'` default, `'hotspots'`). When it's `hotspots`, load `data/clean/hotspots.json`, keep the top `--top` items of `type === 'dumping'` first and then the rest by score. Aim at `{lat, lon}` the same way as for buildings, and write `hotspot_id: h.id` on the index entry.
+- [ ] **Step 1:** Add a `source` option (`'buildings'` default, `'hotspots'`). When it's `hotspots`, load `data/clean/hotspots.json`, keep the top `--top` items of `category === 'dumping'` first and then the rest by score. Aim at `{lat, lon}` the same way as for buildings, and write `hotspot_id: h.id` on the index entry.
 - [ ] **Step 2:** Run `MAPILLARY_TOKEN=… node scripts/fetch-building-photos.mjs --source hotspots --top 300 --max 20 --detect http://localhost:3000 --precise 1`. Use `--precise 1` (Gemini), never Groq near recording, because the Groq daily cap is ~95 photos.
 - [ ] **Step 3:** Open 5 saved photos and check the dumping boxes sit on actual debris. Expect low coverage: Mapillary photos are mostly from main roads, and dumping is often in alleys. Pick the 3–4 hotspots that have good photos as the **featured** demo hotspots and record their ids in the PR description.
 - [ ] **Step 4:** Commit `feat: street photos at top dumping hotspots`.
 
 ---
 
-### Task 6: Hotspot map + side panel (Vedant, on PRs #20 / #21)
+### Task 6: Fixes to the hotspot map + panel (Vedant, PR #22)
+
+PR #22 already has the map, category/ward/day/time filters, the vacant-buildings toggle, the panel with a monthly timeline and nearest photo, and friendly 429/503 errors. Review on 2026-10-14: typecheck, lint, 14 tests and build all pass. These fixes remain:
 
 **Interfaces:**
-- Consumes: `app/data/clean/hotspots_lite.json` rows `[id, type, lat, lon, score, reports_12m]`; `POST /api/plan` (Task 4); `app/public/photos/index.json` entries with `hotspot_id` (Task 5); `/api/frames` categories `dumping`, `pothole`, `graffiti`, `broken_curb`, `sidewalk_damage`.
+- Consumes: `hotspots.json` (Task 2 shape, Vedant's field names plus plan fields); `POST /api/plan` (Task 4) with body `{id, detections}`, returning `{id, headline, what_we_know[], watch[], actions[], evidence[]}`; `app/public/photos/index.json` entries with `hotspot_id` (Task 5).
 
-- [ ] **Step 1:** Replace the building dots with hotspot circles colored by `score`, with filter chips for Dumping / Potholes / Graffiti / All. Default to Dumping.
-- [ ] **Step 2:** Add an optional toggle "Nearby vacant buildings" that reuses the existing `vacant_buildings_lite.json` layer, off by default.
-- [ ] **Step 3:** Side panel for a clicked hotspot: address, score and rank, `reasons` as bullets, "Reports mostly come in {report_window} · most on {peak_weekday}" (exact wording, see Global Constraints), last 10 reports, the photo with boxes if one has a matching `hotspot_id`, and a "Write plan" button that POSTs `{id, detections}` to `/api/plan` and renders `headline`, `watch`, `actions` and `evidence`.
-- [ ] **Step 4:** Errors: `429` means show "Too many requests, try again in {Retry-After}s", `503`/`502` means "The AI is busy, try again".
-- [ ] **Step 5:** `npm run typecheck && npm run lint && npm run build` pass. Push and ask Prahlad to review.
+- [ ] **Step 1 (bug, confirmed in browser):** "Write plan" POSTs `{hotspot_id}` to `/api/brief`, which wants an 11-digit building `handle`, so it always fails with "Invalid input: expected string, received undefined → at handle". Change it to `fetch("/api/plan", … body: JSON.stringify({ id: h.id, detections }))` and render `headline`, `what_we_know`, `watch`, `actions` and `evidence` (drop the guessed `hazards`/`crew_notes`).
+- [ ] **Step 2 (wording rule):** Rename the "Peak hour" stat to "Most reports at" and the "Time" filter label to "Reported", or replace the stat with `report_window` ("Reports mostly come in 2pm-5pm"). Report times are not dumping times.
+- [ ] **Step 3 (payload):** `page.tsx` passes every full hotspot (by_hour, monthly, recent, reasons) and all 9,884 vacant rows into the client component, so it all goes into the page HTML. That's 495 KB today with sample data; real data adds about 1 KB per hotspot. If the built `index.html` goes over ~1.5 MB, strip the client list to `{id, category, lat, lon, ward, score, report_count, by_dow, by_hour}` and fetch the full record from a tiny `GET /api/hotspots/[id]` (copy `api/buildings/[handle]/route.ts`, use `getHotspot` from `@/lib/hotspot-store`).
+- [ ] **Step 4:** Show `top_address`, `rank` and `reasons` in the panel header once the real file lands, plus the last 10 `recent` reports.
+- [ ] **Step 5:** Prefer the photo whose `hotspot_id` matches (Task 5) and fall back to the nearest within 300 m. Label a fallback photo "nearest street photo, X m away" (already done) so viewers don't assume it's the exact spot.
+- [ ] **Step 6:** Update copy in `layout.tsx`: the description still says "Ranks St. Louis vacant buildings by danger…". Change it to the dumping pitch.
+- [ ] **Step 7:** `npm run typecheck && npm run lint && npm run build` pass. Push to #22.
 
 ---
 
 ### Task 7: Crew view, "Today's hotspots" (Sarthak)
 
-- [ ] **Step 1:** List the top 10 hotspots from `hotspots_lite.json` for the chosen type (default dumping), sorted by score. Each row shows the address (from a server-side join with `hotspots.json`), score, "most reports on {peak_weekday}", and an "Open plan" link to the map panel for that id.
+- [ ] **Step 1:** List the top 10 hotspots from `hotspots_lite.json` for the chosen category (default dumping), sorted by score. Each row shows the address (from a server-side join with `hotspots.json`), score, "most reports on {peak_day}", and an "Open plan" link to the map panel for that id.
 - [ ] **Step 2:** Mobile-first layout (crews use phones). Reuse shadcn `Card`, `Badge` and `Button`.
 - [ ] **Step 3:** `npm run typecheck && npm run lint && npm run build` pass. Push.
 
