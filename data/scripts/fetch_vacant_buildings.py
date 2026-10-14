@@ -17,6 +17,7 @@ Run from the repo root:
 It writes two files:
     app/data/clean/vacant_buildings.json   one record per vacant building parcel
     app/data/clean/vacant_summary.json     small counts, safe to send to the LLM
+    app/data/clean/vacant_buildings_lite.json  just what the map needs, small enough for the browser
 
 Each building gets an inspection priority score (risk_score, 0-100), its rank,
 and plain-language reasons. The score only orders buildings for a human to look
@@ -215,6 +216,9 @@ def main() -> None:
     records = df.astype(object).where(df.notna(), None).to_dict(orient="records")
     (OUT_DIR / "vacant_buildings.json").write_text(json.dumps(records, indent=1))
     (OUT_DIR / "vacant_summary.json").write_text(json.dumps(summarize(df, len(overview)), indent=2))
+    # One short array per building: [handle, lat, lon, risk_score, ward]. About 1/7 the size of the full file.
+    lite = [[r["handle"], r["lat"], r["lon"], r["risk_score"], r["ward"]] for r in records]
+    (OUT_DIR / "vacant_buildings_lite.json").write_text(json.dumps(lite, separators=(",", ":")))
 
     print(f"Saved {len(df)} buildings to {OUT_DIR.relative_to(ROOT)}/vacant_buildings.json")
     print(f"Saved counts to {OUT_DIR.relative_to(ROOT)}/vacant_summary.json")
