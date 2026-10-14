@@ -3,8 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
-  // hotspot-store.ts reads this at runtime, so tell the Vercel bundle to ship it.
-  outputFileTracingIncludes: { "/api/plan": ["./data/clean/hotspots.json"] },
+  // These routes read files at request time; Vercel only ships files the bundle is told about
+  // (public/ is served from the CDN, not the function's disk).
+  outputFileTracingIncludes: {
+    "/api/plan": ["./data/clean/hotspots.json"],
+    "/crew": ["./data/clean/hotspots.json", "./data/sample/hotspots.sample.json", "./public/photos/index.json"],
+  },
   // Basic hardening for every response. Same-origin framing still works for our own views.
   async headers() {
     return [
