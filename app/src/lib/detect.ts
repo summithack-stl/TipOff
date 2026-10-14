@@ -1,7 +1,7 @@
 import "server-only";
 
 import { visionJSON } from "@/lib/llm";
-import { dropOverlaps, iou, needsConfirm, toBox, visionResultSchema, type Box, type Category, type Severity, type VisionDetection } from "@/lib/issues";
+import { capPerCategory, dropOverlaps, iou, needsConfirm, toBox, visionResultSchema, type Box, type Category, type Severity, type VisionDetection } from "@/lib/issues";
 
 export type Detection = {
   category: Category;
@@ -24,7 +24,8 @@ Street issues:
 - pothole: holes or broken pavement in the road surface
 - dumping: piles of trash, bags, furniture, mattresses, tires, construction debris left outside
 - streetlight_out: a street lamp that is visibly dark at night
-Only report what is clearly visible. Boarded-up openings are NOT open_entry.
+Only report what is clearly visible. Boarded-up, bricked-up or otherwise sealed openings are NOT open_entry.
+Report each distinct problem once; group a row of similar broken windows into one box instead of one box per window.
 Building hazards only apply to buildings that look vacant, abandoned or damaged (missing or broken glass, missing doors,
 overgrowth, collapse, charring). Normal doors, windows and storefronts on buildings in use are NOT hazards.
 Ignore people and vehicles entirely. Never describe people.
@@ -44,8 +45,12 @@ const toDetection = (d: VisionDetection, confirmed: boolean): Detection => ({
 // Fast model finds issues; the second model re-checks the unsure or severe ones.
 // If the fast model is down or rate-limited, the second model does the whole frame.
 // confirm: false skips the slow second model (live mode); unsure detections come back unconfirmed.
-export async function detectFrame(imageDataUrl: string, { confirm = true } = {}): Promise<Detection[]> {
-  return dropOverlaps(await detectAll(imageDataUrl, confirm));
+// precise: true sends the whole frame to the second model only. Slow, but its boxes are much tighter (hero shots).
+export async function detectFrame(imageDataUrl: string, { confirm = true, precise = false } = {}): Promise<Detection[]> {
+  const found = precise
+    ? (await visionJSON(PROMPT, imageDataUrl, visionResultSchema, "CONFIRM")).detections.map((d) => toDetection(d, true))
+    : await detectAll(imageDataUrl, confirm);
+  return capPerCategory(dropOverlaps(found));
 }
 
 async function detectAll(imageDataUrl: string, confirm: boolean): Promise<Detection[]> {
