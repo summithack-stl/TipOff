@@ -16,7 +16,9 @@ export async function cached<T>(key: unknown, fn: () => Promise<T>): Promise<T> 
   }
 
   const result = await fn();
-  await mkdir(directory, { recursive: true });
-  await writeFile(file, JSON.stringify(result));
+  // Best effort: Vercel's file system is read-only, and a failed save must not fail the request.
+  await mkdir(directory, { recursive: true })
+    .then(() => writeFile(file, JSON.stringify(result)))
+    .catch((error: unknown) => console.warn('demo cache not saved:', (error as Error).message));
   return result;
 }
