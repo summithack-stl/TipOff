@@ -17,6 +17,10 @@ Run from the repo root:
 It writes two files:
     app/data/clean/vacant_buildings.json   one record per vacant building parcel
     app/data/clean/vacant_summary.json     small counts, safe to send to the LLM
+
+Each building gets an inspection priority score (risk_score, 0-100), its rank,
+and plain-language reasons. The score only orders buildings for a human to look
+at first; it is not a structural assessment and does not predict collapse.
 """
 
 import json
@@ -121,6 +125,54 @@ def clean(overview: pd.DataFrame, parcels: pd.DataFrame) -> pd.DataFrame:
     return out.sort_values(["major_violations", "months_vacant"], ascending=False).reset_index(drop=True)
 
 
+def score(b: dict) -> tuple[int, list[str]]:
+    """Inspection priority from city records. Each part is capped so no single field dominates.
+
+    major code violations  up to 35   (20+ violations = full points)
+    months on the vacant list  up to 20   (10+ years = full points)
+    building age           up to 15   (pre-1900 = 15, pre-1920 = 10, pre-1950 = 5)
+    minor code violations  up to 10
+    311 complaints         up to 10   (5+ = full points)
+    unpaid fees            up to 10   (any = 5, over $2,000 = 10)
+    """
+    parts: list[tuple[float, str]] = []
+    vmaj, mo, vmin, csb, fees = b["major_violations"], b["months_vacant"], b["minor_violations"], b["complaints_311"], b["unpaid_fees"]
+    year = b["year_built"]
+    if vmaj:
+        parts.append((35 * min(vmaj, 20) / 20, f"{vmaj} major code violation{'s' if vmaj != 1 else ''}"))
+    if mo:
+        parts.append((20 * min(mo, 120) / 120, f"on the vacant list {mo // 12} yr {mo % 12} mo" if mo >= 12 else f"on the vacant list {mo} months"))
+    if year is not None and not pd.isna(year):
+        age_pts = 15 if year < 1900 else 10 if year < 1920 else 5 if year < 1950 else 0
+        if age_pts:
+            parts.append((age_pts, f"built {int(year)}"))
+    if vmin:
+        parts.append((10 * min(vmin, 20) / 20, f"{vmin} minor code violation{'s' if vmin != 1 else ''}"))
+    if csb:
+        parts.append((10 * min(csb, 5) / 5, f"{csb} recent 311 complaint{'s' if csb != 1 else ''}"))
+    if fees:
+        parts.append((10 if fees > 2000 else 5, f"${fees:,.0f} in unpaid vacant-building fees"))
+    total = round(sum(p for p, _ in parts))
+    reasons = [r for _, r in sorted(parts, key=lambda p: -p[0])]
+    return min(total, 100), reasons
+
+
+def check_scoring() -> None:
+    worst = {"major_violations": 25, "months_vacant": 200, "year_built": 1890, "minor_violations": 30, "complaints_311": 9, "unpaid_fees": 5000.0}
+    assert score(worst) == (100, score(worst)[1]), score(worst)
+    assert score(worst)[1][0].startswith("25 major"), "biggest factor should come first"
+    empty = {"major_violations": 0, "months_vacant": 0, "year_built": None, "minor_violations": 0, "complaints_311": 0, "unpaid_fees": 0.0}
+    assert score(empty) == (0, []), score(empty)
+    assert score({**empty, "year_built": 1915})[0] == 10
+
+
+def add_scores(df: pd.DataFrame) -> pd.DataFrame:
+    scored = [score(b) for b in df.astype(object).where(df.notna(), None).to_dict(orient="records")]
+    df = df.assign(risk_score=[s for s, _ in scored], risk_reasons=[r for _, r in scored])
+    df = df.sort_values(["risk_score", "major_violations"], ascending=False).reset_index(drop=True)
+    return df.assign(risk_rank=range(1, len(df) + 1))
+
+
 def summarize(df: pd.DataFrame, overview_count: int) -> dict:
     by_ward = df.groupby("ward").size().sort_values(ascending=False)
     return {
@@ -132,6 +184,9 @@ def summarize(df: pd.DataFrame, overview_count: int) -> dict:
         "with_5plus_major_violations": int((df["major_violations"] >= 5).sum()),
         "median_months_vacant": float(df["months_vacant"].median()),
         "built_before_1920": int((df["year_built"] < 1920).sum()),
+        "risk_score_70_plus": int((df["risk_score"] >= 70).sum()),
+        "risk_score_50_plus": int((df["risk_score"] >= 50).sum()),
+        "top_100_wards": {str(k): int(v) for k, v in df.head(100).groupby("ward").size().sort_values(ascending=False).items()},
         "top_wards": {str(k): int(v) for k, v in by_ward.head(10).items()},
     }
 
@@ -152,7 +207,8 @@ def main() -> None:
     print("Looking up locations from the Assessor parcel map ...")
     parcels = download_parcels(overview["handle"].tolist())
 
-    df = clean(overview, parcels)
+    check_scoring()
+    df = add_scores(clean(overview, parcels))
     check(df, len(overview))
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
