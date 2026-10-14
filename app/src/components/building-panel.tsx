@@ -5,15 +5,12 @@ import { XIcon } from "lucide-react";
 import type { Building } from "@/lib/buildings";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrackerOverlay, type Detection } from "@/components/tracker-overlay";
+import { TrackerOverlay } from "@/components/tracker-overlay";
+import { friendlyError } from "@/lib/api-error";
+import { loadPhotos, type Photo } from "@/lib/photos";
 import { riskColor } from "@/lib/risk";
 
-type Photo = { handle: string; attribution: string; after: { file: string; year: number; detections?: Detection[] } };
 type Brief = { headline: string; hazards: string[]; crew_notes: string[] };
-
-// One fetch of the photo index, shared by every panel the user opens.
-let photoIndex: Promise<Photo[]> | undefined;
-const loadPhotos = (): Promise<Photo[]> => (photoIndex ??= fetch("/photos/index.json").then((r) => (r.ok ? r.json() : [])));
 
 // ponytail: status is local only until the Supabase tickets table is wired in.
 const STATUSES = ["open", "inspected", "boarded up"] as const;
@@ -51,9 +48,8 @@ export function BuildingPanel({ handle, onClose }: { handle: string; onClose: ()
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ handle, detections: detections.map(({ category, severity, note }) => ({ category, severity, note })) }),
       });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
-      setBrief(body);
+      if (!res.ok) throw new Error(await friendlyError(res));
+      setBrief(await res.json());
       setBriefState("idle");
     } catch (e) {
       setBriefError(e instanceof Error ? e.message : String(e));
@@ -133,8 +129,8 @@ export function BuildingPanel({ handle, onClose }: { handle: string; onClose: ()
               <Skeleton className="h-24" />
             ) : (
               <div className="flex flex-col items-start gap-2">
-                <Button onClick={writeBrief}>Write brief</Button>
-                {briefState === "error" && <p className="text-sm text-destructive">Brief failed: {briefError}</p>}
+                <Button onClick={writeBrief}>{briefState === "error" ? "Try again" : "Write brief"}</Button>
+                {briefState === "error" && <p className="text-sm text-destructive">{briefError}</p>}
               </div>
             )}
           </section>
