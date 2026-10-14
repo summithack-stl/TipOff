@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { detectFrame } from "@/lib/detect";
+import { rateLimit, upstreamError } from "@/lib/guard";
 
-const MAX_BYTES = 5 * 1024 * 1024;
+// Vercel rejects request bodies over 4.5 MB, so stay under that.
+const MAX_BYTES = 4 * 1024 * 1024;
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+// The precise pass can take up to 60 s on the second model.
+export const maxDuration = 60;
 
 const fieldsSchema = z.object({
   camera_id: z.string().min(1).max(100),
@@ -17,14 +22,19 @@ const fieldsSchema = z.object({
 // Live mode sends confirm=0 to skip the slow second model; hero shots send precise=1 for tighter boxes.
 export async function POST(request: Request) {
   const start = Date.now();
-  const form = await request.formData();
+  // Free-tier vision quota is ~30 images/min shared by everyone, so cap each client.
+  const limited = rateLimit(request, "frames", 20);
+  if (limited) return limited;
+
+  const form = await request.formData().catch(() => null);
+  if (!form) return NextResponse.json({ error: "send multipart/form-data" }, { status: 400 });
 
   const image = form.get("image");
-  if (!(image instanceof File) || !image.type.startsWith("image/")) {
-    return NextResponse.json({ error: "image file is required" }, { status: 400 });
+  if (!(image instanceof File) || !IMAGE_TYPES.includes(image.type)) {
+    return NextResponse.json({ error: "image must be a JPEG, PNG or WebP file" }, { status: 400 });
   }
   if (image.size > MAX_BYTES) {
-    return NextResponse.json({ error: "image is over 5 MB" }, { status: 413 });
+    return NextResponse.json({ error: "image is over 4 MB" }, { status: 413 });
   }
 
   const fields = fieldsSchema.safeParse({
@@ -48,7 +58,6 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ ...fields.data, detections, ms: Date.now() - start });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: message, ms: Date.now() - start }, { status: 502 });
+    return upstreamError("frames", error, { ms: Date.now() - start });
   }
 }
