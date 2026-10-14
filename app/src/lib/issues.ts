@@ -111,3 +111,15 @@ export function dropOverlaps<T extends { category: string; confidence: number; b
   }
   return kept;
 }
+
+// A row of boarded windows can come back as a dozen boxes. Keep the most confident few per category.
+export function capPerCategory<T extends { category: string; confidence: number }>(detections: T[], max = 4): T[] {
+  const seen = new Map<string, number>();
+  return [...detections]
+    .sort((a, b) => b.confidence - a.confidence)
+    .filter((d) => {
+      const n = (seen.get(d.category) ?? 0) + 1;
+      seen.set(d.category, n);
+      return n <= max;
+    });
+}
