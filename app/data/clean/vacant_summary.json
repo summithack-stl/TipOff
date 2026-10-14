@@ -1,0 +1,25 @@
+{
+  "sources": [
+    "https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=108",
+    "https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=82"
+  ],
+  "downloaded": "2026-10-13",
+  "vacant_building_parcels": 9943,
+  "with_location": 9884,
+  "lra_owned": 338,
+  "with_5plus_major_violations": 1380,
+  "median_months_vacant": 0.0,
+  "built_before_1920": 5714,
+  "top_wards": {
+    "13": 1654,
+    "12": 1560,
+    "10": 1055,
+    "11": 1015,
+    "14": 807,
+    "7": 790,
+    "3": 654,
+    "8": 442,
+    "1": 431,
+    "6": 337
+  }
+}
