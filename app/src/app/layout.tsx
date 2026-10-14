@@ -16,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <span className="font-semibold">StreetSense</span>
           <nav className="flex gap-4 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">Hotspots</Link>
+            <Link href="/crew" className="hover:text-foreground">Crew</Link>
             <Link href="/watch" className="hover:text-foreground">Tracker</Link>
           </nav>
         </header>
