@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TrackerOverlay } from "@/components/tracker-overlay";
 import { friendlyError } from "@/lib/api-error";
 import { CATEGORY_COLOR, CATEGORY_LABEL } from "@/lib/categories";
-import { formatHour, type Hotspot } from "@/lib/hotspots";
+import type { Hotspot } from "@/lib/hotspots";
 import { nearestPhoto, type Photo } from "@/lib/photos";
 import { riskColor } from "@/lib/risk";
 
@@ -105,10 +105,10 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
         <div>
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             <span className="size-3 rounded-full" style={{ background: CATEGORY_COLOR[h.category] }} />
-            {CATEGORY_LABEL[h.category]} hotspot
+            {h.top_address || `${CATEGORY_LABEL[h.category]} hotspot`}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Ward {h.ward ?? "?"} · {h.lat.toFixed(4)}, {h.lon.toFixed(4)}
+            #{h.rank} of {CATEGORY_LABEL[h.category].toLowerCase()} hotspots · Ward {h.ward ?? "?"}
           </p>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel">
@@ -130,13 +130,34 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
             {stat("Trend, last 12 mo", `${trendPct > 0 ? "↑" : trendPct < 0 ? "↓" : "→"} ${Math.abs(trendPct)}%`)}
             {stat("Most reports on", h.peak_day)}
             {/* 311 times are when people report, not when dumping happens. */}
-            {stat("Most reports at", formatHour(h.peak_hour))}
+            {stat("Reports mostly come in", h.report_window)}
           </div>
+        </section>
+
+        <section>
+          <h3 className="mb-2 text-sm font-medium">Why it&apos;s flagged</h3>
+          <ul className="list-disc space-y-1 pl-4 text-sm">
+            {h.reasons.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
         </section>
 
         <section>
           <h3 className="mb-2 text-sm font-medium">311 reports per month</h3>
           <Timeline months={h.monthly} color={CATEGORY_COLOR[h.category]} />
+        </section>
+
+        <section>
+          <h3 className="mb-2 text-sm font-medium">Latest reports</h3>
+          <ul className="divide-y text-sm">
+            {h.recent.slice(0, 5).map((r, i) => (
+              <li key={i} className="flex justify-between gap-3 py-1.5">
+                <span className="truncate">{r.address}</span>
+                <span className="shrink-0 text-muted-foreground tabular-nums">{r.opened}</span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section>
