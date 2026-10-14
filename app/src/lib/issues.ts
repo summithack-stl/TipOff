@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-export const CATEGORIES = ["graffiti", "pothole", "dumping", "streetlight_out"] as const;
+export const STREET_CATEGORIES = ["graffiti", "pothole", "dumping", "streetlight_out"] as const;
+export const BUILDING_CATEGORIES = ["open_entry", "roof_damage", "wall_damage", "fire_damage"] as const;
+export const CATEGORIES = [...STREET_CATEGORIES, ...BUILDING_CATEGORIES] as const;
 export type Category = (typeof CATEGORIES)[number];
 export type Severity = "low" | "medium" | "high";
 export type Box = { x: number; y: number; w: number; h: number };
@@ -12,6 +14,11 @@ export const DEPARTMENT: Record<Category, string> = {
   graffiti: "Graffiti removal",
   dumping: "Refuse: illegal dumping",
   streetlight_out: "Street lighting",
+  // Building hazards go to the Building Division (board-up / condemnation) and feed the Fire Department's vacant-building warnings.
+  open_entry: "Building Division: board-up",
+  roof_damage: "Building Division: inspection",
+  wall_damage: "Building Division: inspection",
+  fire_damage: "Building Division: inspection",
 };
 
 // What the vision models return. box_2d is [ymin, xmin, ymax, xmax] on a 0-1000 grid.
