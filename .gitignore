@@ -9,3 +9,5 @@ sleipnir.toml
 .env*.local
 .venv/
 __pycache__/
+
+data/raw/
