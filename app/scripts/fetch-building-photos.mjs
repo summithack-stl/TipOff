@@ -2,6 +2,7 @@
 // optionally runs hazard detection, and writes app/public/photos/ for the app.
 //
 //   MAPILLARY_TOKEN=MLY|... node scripts/fetch-building-photos.mjs [--top 1500] [--max 30] [--detect http://localhost:3000]
+//   MAPILLARY_TOKEN=MLY|... node scripts/fetch-building-photos.mjs --source hotspots --top 300 --max 20 [--detect ...]
 //   node scripts/fetch-building-photos.mjs --redetect --detect http://localhost:3000 [--confirm 1]   (re-run detection on saved photos only)
 //
 // Photos are Mapillary imagery, CC BY-SA 4.0: index.json keeps the image id and a link for attribution.
@@ -12,7 +13,8 @@ import sharp from 'sharp';
 
 const { values: args } = parseArgs({
   options: {
-    top: { type: 'string', default: '1500' }, // how many of the highest-risk buildings to search
+    source: { type: 'string', default: 'buildings' }, // 'buildings' or 'hotspots' (311 hotspots, dumping first)
+    top: { type: 'string', default: '1500' }, // how many of the highest-ranked targets to search
     max: { type: 'string', default: '30' }, // how many buildings to save photos for
     detect: { type: 'string' }, // app URL: also run /api/frames on each photo
     every: { type: 'string', default: '15' }, // seconds between detection calls (free-tier pace)
@@ -29,7 +31,29 @@ const appDir = join(import.meta.dirname, '..');
 const outDir = join(appDir, 'public', 'photos');
 const indexFile = join(outDir, 'index.json');
 await mkdir(outDir, { recursive: true });
-const buildings = JSON.parse(await readFile(join(appDir, 'data', 'clean', 'vacant_buildings.json'), 'utf8')).slice(0, Number(args.top));
+const readJSON = async (file) => JSON.parse(await readFile(file, 'utf8'));
+const readIndex = () => readJSON(indexFile).catch(() => []);
+
+// Each target is a place to photograph: key names the files, info goes into its index entry.
+async function loadTargets() {
+  if (args.source === 'buildings') {
+    const buildings = await readJSON(join(appDir, 'data', 'clean', 'vacant_buildings.json'));
+    return buildings.map((b) => ({
+      key: b.handle, lat: b.lat, lon: b.lon, label: `rank ${b.risk_rank} ${b.address}`,
+      info: { handle: b.handle, address: b.address, lat: b.lat, lon: b.lon, ward: b.ward,
+        risk_score: b.risk_score, risk_rank: b.risk_rank, risk_reasons: b.risk_reasons },
+    }));
+  }
+  if (args.source !== 'hotspots') throw new Error(`unknown --source ${args.source}`);
+  // hotspots.json is sorted by score; dumping goes first because it is the problem set.
+  const hotspots = await readJSON(join(appDir, 'data', 'clean', 'hotspots.json'));
+  const ordered = [...hotspots.filter((h) => h.category === 'dumping'), ...hotspots.filter((h) => h.category !== 'dumping')];
+  return ordered.map((h) => ({
+    key: h.id, lat: h.lat, lon: h.lon, label: `${h.category} #${h.rank} ${h.top_address}`,
+    info: { hotspot_id: h.id, category: h.category, address: h.top_address, lat: h.lat, lon: h.lon, ward: h.ward,
+      score: h.score, rank: h.rank, reasons: h.reasons },
+  }));
+}
 
 const rad = Math.PI / 180;
 function bearing(from, to) {
@@ -106,7 +130,7 @@ const pause = (started) => new Promise((r) => setTimeout(r, Math.max(0, Number(a
 
 if (args.redetect) {
   if (!args.detect) throw new Error('--redetect needs --detect <app url>');
-  const saved = JSON.parse(await readFile(indexFile, 'utf8'));
+  const saved = await readIndex();
   for (const [i, entry] of saved.entries()) {
     if (args.featured && !entry.featured) continue;
     const started = Date.now();
@@ -122,28 +146,30 @@ if (args.redetect) {
   process.exit(0);
 }
 
-const index = [];
-for (const b of buildings) {
-  if (index.length >= Number(args.max)) break;
+const targets = (await loadTargets()).slice(0, Number(args.top));
+// A hotspot run adds to the building photos instead of replacing them (and replaces earlier hotspot photos).
+const index = args.source === 'hotspots' ? (await readIndex()).filter((e) => !e.hotspot_id) : [];
+let added = 0;
+for (const b of targets) {
+  if (added >= Number(args.max)) break;
   let found;
   try {
     found = await findPhotos(b);
   } catch (error) {
-    console.warn(`  ${b.address}: ${error.message}`);
+    console.warn(`  ${b.label}: ${error.message}`);
     continue;
   }
   if (!found) continue;
 
   const entry = {
-    handle: b.handle, address: b.address, lat: b.lat, lon: b.lon, ward: b.ward,
-    risk_score: b.risk_score, risk_rank: b.risk_rank, risk_reasons: b.risk_reasons,
+    ...b.info,
     attribution: 'Street imagery: Mapillary contributors, CC BY-SA 4.0',
   };
   for (const which of ['after', 'before']) {
     const img = found[which];
     if (!img) continue;
     const year = new Date(img.captured_at).getFullYear();
-    const file = `${b.handle}-${year}.jpg`;
+    const file = `${b.key}-${year}.jpg`;
     await writeFile(join(outDir, file), await aimedJpeg(img));
     entry[which] = {
       file, year, image_id: img.id, pano: Boolean(img.is_pano), meters: Math.round(img.meters),
@@ -161,8 +187,9 @@ for (const b of buildings) {
     await pause(started);
   }
   index.push(entry);
+  added += 1;
   // Save as we go so an interrupted run keeps its work.
   await writeFile(indexFile, JSON.stringify(index, null, 1));
-  console.log(`${index.length}. rank ${b.risk_rank} ${b.address}: ${entry.after.year}${entry.before ? ` + ${entry.before.year}` : ''}${entry.after.detections ? `, ${entry.after.detections.length} hazards` : ''}`);
+  console.log(`${added}. ${b.label}: ${entry.after.year}${entry.before ? ` + ${entry.before.year}` : ''}${entry.after.detections ? `, ${entry.after.detections.length} hazards` : ''}`);
 }
-console.log(`wrote ${indexFile} (${index.length} buildings)`);
+console.log(`wrote ${indexFile} (${added} new ${args.source}, ${index.length} entries)`);
