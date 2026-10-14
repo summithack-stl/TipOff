@@ -127,7 +127,11 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
           </div>
           <div className="grid flex-1 grid-cols-2 gap-3 text-sm">
             {stat("311 reports", h.report_count.toLocaleString())}
-            {stat("Trend, last 12 mo", `${trendPct > 0 ? "↑" : trendPct < 0 ? "↓" : "→"} ${Math.abs(trendPct)}%`)}
+            {/* With no reports the year before, a % is meaningless (0 → 7 reads as +700%). */}
+            {stat(
+              "Trend, last 12 mo",
+              h.reports_prev_12m === 0 && h.reports_12m > 0 ? "New this year" : `${trendPct > 0 ? "↑" : trendPct < 0 ? "↓" : "→"} ${Math.abs(trendPct)}%`,
+            )}
             {stat("Most reports on", h.peak_day)}
             {/* 311 times are when people report, not when dumping happens. */}
             {stat("Reports mostly come in", h.report_window)}
