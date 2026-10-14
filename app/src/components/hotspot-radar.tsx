@@ -93,7 +93,7 @@ export function HotspotRadar({ hotspots, vacant }: { hotspots: Hotspot[]; vacant
           </select>
         </label>
         <label className="flex items-center gap-2">
-          Time
+          Reported
           <select value={block ?? ""} onChange={(e) => setBlock(e.target.value === "" ? null : Number(e.target.value))} className={control}>
             <option value="">Any</option>
             {HOUR_BLOCKS.map(([label], i) => (
