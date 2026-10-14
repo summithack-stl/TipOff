@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { assignIds, capPerCategory, distanceMeters, dropOverlaps, findDuplicate, needsConfirm, toBox } from './issues.ts';
+import { assignIds, capPerCategory, CATEGORIES, DEPARTMENT, distanceMeters, dropOverlaps, findDuplicate, needsConfirm, toBox, visionResultSchema } from './issues.ts';
 
 test('toBox converts Gemini box_2d (ymin,xmin,ymax,xmax 0-1000) to 0-1 x/y/w/h', () => {
   assert.deepEqual(toBox([100, 200, 500, 600]), { x: 0.2, y: 0.1, w: 0.4, h: 0.4 });
@@ -67,4 +67,24 @@ test('capPerCategory keeps the most confident few per category', () => {
   const out = capPerCategory([...many, { category: 'graffiti', confidence: 0.4, box }], 4);
   assert.deepEqual(out.filter((d) => d.category === 'open_entry').map((d) => d.confidence), [0.95, 0.9, 0.8, 0.7]);
   assert.equal(out.filter((d) => d.category === 'graffiti').length, 1);
+});
+
+test('vision schema accepts the curb and sidewalk categories and every category has a department', () => {
+  for (const category of ['broken_curb', 'sidewalk_damage']) {
+    const parsed = visionResultSchema.parse({ detections: [{ category, box_2d: [0, 0, 10, 10], confidence: 0.9 }] });
+    assert.equal(parsed.detections[0].category, category);
+  }
+  for (const c of CATEGORIES) assert.ok(DEPARTMENT[c], `no department for ${c}`);
+});
+
+test('vision schema drops malformed detections instead of failing the whole frame', () => {
+  const parsed = visionResultSchema.parse({
+    detections: [
+      { category: 'potholes', box_2d: [0, 0, 10, 10], confidence: 0.9 },
+      { category: 'pothole', box_2d: [[0, 0, 10, 10]], confidence: 0.9 },
+      { category: 'pothole', box_2d: [100, 200, 300, 400], confidence: 0.8 },
+    ],
+  });
+  assert.equal(parsed.detections.length, 1);
+  assert.deepEqual(parsed.detections[0].box_2d, [100, 200, 300, 400]);
 });
