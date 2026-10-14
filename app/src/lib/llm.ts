@@ -52,20 +52,24 @@ async function complete(
       return content;
     };
 
+    const rateLimited = (error: unknown) => error instanceof OpenAI.APIError && error.status === 429;
+    const busy = (why: string) => {
+      const error = new Error(`${provider} rate limit hit at ${model} (${why}). Wait or set DEMO_CACHE=1.`);
+      error.name = "RateLimitError"; // routes turn this into a 503 "busy" reply
+      return error;
+    };
+
     try {
       return await request();
     } catch (error) {
-      if (!(error instanceof OpenAI.APIError) || error.status !== 429) throw error;
+      if (!rateLimited(error)) throw error;
+      // A daily cap won't clear in 1.5 s, so fail fast and let the caller fall back to the other provider.
+      if (/per day/i.test((error as Error).message)) throw busy("daily cap");
       await new Promise<void>((resolve) => setTimeout(resolve, 1_500));
       try {
         return await request();
       } catch (retryError) {
-        if (retryError instanceof OpenAI.APIError && retryError.status === 429) {
-          const busy = new Error(`${provider} rate limit hit at ${model} after one retry. Wait a minute or set DEMO_CACHE=1.`);
-          busy.name = "RateLimitError"; // routes turn this into a 503 "busy" reply
-          throw busy;
-        }
-        throw retryError;
+        throw rateLimited(retryError) ? busy("after one retry") : retryError;
       }
     }
   });
