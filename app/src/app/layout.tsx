@@ -1,27 +1,25 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SummitHack",
-  description: "SummitHack starter",
+  title: "StreetSense",
+  description: "Ranks St. Louis vacant buildings by danger and flags visible hazards in street photos.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className="h-full antialiased"
-    >
-      <body className="flex min-h-full flex-col">
-        <header className="border-b">
-          <div className="mx-auto w-full max-w-5xl px-6 py-4 font-semibold">
-            SummitHack
-          </div>
+    <html lang="en" className="dark h-full antialiased">
+      <body className="flex min-h-full flex-col bg-background text-foreground">
+        <header className="flex h-14 shrink-0 items-center gap-6 border-b px-4">
+          <span className="font-semibold">StreetSense</span>
+          <nav className="flex gap-4 text-sm text-muted-foreground">
+            <Link href="/" className="hover:text-foreground">Danger Radar</Link>
+            <Link href="/watch" className="hover:text-foreground">Tracker</Link>
+          </nav>
         </header>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
-          {children}
-        </main>
+        <main className="flex flex-1 flex-col">{children}</main>
         <Toaster />
       </body>
     </html>
