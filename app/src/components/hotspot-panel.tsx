@@ -13,8 +13,14 @@ import { riskColor } from "@/lib/risk";
 
 const PHOTO_RADIUS_M = 300;
 
-// ponytail: plan text shape guessed until Prahlad's hotspot version of /api/brief lands.
-type Plan = { headline: string; hazards?: string[]; crew_notes?: string[]; actions?: string[] };
+// Shape of POST /api/plan (Prahlad, Task 4).
+type Plan = { id: string; headline: string; what_we_know: string[]; watch: string[]; actions: string[]; evidence: string[] };
+const PLAN_SECTIONS = [
+  ["what_we_know", "What we know"],
+  ["watch", "Where and when to watch"],
+  ["actions", "Actions"],
+  ["evidence", "Evidence"],
+] as const;
 
 // Monthly 311 reports as thin bars. One series, so no legend: the heading names it.
 function Timeline({ months, color }: { months: Hotspot["monthly"]; color: string }) {
@@ -45,14 +51,14 @@ function Timeline({ months, color }: { months: Hotspot["monthly"]; color: string
 }
 
 export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () => void }) {
-  const [near, setNear] = useState<{ photo: Photo; meters: number } | null | undefined>(undefined);
+  const [near, setNear] = useState<{ photo: Photo; meters: number; exact: boolean } | null | undefined>(undefined);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [planState, setPlanState] = useState<"idle" | "loading" | "error">("idle");
   const [planError, setPlanError] = useState("");
 
   useEffect(() => {
-    nearestPhoto(h.lat, h.lon, PHOTO_RADIUS_M).then(setNear);
-  }, [h.lat, h.lon]);
+    nearestPhoto(h.lat, h.lon, PHOTO_RADIUS_M, h.id).then(setNear);
+  }, [h.lat, h.lon, h.id]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -66,11 +72,11 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
   const writePlan = async () => {
     setPlanState("loading");
     try {
-      const res = await fetch("/api/brief", {
+      const res = await fetch("/api/plan", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          hotspot_id: h.id,
+          id: h.id,
           detections: detections.map(({ category, severity, note }) => ({ category, severity, note })),
         }),
       });
@@ -122,8 +128,9 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
           <div className="grid flex-1 grid-cols-2 gap-3 text-sm">
             {stat("311 reports", h.report_count.toLocaleString())}
             {stat("Trend, last 12 mo", `${trendPct > 0 ? "↑" : trendPct < 0 ? "↓" : "→"} ${Math.abs(trendPct)}%`)}
-            {stat("Peak day", h.peak_day)}
-            {stat("Peak hour", formatHour(h.peak_hour))}
+            {stat("Most reports on", h.peak_day)}
+            {/* 311 times are when people report, not when dumping happens. */}
+            {stat("Most reports at", formatHour(h.peak_hour))}
           </div>
         </section>
 
@@ -133,7 +140,7 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
         </section>
 
         <section>
-          <h3 className="mb-2 text-sm font-medium">Nearest street photo</h3>
+          <h3 className="mb-2 text-sm font-medium">{near?.exact ? "Street photo at this hotspot" : "Nearest street photo"}</h3>
           {near === undefined ? (
             <Skeleton className="aspect-video" />
           ) : near ? (
@@ -154,17 +161,17 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
           {plan ? (
             <div className="space-y-2 rounded-lg border p-3 text-sm">
               <p className="font-medium">{plan.headline}</p>
-              <ul className="list-disc pl-4">
-                {[...(plan.actions ?? []), ...(plan.hazards ?? [])].map((a) => (
-                  <li key={a}>{a}</li>
-                ))}
-              </ul>
-              {plan.crew_notes && (
-                <ul className="list-disc pl-4 text-muted-foreground">
-                  {plan.crew_notes.map((n) => (
-                    <li key={n}>{n}</li>
-                  ))}
-                </ul>
+              {PLAN_SECTIONS.map(([key, title]) =>
+                plan[key]?.length ? (
+                  <div key={key}>
+                    <h4 className="text-xs font-medium text-muted-foreground">{title}</h4>
+                    <ul className={`list-disc pl-4 ${key === "evidence" ? "text-muted-foreground" : ""}`}>
+                      {plan[key].map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null,
               )}
             </div>
           ) : planState === "loading" ? (
