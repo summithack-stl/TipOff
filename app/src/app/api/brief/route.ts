@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getBuilding } from "@/lib/buildings";
+import { rateLimit, upstreamError } from "@/lib/guard";
 import { CATEGORIES } from "@/lib/issues";
 import { chatJSON } from "@/lib/llm";
 
@@ -25,8 +26,13 @@ This is not a structural assessment: phrase photo findings as "photo shows" and 
 Plain words, no jargon. Return JSON only:
 {"headline":"one line, under 15 words","hazards":["up to 6 short bullet strings"],"crew_notes":["up to 5 short practical notes, e.g. what to check before entry"]}`;
 
+export const maxDuration = 30;
+
 // Building record + latest photo findings in, a short firefighter/inspector brief out.
 export async function POST(request: Request) {
+  const limited = rateLimit(request, "brief", 20);
+  if (limited) return limited;
+
   const parsed = requestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: z.prettifyError(parsed.error) }, { status: 400 });
@@ -60,7 +66,6 @@ export async function POST(request: Request) {
     );
     return NextResponse.json({ handle: building.handle, ...brief });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: message }, { status: 502 });
+    return upstreamError("brief", error);
   }
 }
