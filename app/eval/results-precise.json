@@ -1,0 +1,704 @@
+{
+ "at": "2026-10-14T13:05:25.723Z",
+ "summary": {
+  "mode": {
+   "confirm": "1",
+   "precise": "1"
+  },
+  "photos": 53,
+  "errors": 0,
+  "expected": 27,
+  "found": 24,
+  "photosWithFalseAlarm": 10,
+  "cleanPhotosFlagged": "6 of 28",
+  "perCategory": [
+   {
+    "category": "broken_curb",
+    "expected": 4,
+    "found": 4,
+    "falseAlarms": 2
+   },
+   {
+    "category": "dumping",
+    "expected": 4,
+    "found": 2,
+    "falseAlarms": 1
+   },
+   {
+    "category": "fire_damage",
+    "expected": 0,
+    "found": 0,
+    "falseAlarms": 2
+   },
+   {
+    "category": "graffiti",
+    "expected": 5,
+    "found": 5,
+    "falseAlarms": 0
+   },
+   {
+    "category": "open_entry",
+    "expected": 5,
+    "found": 4,
+    "falseAlarms": 2
+   },
+   {
+    "category": "pothole",
+    "expected": 4,
+    "found": 4,
+    "falseAlarms": 0
+   },
+   {
+    "category": "roof_damage",
+    "expected": 1,
+    "found": 1,
+    "falseAlarms": 2
+   },
+   {
+    "category": "sidewalk_damage",
+    "expected": 4,
+    "found": 4,
+    "falseAlarms": 4
+   }
+  ]
+ },
+ "rows": [
+  {
+   "file": "eval/photos/clean-1.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/clean-2.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/clean-3.jpg",
+   "expect": [],
+   "found": [
+    "sidewalk_damage"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": [
+    "sidewalk_damage"
+   ]
+  },
+  {
+   "file": "eval/photos/curb-1.jpg",
+   "expect": [
+    "broken_curb"
+   ],
+   "found": [
+    "broken_curb"
+   ],
+   "hits": [
+    "broken_curb"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/curb-2.jpg",
+   "expect": [
+    "broken_curb"
+   ],
+   "found": [
+    "broken_curb"
+   ],
+   "hits": [
+    "broken_curb"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/curb-3.jpg",
+   "expect": [
+    "broken_curb"
+   ],
+   "found": [
+    "broken_curb"
+   ],
+   "hits": [
+    "broken_curb"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/curb-4.jpg",
+   "expect": [
+    "broken_curb"
+   ],
+   "found": [
+    "broken_curb",
+    "dumping"
+   ],
+   "hits": [
+    "broken_curb"
+   ],
+   "misses": [],
+   "falseAlarms": [
+    "dumping"
+   ]
+  },
+  {
+   "file": "eval/photos/dumping-1.jpg",
+   "expect": [
+    "dumping"
+   ],
+   "found": [],
+   "hits": [],
+   "misses": [
+    "dumping"
+   ],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/dumping-2.jpg",
+   "expect": [
+    "dumping"
+   ],
+   "found": [
+    "dumping"
+   ],
+   "hits": [
+    "dumping"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/dumping-3.jpg",
+   "expect": [
+    "dumping"
+   ],
+   "found": [],
+   "hits": [],
+   "misses": [
+    "dumping"
+   ],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/dumping-4.jpg",
+   "expect": [
+    "dumping"
+   ],
+   "found": [
+    "dumping"
+   ],
+   "hits": [
+    "dumping"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/graffiti-1.jpg",
+   "expect": [
+    "graffiti"
+   ],
+   "found": [
+    "graffiti"
+   ],
+   "hits": [
+    "graffiti"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/graffiti-2.jpg",
+   "expect": [
+    "graffiti"
+   ],
+   "found": [
+    "graffiti",
+    "roof_damage",
+    "wall_damage",
+    "broken_curb"
+   ],
+   "hits": [
+    "graffiti"
+   ],
+   "misses": [],
+   "falseAlarms": [
+    "broken_curb"
+   ]
+  },
+  {
+   "file": "eval/photos/graffiti-3.jpg",
+   "expect": [
+    "graffiti"
+   ],
+   "found": [
+    "graffiti",
+    "wall_damage"
+   ],
+   "hits": [
+    "graffiti"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/pothole-1.jpg",
+   "expect": [
+    "pothole"
+   ],
+   "found": [
+    "pothole"
+   ],
+   "hits": [
+    "pothole"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/pothole-2.jpg",
+   "expect": [
+    "pothole"
+   ],
+   "found": [
+    "pothole"
+   ],
+   "hits": [
+    "pothole"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/pothole-3.jpg",
+   "expect": [
+    "pothole"
+   ],
+   "found": [
+    "broken_curb",
+    "pothole"
+   ],
+   "hits": [
+    "pothole"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/pothole-4.jpg",
+   "expect": [
+    "pothole"
+   ],
+   "found": [
+    "pothole"
+   ],
+   "hits": [
+    "pothole"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/sidewalk-1.jpg",
+   "expect": [
+    "sidewalk_damage"
+   ],
+   "found": [
+    "sidewalk_damage"
+   ],
+   "hits": [
+    "sidewalk_damage"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/sidewalk-2.jpg",
+   "expect": [
+    "sidewalk_damage"
+   ],
+   "found": [
+    "sidewalk_damage"
+   ],
+   "hits": [
+    "sidewalk_damage"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/sidewalk-3.jpg",
+   "expect": [
+    "sidewalk_damage"
+   ],
+   "found": [
+    "sidewalk_damage"
+   ],
+   "hits": [
+    "sidewalk_damage"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "eval/photos/sidewalk-4.jpg",
+   "expect": [
+    "sidewalk_damage"
+   ],
+   "found": [
+    "sidewalk_damage"
+   ],
+   "hits": [
+    "sidewalk_damage"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/11144000070-2026.jpg",
+   "expect": [
+    "open_entry"
+   ],
+   "found": [],
+   "hits": [],
+   "misses": [
+    "open_entry"
+   ],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/11893000080-2026.jpg",
+   "expect": [
+    "open_entry",
+    "roof_damage",
+    "graffiti"
+   ],
+   "found": [
+    "graffiti",
+    "open_entry",
+    "roof_damage"
+   ],
+   "hits": [
+    "open_entry",
+    "roof_damage",
+    "graffiti"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/12062000090-2026.jpg",
+   "expect": [
+    "graffiti"
+   ],
+   "found": [
+    "graffiti",
+    "open_entry"
+   ],
+   "hits": [
+    "graffiti"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/14389020260-2026.jpg",
+   "expect": [
+    "open_entry"
+   ],
+   "found": [
+    "open_entry"
+   ],
+   "hits": [
+    "open_entry"
+   ],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/15493000210-2026.jpg",
+   "expect": [
+    "open_entry"
+   ],
+   "found": [
+    "open_entry",
+    "roof_damage"
+   ],
+   "hits": [
+    "open_entry"
+   ],
+   "misses": [],
+   "falseAlarms": [
+    "roof_damage"
+   ]
+  },
+  {
+   "file": "public/photos/13546000240-2026.jpg",
+   "expect": [
+    "open_entry"
+   ],
+   "found": [
+    "fire_damage",
+    "open_entry"
+   ],
+   "hits": [
+    "open_entry"
+   ],
+   "misses": [],
+   "falseAlarms": [
+    "fire_damage"
+   ]
+  },
+  {
+   "file": "public/photos/11179000010-2026.jpg",
+   "expect": [],
+   "found": [
+    "sidewalk_damage"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": [
+    "sidewalk_damage"
+   ]
+  },
+  {
+   "file": "public/photos/12782040260-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/15637000240-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/10639000020-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/11122000160-2018.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/11122000160-2026.jpg",
+   "expect": [],
+   "found": [
+    "sidewalk_damage",
+    "broken_curb"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": [
+    "sidewalk_damage",
+    "broken_curb"
+   ]
+  },
+  {
+   "file": "public/photos/13548000210-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/13551000220-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/13551000230-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/14239010121-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/15142000270-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/15549000310-2026.jpg",
+   "expect": [],
+   "found": [
+    "roof_damage",
+    "fire_damage",
+    "open_entry"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": [
+    "roof_damage",
+    "fire_damage",
+    "open_entry"
+   ]
+  },
+  {
+   "file": "public/photos/15672010140-2026.jpg",
+   "expect": [],
+   "found": [
+    "open_entry"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": [
+    "open_entry"
+   ]
+  },
+  {
+   "file": "public/photos/10409000070-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/11128000170-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/11144000060-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/11191000050-2026.jpg",
+   "expect": [],
+   "found": [
+    "graffiti",
+    "dumping",
+    "open_entry"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/12404000040-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/13357000385-2026.jpg",
+   "expect": [],
+   "found": [
+    "roof_damage",
+    "wall_damage"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/13541000020-2026.jpg",
+   "expect": [],
+   "found": [
+    "roof_damage"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/14389020330-2026.jpg",
+   "expect": [],
+   "found": [
+    "open_entry"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/14390310280-2026.jpg",
+   "expect": [],
+   "found": [
+    "sidewalk_damage",
+    "dumping"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": [
+    "sidewalk_damage"
+   ]
+  },
+  {
+   "file": "public/photos/15397000430-2026.jpg",
+   "expect": [],
+   "found": [
+    "open_entry"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/15450000010-2026.jpg",
+   "expect": [],
+   "found": [
+    "open_entry"
+   ],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  },
+  {
+   "file": "public/photos/15524000210-2026.jpg",
+   "expect": [],
+   "found": [],
+   "hits": [],
+   "misses": [],
+   "falseAlarms": []
+  }
+ ]
+}
