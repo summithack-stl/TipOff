@@ -1481,5 +1481,514 @@
     }
    ]
   }
+ },
+ {
+  "hotspot_id": "dumping-27654_-50128",
+  "category": "dumping",
+  "address": "8440 N BROADWAY",
+  "lat": 38.71633,
+  "lon": -90.22918,
+  "ward": 13,
+  "score": 78,
+  "rank": 1,
+  "reasons": [
+   "26 reports in the last 12 months",
+   "reported in 14 different weeks this year",
+   "up from 10 the year before",
+   "13 vacant buildings within 150 m",
+   "most reports on Wed, mostly reported 5am-8am"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27654_-50128-2026.jpg",
+   "year": 2026,
+   "image_id": "1310863091121541",
+   "pano": true,
+   "meters": 41,
+   "link": "https://www.mapillary.com/app/?pKey=1310863091121541",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27641_-50138",
+  "category": "dumping",
+  "address": "5430 THRUSH AVE",
+  "lat": 38.6983,
+  "lon": -90.24767,
+  "ward": 13,
+  "score": 77,
+  "rank": 2,
+  "reasons": [
+   "16 reports in the last 12 months",
+   "reported in 13 different weeks this year",
+   "up from 5 the year before",
+   "18 vacant buildings within 150 m",
+   "most reports on Fri, mostly reported 10am-1pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27641_-50138-2026.jpg",
+   "year": 2026,
+   "image_id": "1717164515971145",
+   "pano": true,
+   "meters": 12,
+   "link": "https://www.mapillary.com/app/?pKey=1717164515971145",
+   "detections": [
+    {
+     "category": "roof_damage",
+     "box": {
+      "x": 0.693,
+      "y": 0.55,
+      "w": 0.141,
+      "h": 0.163
+     },
+     "confidence": 0.82,
+     "severity": "high",
+     "note": "Damaged or collapsed roof on structure",
+     "confirmed": true
+    },
+    {
+     "category": "wall_damage",
+     "box": {
+      "x": 0.693,
+      "y": 0.597,
+      "w": 0.112,
+      "h": 0.116
+     },
+     "confidence": 0.78,
+     "severity": "high",
+     "note": "Damaged exterior walls on abandoned building",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "hotspot_id": "dumping-27592_-50171",
+  "category": "dumping",
+  "address": "MCCAUSLAND AVE & WISE AVE",
+  "lat": 38.62944,
+  "lon": -90.30675,
+  "ward": 4,
+  "score": 70,
+  "rank": 46,
+  "reasons": [
+   "7 reports in the last 12 months",
+   "reported in 4 different weeks this year",
+   "5 vacant buildings within 150 m",
+   "most reports on Fri, mostly reported 1am-4am"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27592_-50171-2026.jpg",
+   "year": 2026,
+   "image_id": "1539052664159329",
+   "pano": true,
+   "meters": 11,
+   "link": "https://www.mapillary.com/app/?pKey=1539052664159329",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27627_-50135",
+  "category": "dumping",
+  "address": "4139 SHREVE AVE",
+  "lat": 38.6785,
+  "lon": -90.24206,
+  "ward": 12,
+  "score": 67,
+  "rank": 92,
+  "reasons": [
+   "5 reports in the last 12 months",
+   "reported in 4 different weeks this year",
+   "up from 1 the year before",
+   "18 vacant buildings within 150 m",
+   "most reports on Tue, mostly reported 8am-11am"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27627_-50135-2026.jpg",
+   "year": 2026,
+   "image_id": "942545995376764",
+   "pano": true,
+   "meters": 23,
+   "link": "https://www.mapillary.com/app/?pKey=942545995376764",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27642_-50138",
+  "category": "dumping",
+  "address": "5420 PLOVER AVE",
+  "lat": 38.69938,
+  "lon": -90.24766,
+  "ward": 13,
+  "score": 64,
+  "rank": 129,
+  "reasons": [
+   "7 reports in the last 12 months",
+   "reported in 5 different weeks this year",
+   "21 vacant buildings within 150 m",
+   "most reports on Mon, mostly reported 1pm-4pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27642_-50138-2026.jpg",
+   "year": 2026,
+   "image_id": "1314232894178733",
+   "pano": true,
+   "meters": 18,
+   "link": "https://www.mapillary.com/app/?pKey=1314232894178733",
+   "detections": [
+    {
+     "category": "open_entry",
+     "box": {
+      "x": 0.142,
+      "y": 0.531,
+      "w": 0.043,
+      "h": 0.066
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Open doorway on abandoned building",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "hotspot_id": "dumping-27580_-50146",
+  "category": "dumping",
+  "address": "2121 ALFRED AVE",
+  "lat": 38.613,
+  "lon": -90.26226,
+  "ward": 5,
+  "score": 64,
+  "rank": 140,
+  "reasons": [
+   "4 reports in the last 12 months",
+   "reported in 4 different weeks this year",
+   "up from 1 the year before",
+   "3 vacant buildings within 150 m",
+   "most reports on Wed, mostly reported 10am-1pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27580_-50146-2025.jpg",
+   "year": 2025,
+   "image_id": "1079855654344036",
+   "pano": false,
+   "meters": 42,
+   "link": "https://www.mapillary.com/app/?pKey=1079855654344036",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27651_-50129",
+  "category": "dumping",
+  "address": "8319 HALLS FERRY RD",
+  "lat": 38.71208,
+  "lon": -90.23081,
+  "ward": 12,
+  "score": 64,
+  "rank": 151,
+  "reasons": [
+   "4 reports in the last 12 months",
+   "reported in 4 different weeks this year",
+   "up from 1 the year before",
+   "9 vacant buildings within 150 m",
+   "most reports on Mon, mostly reported 10am-1pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27651_-50129-2026.jpg",
+   "year": 2026,
+   "image_id": "1765783241087097",
+   "pano": true,
+   "meters": 36,
+   "link": "https://www.mapillary.com/app/?pKey=1765783241087097",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27659_-50127",
+  "category": "dumping",
+  "address": "8786 N BROADWAY",
+  "lat": 38.72354,
+  "lon": -90.22791,
+  "ward": 13,
+  "score": 63,
+  "rank": 158,
+  "reasons": [
+   "7 reports in the last 12 months",
+   "17 vacant buildings within 150 m",
+   "most reports on Sun, mostly reported 6am-9am"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27659_-50127-2026.jpg",
+   "year": 2026,
+   "image_id": "3098751190323432",
+   "pano": true,
+   "meters": 41,
+   "link": "https://www.mapillary.com/app/?pKey=3098751190323432",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27605_-50109",
+  "category": "dumping",
+  "address": "1222 N MARKET PL",
+  "lat": 38.64796,
+  "lon": -90.19487,
+  "ward": 14,
+  "score": 63,
+  "rank": 173,
+  "reasons": [
+   "4 reports in the last 12 months",
+   "14 vacant buildings within 150 m",
+   "most reports on Wed, mostly reported 1pm-4pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27605_-50109-2026.jpg",
+   "year": 2026,
+   "image_id": "947340704993292",
+   "pano": true,
+   "meters": 18,
+   "link": "https://www.mapillary.com/app/?pKey=947340704993292",
+   "detections": [
+    {
+     "category": "sidewalk_damage",
+     "box": {
+      "x": 0,
+      "y": 0.741,
+      "w": 0.982,
+      "h": 0.161
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Extensive missing or broken sidewalk slabs",
+     "confirmed": true
+    },
+    {
+     "category": "broken_curb",
+     "box": {
+      "x": 0.001,
+      "y": 0.805,
+      "w": 0.998,
+      "h": 0.085
+     },
+     "confidence": 0.8,
+     "severity": "medium",
+     "note": "Curb missing and broken along corner",
+     "confirmed": true
+    }
+   ]
+  },
+  "before": {
+   "file": "dumping-27605_-50109-2018.jpg",
+   "year": 2018,
+   "image_id": "961313787975648",
+   "pano": false,
+   "meters": 26,
+   "link": "https://www.mapillary.com/app/?pKey=961313787975648"
+  }
+ },
+ {
+  "hotspot_id": "dumping-27616_-50116",
+  "category": "dumping",
+  "address": "4025 N FLORISSANT AVE",
+  "lat": 38.66349,
+  "lon": -90.20742,
+  "ward": 14,
+  "score": 63,
+  "rank": 178,
+  "reasons": [
+   "4 reports in the last 12 months",
+   "12 vacant buildings within 150 m",
+   "most reports on Tue, mostly reported 12pm-3pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27616_-50116-2026.jpg",
+   "year": 2026,
+   "image_id": "27700836849569303",
+   "pano": true,
+   "meters": 31,
+   "link": "https://www.mapillary.com/app/?pKey=27700836849569303",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27638_-50142",
+  "category": "dumping",
+  "address": "4938 GENEVIEVE AVE",
+  "lat": 38.69422,
+  "lon": -90.25434,
+  "ward": 13,
+  "score": 63,
+  "rank": 187,
+  "reasons": [
+   "4 reports in the last 12 months",
+   "up from 2 the year before",
+   "24 vacant buildings within 150 m",
+   "most reports on Tue, mostly reported 2pm-5pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27638_-50142-2026.jpg",
+   "year": 2026,
+   "image_id": "1608034874090301",
+   "pano": true,
+   "meters": 3,
+   "link": "https://www.mapillary.com/app/?pKey=1608034874090301",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27638_-50144",
+  "category": "dumping",
+  "address": "4700 PLOVER AVE",
+  "lat": 38.69392,
+  "lon": -90.25838,
+  "ward": 13,
+  "score": 63,
+  "rank": 188,
+  "reasons": [
+   "4 reports in the last 12 months",
+   "up from 1 the year before",
+   "16 vacant buildings within 150 m",
+   "most reports on Tue, mostly reported 10am-1pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27638_-50144-2026.jpg",
+   "year": 2026,
+   "image_id": "824583717171812",
+   "pano": true,
+   "meters": 18,
+   "link": "https://www.mapillary.com/app/?pKey=824583717171812",
+   "detections": [
+    {
+     "category": "dumping",
+     "box": {
+      "x": 0.404,
+      "y": 0.697,
+      "w": 0.073,
+      "h": 0.042
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Debris and trash accumulation in yard",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "hotspot_id": "dumping-27647_-50128",
+  "category": "dumping",
+  "address": "7816 N BROADWAY",
+  "lat": 38.70639,
+  "lon": -90.22963,
+  "ward": 12,
+  "score": 62,
+  "rank": 194,
+  "reasons": [
+   "7 reports in the last 12 months",
+   "reported in 6 different weeks this year",
+   "6 vacant buildings within 150 m",
+   "most reports on Mon, mostly reported 1pm-4pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27647_-50128-2026.jpg",
+   "year": 2026,
+   "image_id": "1817777272980456",
+   "pano": true,
+   "meters": 45,
+   "link": "https://www.mapillary.com/app/?pKey=1817777272980456",
+   "detections": [
+    {
+     "category": "broken_curb",
+     "box": {
+      "x": 0.154,
+      "y": 0.804,
+      "w": 0.846,
+      "h": 0.162
+     },
+     "confidence": 0.85,
+     "severity": "medium",
+     "note": "Crumbling and broken curb edge",
+     "confirmed": true
+    },
+    {
+     "category": "sidewalk_damage",
+     "box": {
+      "x": 0.099,
+      "y": 0.637,
+      "w": 0.175,
+      "h": 0.173
+     },
+     "confidence": 0.8,
+     "severity": "medium",
+     "note": "Uneven sidewalk slabs",
+     "confirmed": true
+    }
+   ]
+  }
+ },
+ {
+  "hotspot_id": "dumping-27638_-50143",
+  "category": "dumping",
+  "address": "4751 THRUSH AVE",
+  "lat": 38.69386,
+  "lon": -90.25673,
+  "ward": 13,
+  "score": 61,
+  "rank": 205,
+  "reasons": [
+   "6 reports in the last 12 months",
+   "reported in 6 different weeks this year",
+   "20 vacant buildings within 150 m",
+   "most reports on Tue, mostly reported 2pm-5pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27638_-50143-2026.jpg",
+   "year": 2026,
+   "image_id": "1888743769196486",
+   "pano": true,
+   "meters": 16,
+   "link": "https://www.mapillary.com/app/?pKey=1888743769196486",
+   "detections": []
+  }
+ },
+ {
+  "hotspot_id": "dumping-27642_-50139",
+  "category": "dumping",
+  "address": "5400 PLOVER AVE",
+  "lat": 38.69933,
+  "lon": -90.24871,
+  "ward": 13,
+  "score": 59,
+  "rank": 224,
+  "reasons": [
+   "5 reports in the last 12 months",
+   "reported in 4 different weeks this year",
+   "15 vacant buildings within 150 m",
+   "most reports on Mon, mostly reported 9am-12pm"
+  ],
+  "attribution": "Street imagery: Mapillary contributors, CC BY-SA 4.0",
+  "after": {
+   "file": "dumping-27642_-50139-2026.jpg",
+   "year": 2026,
+   "image_id": "987861280314607",
+   "pano": true,
+   "meters": 30,
+   "link": "https://www.mapillary.com/app/?pKey=987861280314607",
+   "detections": []
+  }
  }
 ]
