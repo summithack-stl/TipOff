@@ -51,6 +51,8 @@ Full table and method: [`data/backtest/RESULTS.md`](data/backtest/RESULTS.md). R
 - **Plans** (`POST /api/plan`, gpt-oss-120b on Groq): turns a hotspot's sourced facts into a plan (what we know, where and when to watch, actions, evidence for a citation). The prompt allows only the given facts: no invented dates, counts, people, vehicles or causes.
 - **Street photos** (`POST /api/frames`): a fast vision model on Groq flags dumping, potholes, graffiti and curb or sidewalk damage; Gemini double-checks anything uncertain or severe. On 53 hand-labeled test photos it found 11 of 13 street problems (2 of 4 dumping piles), so the 311 history does the heavy lifting.
 - No face or license-plate recognition anywhere.
+- **Not AI:** the hotspot score is a plain formula (see [How a block becomes a hotspot](#how-a-block-becomes-a-hotspot)), not a model. The backtest uses that same formula.
+- **Demo video:** every voice is a real team member. Edits only cut words out; no voice was AI-generated or cloned.
 
 ## Keeping the data fresh
 
