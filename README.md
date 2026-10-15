@@ -28,7 +28,7 @@ City staff, not residents. Residents keep reporting through 311 exactly as they 
 ## Demo
 
 - Live app: https://summithack-blond.vercel.app (overview and setup guide; hotspot map at `/map`, crew list at `/crew`)
-- Demo video: [YouTube link]
+- Demo video: https://youtu.be/z5E3rEblO9o
 
 ## Does it work? (backtest)
 
