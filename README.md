@@ -2,6 +2,10 @@
 
 > Finds the St. Louis blocks where illegal dumping keeps coming back, shows when it gets reported, and writes a camera and cleanup plan for city staff.
 
+**Try it:** https://summithack-blond.vercel.app (no login). Pick **Dumping**, click a hotspot, press **Write plan**. The morning crew list is at [`/crew`](https://summithack-blond.vercel.app/crew).
+
+**Run it yourself** (Node 20+): `git clone https://github.com/summithack-stl/summithack && cd summithack/app && npm ci && npm run dev`, then open http://localhost:3000. The map, scores and crew list work with no keys; the AI plan and photo check need a free Groq key in `app/.env.local` (see [Run locally](#run-locally)).
+
 ## Problem
 
 Civic AI Hackathon, Problem Set #3: Illegal Dumping. The City raised the maximum dumping fine from $500 to $1,000 in 2022, but it still struggles to gather evidence: even where cameras are installed, footage often misses the plate or the face. The City asked for help to "proactively identify hotspots of dumping or likely areas/times that offenders frequent to target preventative action."
@@ -81,16 +85,17 @@ Mapillary photos ──(scripts/fetch-building-photos.mjs)──> public/photos/
 
 All model calls go through `app/src/lib/llm.ts` (server only). Each route is rate limited per client and never returns raw provider errors.
 
-### Inspection priority score
+### Earlier direction: vacant-building inspection map
 
-Every vacant building gets a 0–100 score from city records only. Each part is capped so no single field dominates: major code violations up to 35 points, time on the vacant list up to 20, building age up to 15 (pre-1900 gets all 15), minor code violations up to 10, recent 311 complaints up to 10, unpaid vacant-building fees up to 10. The formula lives in `data/scripts/fetch_vacant_buildings.py`. The score orders buildings for inspection. It does not predict collapse. Each building keeps its plain-language reasons (for example "29 major code violations").
+Before Problem Set #3 was announced we built a vacant-building inspection map; its code is still in the repo (`/api/brief`, `fetch_vacant_buildings.py`), and TipOff uses the vacant-building list only as one hotspot signal. Every vacant building gets a 0–100 score from city records only. Each part is capped so no single field dominates: major code violations up to 35 points, time on the vacant list up to 20, building age up to 15 (pre-1900 gets all 15), minor code violations up to 10, recent 311 complaints up to 10, unpaid vacant-building fees up to 10. The formula lives in `data/scripts/fetch_vacant_buildings.py`. The score orders buildings for inspection. It does not predict collapse. Each building keeps its plain-language reasons (for example "29 major code violations").
 
 ### API
 
 | Route | Input | Output |
 | --- | --- | --- |
 | `POST /api/frames` | multipart form: `image` (JPEG/PNG/WebP, max 4 MB), `camera_id`, optional `lat`, `lon`, `captured_at`, `confirm` (`1` default, `0` skips the second model), `precise` (`1` sends the whole frame to the second model for tighter boxes) | `{ detections: [{ category, box: {x,y,w,h} (0–1), confidence, severity, note, confirmed }], ms }` |
-| `POST /api/brief` | JSON `{ handle: "11-digit parcel handle", detections?: [{ category, severity, note }] }` | `{ handle, headline, hazards[], crew_notes[] }` |
+| `POST /api/plan` | JSON `{ id: "hotspot id, e.g. dumping-27654_-50128", detections?: [{ category, severity, note }] }` | `{ id, headline, what_we_know[], watch[], actions[], evidence[] }` |
+| `POST /api/brief` (earlier direction) | JSON `{ handle: "11-digit parcel handle", detections?: [{ category, severity, note }] }` | `{ handle, headline, hazards[], crew_notes[] }` |
 | `GET /api/health` | none | `{ ok, provider, model, vision: { fast, confirm }, reply, ms }` |
 
 Categories: building hazards `open_entry`, `roof_damage`, `wall_damage`, `fire_damage`; street issues `graffiti`, `pothole`, `dumping`, `streetlight_out`, `broken_curb`, `sidewalk_damage`.
