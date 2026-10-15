@@ -1,29 +1,62 @@
-# [Project name]
+# TipOff
 
-> One sentence: what it does and for whom.
+> Finds the St. Louis blocks where illegal dumping keeps coming back, shows when it gets reported, and writes a camera and cleanup plan for city staff.
 
 ## Problem
 
-[The St. Louis problem, in the words city leaders used at kickoff. Name the challenge we picked.]
+Civic AI Hackathon, Problem Set #3: Illegal Dumping. The City raised the maximum dumping fine from $500 to $1,000 in 2022, but it still struggles to gather evidence: even where cameras are installed, footage often misses the plate or the face. The City asked for help to "proactively identify hotspots of dumping or likely areas/times that offenders frequent to target preventative action."
 
 ## Who it helps
 
-[The specific user, e.g. "a CSB intake worker", and what changes for them.]
+City staff, not residents. Residents keep reporting through 311 exactly as they do now; those reports feed TipOff.
+
+- **Citizens' Service Bureau / refuse crews:** a daily list of the blocks that usually get reports on today's weekday, with a suggested watch window and a plan. Crews can clean on a schedule instead of waiting for complaints (35% of dumping and debris reports stay open more than a week; median 3.2 days).
+- **Whoever places the city's cameras:** a ranked list of 1,173 dumping hotspots, so the few cameras go to the blocks where dumping keeps coming back, recording around the clock.
+- **Code enforcement:** each plan lists the evidence a citation needs.
+
+### How the City gets the most out of it
+
+1. **Cameras:** put them on the top-ranked blocks first, recording 24/7 (report times are when people report, not when dumping happens).
+2. **Cleanups:** schedule crews from the daily Crew list instead of only reacting to new 311 tickets.
+3. **Evidence:** use each block's plan as the checklist for a citation.
+4. **Measure:** re-check a block's reports a month after acting on it. If they don't drop, change the approach. The nightly data refresh makes this a habit, not a project.
 
 ## Demo
 
-- Live app: [URL]
-- Demo video: [URL]
+- Live app: https://summithack-blond.vercel.app (crew list at `/crew`)
+- Demo video: [YouTube link]
+
+## Does it work? (backtest)
+
+We scored every dumping hotspot as if it were a year ago, using only reports up to 2025-10-14, with the same formula the app uses. Then we checked the next 12 months, which the score never saw:
+
+| Top N blocks | Got dumping or debris reports again |
+| --- | --- |
+| 10 | 9 |
+| 50 | 42 |
+| 100 | 83 |
+
+Full table and method: [`data/backtest/RESULTS.md`](data/backtest/RESULTS.md). Re-run it with `python data/scripts/backtest.py`.
+
+## How a block becomes a hotspot
+
+`data/scripts/build_hotspots.py` splits the city into squares about 155 m on a side (roughly a block). A square is a hotspot once it has 5 or more reports of one type since January 2024. Each hotspot gets a 0-100 score from its last 12 months: report volume (ranked against hotspots of the same type) 40%, how many different weeks it was reported in 30%, trend against the 12 months before 15%, vacant buildings within 150 m 15%. The score orders where to look first; it does not predict crime and never identifies people.
 
 ## How AI is used
 
-[What the model does that a form or dashboard couldn't, which model and provider, and how we check its output against source data.]
+- **Plans** (`POST /api/plan`, gpt-oss-120b on Groq): turns a hotspot's sourced facts into a plan (what we know, where and when to watch, actions, evidence for a citation). The prompt allows only the given facts: no invented dates, counts, people, vehicles or causes.
+- **Street photos** (`POST /api/frames`): a fast vision model on Groq flags dumping, potholes, graffiti and curb or sidewalk damage; Gemini double-checks anything uncertain or severe. On 53 hand-labeled test photos it found 11 of 13 street problems (2 of 4 dumping piles), so the 311 history does the heavy lifting.
+- No face or license-plate recognition anywhere.
+
+## Keeping the data fresh
+
+`.github/workflows/refresh-data.yml` runs every night: it downloads the City's latest 311 file, rebuilds the hotspots and the backtest, and commits the result; Vercel redeploys on its own. To connect the City's own 311 database instead of the public CSV, replace the download step in `data/scripts/fetch_311.py` with a query that returns the same columns (request ID, problem code, location, time opened, status). Nothing else changes.
 
 ## Data sources
 
 | Dataset | URL | How we use it |
 | --- | --- | --- |
-| Citizens' Service Bureau (311) requests (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/distribution.cfm?id=2 | 40,426 reports of illegal dumping and debris, potholes and graffiti from 2024-2026, grouped into 2,925 repeat hotspots (`data/scripts/fetch_311.py`, `build_hotspots.py`). We keep location, type and time only, never the caller or free-text fields. Report times are when residents reported, not when dumping happened. |
+| Citizens' Service Bureau (311) requests (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/distribution.cfm?id=2 | 40,426 reports of dumping and debris (6 problem codes; 2,157 use the "Illegal dumping" code), potholes and graffiti from 2024-2026, grouped into 2,925 repeat hotspots (`data/scripts/fetch_311.py`, `build_hotspots.py`). We keep location, type and time only, never the caller or free-text fields. Report times are when residents reported, not when dumping happened. |
 | Vacant Building List (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=108 | The 9,943 buildings on the city's vacant list, with code violations, unpaid vacant-building fees and time on the list. Used as context for hotspots (vacant buildings within 150 m). |
 | Parcels / assessor data (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=82 | Location, ward and year built for each vacant parcel (9,884 have a location). |
 | LRA inventory (Land Reutilization Authority) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=30 | Flags the 338 vacant buildings the city itself owns. |
@@ -41,6 +74,7 @@ Mapillary photos ──(scripts/fetch-building-photos.mjs)──> public/photos/
                                                                  │
   POST /api/frames  photo ──> fast vision pass (Groq) ──> unsure or severe? ──> second opinion (Gemini)
                                      │ rate-limited or down: Gemini does the whole frame
+  POST /api/plan    hotspot facts ──> camera and cleanup plan (gpt-oss-120b on Groq, sourced facts only)
   POST /api/brief   building record + photo findings ──> short firefighter brief (Groq text model)
   GET  /api/health  LLM reachable? which vision providers are configured?
 ```
@@ -110,8 +144,8 @@ Run these from `app/`:
 
 | Name | Role |
 | --- | --- |
-| Prahlad | Tech lead / AI |
-| [name] | Core backend / data |
-| [name] | DevOps / integrator |
-| [name] | Frontend |
-| [name] | PM / pitch |
+| Prahlad Venugopalan | Tech lead / AI |
+| Arjun Arun | Data (311 extract, hotspots) |
+| Aarnav Baddam | DevOps |
+| Vedant Pawankar | Frontend (map, overlay) |
+| Sarthak Chaudhary | Presenter, crew view, video |
