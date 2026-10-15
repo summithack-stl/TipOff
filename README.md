@@ -40,7 +40,7 @@ We scored every dumping hotspot as if it were a year ago, using only reports up 
 | 50 | 42 |
 | 100 | 83 |
 
-Full table and method: [`data/backtest/RESULTS.md`](data/backtest/RESULTS.md). Re-run it with `python data/scripts/backtest.py`.
+Full table and method, exactly as shown in our video: [`data/backtest/2026-10-14-video-RESULTS.md`](data/backtest/2026-10-14-video-RESULTS.md). The nightly job also re-runs the test on the newest data in [`data/backtest/RESULTS.md`](data/backtest/RESULTS.md), so the proof keeps checking itself; those numbers can shift slightly as the one-year window moves. Re-run it yourself with `python data/scripts/backtest.py`.
 
 ## How a block becomes a hotspot
 
