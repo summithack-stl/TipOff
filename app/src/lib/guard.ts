@@ -38,6 +38,14 @@ export function rateLimit(request: Request, route: string, limit: number, window
 // Log the real error on the server; send the client a short message without keys, URLs or stack details.
 export function upstreamError(route: string, error: unknown, extra: Record<string, unknown> = {}): Response {
   console.error(`${route} failed:`, error);
+  // A missing key is a setup problem, not a flaky AI: say which variable to set (names only, never values).
+  const unset = error instanceof Error && /^([A-Z]+)_(API_KEY|MODEL) is not set$/.exec(error.message);
+  if (unset) {
+    return Response.json(
+      { error: `AI is not set up on this server: add ${unset[1]}_${unset[2]} to app/.env.local (see README, Run locally).`, ...extra },
+      { status: 503 },
+    );
+  }
   const busy = error instanceof Error && error.name === "RateLimitError";
   return Response.json(
     { error: busy ? "The AI service is busy. Try again in a minute." : "The AI service failed. Try again.", ...extra },
