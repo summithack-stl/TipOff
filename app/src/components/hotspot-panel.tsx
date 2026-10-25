@@ -93,6 +93,8 @@ export function HotspotPanel({ id, initial, onClose }: { id: string; initial?: H
 function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () => void }) {
   const [near, setNear] = useState<{ photo: Photo; meters: number; exact: boolean } | null | undefined>(undefined);
   const [plan, setPlan] = useState<Plan | null>(null);
+  // The service worker answers from its cache when the network fails, and says so in a header.
+  const [planFromCache, setPlanFromCache] = useState(false);
   const [planState, setPlanState] = useState<"idle" | "loading" | "error">("idle");
   const [planError, setPlanError] = useState("");
 
@@ -115,6 +117,7 @@ function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () 
         }),
       });
       if (!res.ok) throw new Error(await friendlyError(res));
+      setPlanFromCache(res.headers.get("x-tipoff-offline") === "cached");
       setPlan(await res.json());
       setPlanState("idle");
     } catch (e) {
@@ -220,6 +223,9 @@ function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () 
           {plan ? (
             <div className="space-y-2 rounded-lg border p-3 text-sm">
               <p className="font-medium">{plan.headline}</p>
+              {planFromCache && (
+                <p className="text-xs text-amber-200">Saved on this phone. Written when you last had signal.</p>
+              )}
               {PLAN_SECTIONS.map(([key, title]) =>
                 plan[key]?.length ? (
                   <div key={key}>

@@ -17,6 +17,25 @@ Installed, it runs full screen and opens straight to [`/crew`](https://summithac
 
 The icons come from [`app/src/app/icon.svg`](app/src/app/icon.svg); see [`app/public/icons/README.md`](app/public/icons/README.md) to regenerate them.
 
+### It keeps working with no signal
+
+Crews are outside, where signal drops. [`app/public/sw.js`](app/public/sw.js) is a hand-written service
+worker (no build step, no extra dependency) that keeps a copy of what matters on the phone:
+
+| What | How it is cached | Why |
+| --- | --- | --- |
+| Pages (`/crew`, `/map`, anything opened) | network first, cache on the way past | always fresh with signal, still there without |
+| `/api/hotspots`, `/api/vacant`, `/api/hotspots/[id]` | stale while revalidating | the list and map draw instantly, then catch up |
+| Plans already opened | kept under the hotspot id, replayed when the network fails | a crew can read a block's plan with no bars |
+| Map tiles already looked at | cache first, capped at 600 | the map is not blank off-grid |
+| `/_next/static`, icons | cache first | hashed by the build, so they cannot go stale |
+
+A replayed plan is labelled "Saved on this phone", so nobody mistakes it for a fresh answer. Live calls
+(`/api/frames`, `/api/health`) are never served stale: they fail honestly instead. A page never opened
+before falls back to `/offline`. A banner across the top says when the phone has no signal.
+
+Bump `VERSION` in `app/public/sw.js` to retire every cached copy at once.
+
 ## Problem
 
 Civic AI Hackathon, Problem Set #3: Illegal Dumping. The City raised the maximum dumping fine from $500 to $1,000 in 2022, but it still struggles to gather evidence: even where cameras are installed, footage often misses the plate or the face. The City asked for help to "proactively identify hotspots of dumping or likely areas/times that offenders frequent to target preventative action."

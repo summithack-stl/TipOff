@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { OfflineBanner } from "@/components/offline-banner";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`dark h-full antialiased ${sans.variable} ${mono.variable}`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
+        <OfflineBanner />
         <header className="flex h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-6 border-b px-4 pt-[var(--safe-top)]">
           <Link href="/" className="font-semibold tracking-tight">
             Tip<span className="text-[var(--hot)]">Off</span>
