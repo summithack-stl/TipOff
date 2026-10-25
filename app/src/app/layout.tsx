@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { OfflineBanner } from "@/components/offline-banner";
 import { MobileTabs, SiteHeader } from "@/components/site-chrome";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-full flex-col bg-background pb-[calc(4rem+var(--safe-bottom))] text-foreground md:pb-[var(--safe-bottom)]">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <TooltipProvider>
+            <OfflineBanner />
             <SiteHeader />
             <main className="flex flex-1 flex-col">{children}</main>
             <MobileTabs />
