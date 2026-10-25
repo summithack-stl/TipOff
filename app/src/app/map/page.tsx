@@ -1,26 +1,8 @@
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-import lite from "../../../data/clean/vacant_buildings_lite.json";
-import { HotspotRadar, type RadarPoint } from "@/components/hotspot-radar";
-import type { Hotspot } from "@/lib/hotspots";
+import { HotspotRadar } from "@/components/hotspot-radar";
 
-// Every hotspot shipped here lands in the page HTML (all 2,925 = 7 MB), so keep the strongest per category.
-// ponytail: top-N cut; fetch panel details per click if the map ever needs every hotspot.
-const PER_CATEGORY = 300;
-
-// The real file wins; the fake sample keeps the map working on a fresh clone without data.
-function loadHotspots(): Hotspot[] {
-  const real = join(process.cwd(), "data/clean/hotspots.json");
-  const file = existsSync(real) ? real : join(process.cwd(), "data/sample/hotspots.sample.json");
-  const all = (JSON.parse(readFileSync(file, "utf8")) as Hotspot[]).sort((a, b) => b.score - a.score);
-  const kept = new Map<string, number>();
-  return all.filter((h) => {
-    const n = kept.get(h.category) ?? 0;
-    kept.set(h.category, n + 1);
-    return n < PER_CATEGORY;
-  });
-}
-
+// Nothing is inlined into this page any more. The hotspots come from the static /api/hotspots and
+// the vacant-building layer from /api/vacant only once a crew switches it on; together those two
+// imports used to make this page 2.5 MB of HTML on every load, painful on a cellular connection.
 export default function MapPage() {
-  return <HotspotRadar hotspots={loadHotspots()} vacant={lite as RadarPoint[]} />;
+  return <HotspotRadar />;
 }

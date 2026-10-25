@@ -8,6 +8,7 @@ import { TrackerOverlay } from "@/components/tracker-overlay";
 import { friendlyError } from "@/lib/api-error";
 import { CATEGORY_COLOR, CATEGORY_LABEL } from "@/lib/categories";
 import type { Hotspot } from "@/lib/hotspots";
+import { useHotspot } from "@/lib/map-data";
 import { nearestPhoto, type Photo } from "@/lib/photos";
 import { riskColor } from "@/lib/risk";
 
@@ -50,7 +51,46 @@ function Timeline({ months, color }: { months: Hotspot["monthly"]; color: string
   );
 }
 
-export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () => void }) {
+const PANEL_CLASS =
+  "absolute inset-y-0 right-0 z-[1001] flex w-[420px] max-w-full flex-col overflow-y-auto border-l bg-background/95 shadow-2xl backdrop-blur";
+
+// The map holds only slim rows, so opening a hotspot fetches its detail. The crew list already has
+// the whole hotspot from the server and passes it as `initial`, which renders with no request.
+export function HotspotPanel({ id, initial, onClose }: { id: string; initial?: Hotspot; onClose: () => void }) {
+  const detail = useHotspot(id, initial);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  if (detail.state === "ready") return <HotspotDetail hotspot={detail.hotspot} onClose={onClose} />;
+
+  return (
+    <aside aria-label="Hotspot details" aria-busy={detail.state === "loading"} className={PANEL_CLASS}>
+      <div className="flex items-start justify-between gap-3 border-b p-4">
+        <h2 className="text-lg font-semibold">{detail.state === "loading" ? "Loading hotspot…" : "Hotspot unavailable"}</h2>
+        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel">
+          <XIcon />
+        </Button>
+      </div>
+      <div className="flex flex-col gap-5 p-4">
+        {detail.state === "loading" ? (
+          <>
+            <Skeleton className="h-20" />
+            <Skeleton className="h-24" />
+            <Skeleton className="h-32" />
+          </>
+        ) : (
+          <p className="text-sm text-destructive">{detail.message}</p>
+        )}
+      </div>
+    </aside>
+  );
+}
+
+function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () => void }) {
   const [near, setNear] = useState<{ photo: Photo; meters: number; exact: boolean } | null | undefined>(undefined);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [planState, setPlanState] = useState<"idle" | "loading" | "error">("idle");
@@ -59,12 +99,6 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
   useEffect(() => {
     nearestPhoto(h.lat, h.lon, PHOTO_RADIUS_M, h.id).then(setNear);
   }, [h.lat, h.lon, h.id]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
 
   const detections = near?.photo.after.detections ?? [];
   const trendPct = Math.round(h.trend * 100);
@@ -99,7 +133,7 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
   return (
     <aside
       aria-label="Hotspot details"
-      className="absolute inset-y-0 right-0 z-[1001] flex w-[420px] max-w-full flex-col overflow-y-auto border-l bg-background/95 shadow-2xl backdrop-blur"
+      className={PANEL_CLASS}
     >
       <div className="flex items-start justify-between gap-3 border-b p-4">
         <div>

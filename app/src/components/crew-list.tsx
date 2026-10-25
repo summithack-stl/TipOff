@@ -112,7 +112,7 @@ export function CrewList({ items, day, today, sample }: { items: CrewItem[]; day
         // The panel positions itself against this layer, below the header.
         <div className="fixed inset-x-0 bottom-0 top-[calc(3.5rem+var(--safe-top))] z-[1000]">
           <button aria-label="Close plan" className="absolute inset-0 bg-black/40" onClick={close} />
-          <HotspotPanel hotspot={open} onClose={close} />
+          <HotspotPanel id={open.id} initial={open} onClose={close} />
         </div>
       )}
     </div>

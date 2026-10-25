@@ -1,15 +1,17 @@
 import Link from "next/link";
-import summary from "../../data/clean/hotspots_summary.json";
 import { InstallCard } from "@/components/install-card";
+import { COUNTS } from "@/lib/hotspot-counts";
 
 // Landing page: what TipOff does, how to use it, and how a city team configures it.
 // Counts come from the nightly data build; the backtest numbers are the frozen run shown in our video.
 
 const REPO = "https://github.com/summithack-stl/summithack";
-const asOf = new Date(`${summary.window_end}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+const asOf = new Date(`${COUNTS.windowEnd}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
+// Counts come from @/lib/hotspot-counts, the one source for every number in the app and the README.
+// Each label says what it counts: the map's total covers all three issue types, this one does not.
 const STATS = [
-  { value: summary.counts.dumping.toLocaleString("en-US"), label: "dumping hotspots ranked" },
+  { value: COUNTS.byCategory.dumping.toLocaleString("en-US"), label: "repeat dumping blocks ranked" },
   { value: "42 / 50", label: "top hotspots dumped on again in the next year" },
   { value: "Nightly", label: `refreshed from City 311 data, last ${asOf}` },
 ];
@@ -17,7 +19,7 @@ const STATS = [
 const STEPS = [
   {
     title: "Open the map",
-    body: "Every dot is a block where reports keep coming back, scored 0 to 100. Filter by type, ward, day and hour.",
+    body: `All ${COUNTS.total.toLocaleString("en-US")} blocks where reports keep coming back \u2014 dumping, potholes and graffiti \u2014 each scored 0 to 100. Filter by type, ward, day and hour.`,
   },
   {
     title: "Click a hotspot",

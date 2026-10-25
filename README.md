@@ -26,7 +26,7 @@ Civic AI Hackathon, Problem Set #3: Illegal Dumping. The City raised the maximum
 City staff, not residents. Residents keep reporting through 311 exactly as they do now; those reports feed TipOff.
 
 - **Citizens' Service Bureau / refuse crews:** a daily list of the blocks that usually get reports on today's weekday, with a suggested watch window and a plan. Crews can clean on a schedule instead of waiting for complaints (35% of dumping and debris reports stay open more than a week; median 3.2 days).
-- **Whoever places the city's cameras:** a ranked list of 1,173 dumping hotspots, so the few cameras go to the blocks where dumping keeps coming back, recording around the clock.
+- **Whoever places the city's cameras:** a ranked list of 1,186 repeat dumping blocks, so the few cameras go to the blocks where dumping keeps coming back, recording around the clock.
 - **Code enforcement:** each plan lists the evidence a citation needs.
 
 ### How the City gets the most out of it
@@ -73,7 +73,7 @@ Full table and method, exactly as shown in our video: [`data/backtest/2026-10-14
 
 | Dataset | URL | How we use it |
 | --- | --- | --- |
-| Citizens' Service Bureau (311) requests (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/distribution.cfm?id=2 | 40,426 reports of dumping and debris (6 problem codes; 2,157 use the "Illegal dumping" code), potholes and graffiti from 2024-2026, grouped into 2,925 repeat hotspots (`data/scripts/fetch_311.py`, `build_hotspots.py`). We keep location, type and time only, never the caller or free-text fields. Report times are when residents reported, not when dumping happened. |
+| Citizens' Service Bureau (311) requests (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/distribution.cfm?id=2 | 40,426 reports of dumping and debris (6 problem codes; 2,157 use the "Illegal dumping" code), potholes and graffiti from 2024-2026, grouped into 2,950 repeat hotspots — 1,186 dumping, 1,420 pothole, 344 graffiti (`data/scripts/fetch_311.py`, `build_hotspots.py`). We keep location, type and time only, never the caller or free-text fields. Report times are when residents reported, not when dumping happened. |
 | Vacant Building List (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=108 | The 9,943 buildings on the city's vacant list, with code violations, unpaid vacant-building fees and time on the list. Used as context for hotspots (vacant buildings within 150 m). |
 | Parcels / assessor data (City of St. Louis) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=82 | Location, ward and year built for each vacant parcel (9,884 have a location). |
 | LRA inventory (Land Reutilization Authority) | https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=30 | Flags the 338 vacant buildings the city itself owns. |
@@ -110,10 +110,13 @@ Before Problem Set #3 was announced we built a vacant-building inspection map; i
 | `POST /api/plan` | JSON `{ id: "hotspot id, e.g. dumping-27654_-50128", detections?: [{ category, severity, note }] }` | `{ id, headline, what_we_know[], watch[], actions[], evidence[] }` |
 | `POST /api/brief` (earlier direction) | JSON `{ handle: "11-digit parcel handle", detections?: [{ category, severity, note }] }` | `{ handle, headline, hazards[], crew_notes[] }` |
 | `GET /api/health` | none | `{ ok, provider, model, vision: { fast, confirm }, reply, ms }` |
+| `GET /api/hotspots` | none | Every hotspot the map draws, one array a row: `[id, category, lat, lon, ward, score, report_count, activity]`. `activity` packs the busy weekdays (bits 0-6, Sunday first) and busy report-hour blocks (bits 7-10). Cached hard; rebuilt by the nightly refresh. |
+| `GET /api/hotspots/[id]` | none | One hotspot in full: monthly history, recent reports, reasons, nearby vacant buildings. Fetched when a hotspot is opened. |
+| `GET /api/vacant` | none | The vacant-building layer, `[handle, lat, lon, risk, ward]` a row. Fetched only when a crew switches the layer on. |
 
 Categories: building hazards `open_entry`, `roof_damage`, `wall_damage`, `fire_damage`; street issues `graffiti`, `pothole`, `dumping`, `streetlight_out`, `broken_curb`, `sidewalk_damage`.
 
-Errors: `400` bad input, `404` unknown building, `413` image too large, `429` too many requests from one client (see `Retry-After`), `502` AI call failed, `503` AI provider busy.
+Errors: `400` bad input, `404` unknown building or hotspot, `413` image too large, `429` too many requests from one client (see `Retry-After`), `502` AI call failed, `503` AI provider busy.
 
 ### Free-tier limits
 
