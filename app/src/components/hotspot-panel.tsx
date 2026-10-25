@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TrackerOverlay } from "@/components/tracker-overlay";
 import { friendlyError } from "@/lib/api-error";
 import { CATEGORY_LABEL, HOTSPOT_VAR } from "@/lib/categories";
-import { parseWindow } from "@/lib/crew";
+import { parseWindow, reportLabel } from "@/lib/crew";
 import { DAYS, type Hotspot } from "@/lib/hotspots";
 import { nearestPhoto, type Photo } from "@/lib/photos";
 
@@ -202,7 +202,10 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
           <ul className="divide-y text-sm">
             {h.recent.slice(0, 5).map((r, i) => (
               <li key={i} className="flex justify-between gap-3 py-1.5">
-                <span className="truncate">{r.address}</span>
+                <span className="min-w-0">
+                  <span className="block truncate">{r.address}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{reportLabel(r.code)}</span>
+                </span>
                 <span className="shrink-0 text-muted-foreground tabular-nums">{r.opened}</span>
               </li>
             ))}

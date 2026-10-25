@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { busyDays, cityToday, parseWindow, todaysHotspots, watchColumn, watchWindow, whatsThere } from './crew.ts';
+import { busyDays, cityToday, parseWindow, reportLabel, todaysHotspots, watchColumn, watchWindow, whatsThere } from './crew.ts';
 
 const base = {
   id: 'dumping-1_-1', category: 'dumping', lat: 38.6, lon: -90.2, ward: 13, score: 78, rank: 1,
@@ -25,10 +25,10 @@ test('report window parses, including noon and midnight', () => {
   assert.equal(parseWindow('soon'), null);
 });
 
-test('watch window is the 12 hours before reports start', () => {
-  assert.equal(watchWindow(base), '8pm–8am');
-  assert.equal(watchWindow({ ...base, report_window: '2pm-5pm' }), '2am–2pm');
-  assert.equal(watchWindow({ ...base, report_window: '12am-3am' }), '12pm–12am');
+test('watch window is the 6 hours before reports start', () => {
+  assert.equal(watchWindow(base), '2am–8am');
+  assert.equal(watchWindow({ ...base, report_window: '2pm-5pm' }), '8am–2pm');
+  assert.equal(watchWindow({ ...base, report_window: '12am-3am' }), '6pm–12am');
 });
 
 test('busy days are above an even spread', () => {
@@ -39,10 +39,10 @@ test('busy days are above an even spread', () => {
 test('what is there prefers photo findings and adds 311 and vacant context', () => {
   const lines = whatsThere(base, [{ category: 'dumping', severity: 'high', note: 'mattress and bags in alley' }]);
   assert.equal(lines[0], 'Street photo: mattress and bags in alley (severe)');
-  assert.equal(lines[1], 'Latest 311: Debris-alley/street, 2026-10-14');
+  assert.equal(lines[1], 'Latest 311: Debris in alley or street, 2026-10-14');
   assert.equal(lines[2], '13 vacant buildings within 150 m');
   assert.equal(whatsThere(base, [])[0], 'Street photo on file, nothing flagged in it');
-  assert.equal(whatsThere(base, undefined)[0], 'Latest 311: Debris-alley/street, 2026-10-14');
+  assert.equal(whatsThere(base, undefined)[0], 'Latest 311: Debris in alley or street, 2026-10-14');
 });
 
 test('today keeps only hotspots busy today, strongest first, capped per category', () => {
@@ -53,9 +53,16 @@ test('today keeps only hotspots busy today, strongest first, capped per category
 });
 
 test('board column follows the watch window start', () => {
-  // Reports 8am-11am, so dumping is watched from 8pm: Evening.
-  assert.equal(watchColumn(base), 3);
+  // Reports 8am-11am, so dumping is watched from 2am: Overnight.
+  assert.equal(watchColumn(base), 0);
   // Potholes use the report window itself: 8am is Morning.
   assert.equal(watchColumn({ ...base, category: 'pothole' }), 1);
   assert.equal(watchColumn({ ...base, report_window: 'soon' }), 0);
+});
+
+test('311 codes get readable labels, unknown codes pass through', () => {
+  assert.equal(reportLabel('Illegal dumpg report'), 'Illegal dumping');
+  assert.equal(reportLabel(' TDebris-alley/street '), 'Debris in alley or street');
+  assert.equal(reportLabel('Something new'), 'Something new');
+  assert.deepEqual(whatsThere({ ...base, recent: [{ opened: '2026-10-17', code: 'Illegal dumpg report', address: 'x' }] }, undefined)[0], 'Latest 311: Illegal dumping, 2026-10-17');
 });

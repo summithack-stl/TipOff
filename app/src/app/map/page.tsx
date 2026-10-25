@@ -1,4 +1,5 @@
 import lite from "../../../data/clean/vacant_buildings_lite.json";
+import summary from "../../../data/clean/hotspots_summary.json";
 import { HotspotRadar, type RadarPoint } from "@/components/hotspot-radar";
 import { loadHotspots, topPerCategory } from "@/lib/hotspot-data";
 
@@ -7,5 +8,5 @@ import { loadHotspots, topPerCategory } from "@/lib/hotspot-data";
 const PER_CATEGORY = 300;
 
 export default function MapPage() {
-  return <HotspotRadar hotspots={topPerCategory(loadHotspots().hotspots, PER_CATEGORY)} vacant={lite as RadarPoint[]} />;
+  return <HotspotRadar hotspots={topPerCategory(loadHotspots().hotspots, PER_CATEGORY)} totals={summary.counts} vacant={lite as RadarPoint[]} />;
 }

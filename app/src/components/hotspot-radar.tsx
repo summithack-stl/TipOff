@@ -42,7 +42,8 @@ function Filter({ label, value, onChange, items }: { label: string; value: strin
   );
 }
 
-export function HotspotRadar({ hotspots, vacant }: { hotspots: Hotspot[]; vacant: RadarPoint[] }) {
+// totals: every hotspot of each type citywide; the map only ships the strongest few hundred.
+export function HotspotRadar({ hotspots, totals, vacant }: { hotspots: Hotspot[]; totals: Record<string, number>; vacant: RadarPoint[] }) {
   // One type at a time: dumping is the problem set, the others are a click away.
   const [category, setCategory] = useState<HotspotCategory>("dumping");
   const [ward, setWard] = useState(ANY);
@@ -92,7 +93,7 @@ export function HotspotRadar({ hotspots, vacant }: { hotspots: Hotspot[]; vacant
           <span className="font-heading text-sm font-semibold tracking-wide text-muted-foreground uppercase">Vacant buildings</span>
         </label>
         <p className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
-          {shown.length} of {ofType.length} {CATEGORY_LABEL[category].toLowerCase()} hotspots · size = reports, brightness = score
+          {shown.length === ofType.length ? `Top ${ofType.length}` : `${shown.length} of the top ${ofType.length}`} of {(totals[category] ?? ofType.length).toLocaleString("en-US")} {CATEGORY_LABEL[category].toLowerCase()} hotspots · size = reports, brightness = score
         </p>
       </div>
 
