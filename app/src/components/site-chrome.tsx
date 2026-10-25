@@ -30,7 +30,7 @@ const isActive = (path: string, href: string) => (href === "/" ? path === "/" : 
 export function SiteHeader() {
   const path = usePathname();
   return (
-    <header className="sticky top-0 z-[1100] flex h-14 shrink-0 items-center gap-8 border-b bg-background/85 px-4 backdrop-blur-md sm:px-6">
+    <header className="sticky top-0 z-[1100] flex h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-8 border-b bg-background/85 px-4 pt-[var(--safe-top)] backdrop-blur-md sm:px-6">
       <Link href="/" aria-label="TipOff home" className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
         <Wordmark />
       </Link>
@@ -59,7 +59,7 @@ export function MobileTabs() {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-[1100] grid h-16 grid-cols-3 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-[1100] grid h-[calc(4rem+var(--safe-bottom))] grid-cols-3 border-t bg-background/95 pb-[var(--safe-bottom)] backdrop-blur-md md:hidden"
     >
       {LINKS.map(({ href, label, icon: Icon }) => (
         <Link

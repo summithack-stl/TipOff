@@ -1,5 +1,6 @@
 import Link from "next/link";
 import summary from "../../data/clean/hotspots_summary.json";
+import { InstallCard } from "@/components/install-card";
 import { Hero } from "@/components/landing/hero";
 import type { HeroPoint } from "@/components/landing/hero-map";
 import { DotMatrix, WeightBars } from "@/components/landing/reveal";
@@ -220,6 +221,18 @@ export default function Landing() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* UI: Sarthak */}
+      <section className="mx-auto w-full max-w-6xl px-5 pt-24 sm:px-8 md:pt-32">
+        <Eyebrow>Install on your phone</Eyebrow>
+        <Heading>Crews carry it into the field</Heading>
+        <p className="mt-4 max-w-2xl text-muted-foreground">
+          TipOff installs from the browser: no app store, no account. It opens straight to today&apos;s crew board and runs full screen.
+        </p>
+        <div className="mt-10">
+          <InstallCard />
         </div>
       </section>
 

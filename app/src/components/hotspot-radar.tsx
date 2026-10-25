@@ -75,7 +75,7 @@ export function HotspotRadar({ hotspots, vacant }: { hotspots: Hotspot[]; vacant
   );
 
   return (
-    <div className="flex h-[calc(100dvh-3.5rem-4rem)] w-full flex-col md:h-[calc(100dvh-3.5rem)]">
+    <div className="flex h-[calc(var(--app-height)-4rem)] w-full flex-col md:h-[var(--app-height)]">
       <div className="z-[1050] flex flex-wrap items-center gap-x-5 gap-y-2 border-b bg-background px-4 py-2.5 text-sm">
         <TypeToggle
           value={category}
