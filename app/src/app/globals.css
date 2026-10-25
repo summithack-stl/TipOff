@@ -161,8 +161,11 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-left: env(safe-area-inset-left, 0px);
     --safe-right: env(safe-area-inset-right, 0px);
-    /* Viewport minus the header and the notch/home bar: what a full-screen view can actually use. */
-    --app-height: calc(100dvh - 3.5rem - var(--safe-top) - var(--safe-bottom));
+    /* The offline banner is in normal flow, so full-height views have to account for it. */
+    --offline-bar: 0px;
+    /* Viewport minus the header, the offline banner and the notch/home bar: what a full-screen
+       view can actually use. */
+    --app-height: calc(100dvh - 3.5rem - var(--offline-bar) - var(--safe-top) - var(--safe-bottom));
   }
   body {
     @apply bg-background text-foreground;
@@ -174,6 +177,10 @@
   }
   html {
     @apply font-sans;
+  }
+  /* Set by @/lib/offline when the phone loses signal. */
+  :root[data-offline="true"] {
+    --offline-bar: 1.75rem;
   }
 }
 

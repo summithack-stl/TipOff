@@ -149,7 +149,7 @@ export function CrewBoard({ items, day, today, load, sample }: { items: CrewItem
           // The drawer positions itself against this layer, below the header.
           <motion.div
             key="drawer"
-            className="fixed inset-x-0 top-[calc(3.5rem+var(--safe-top))] bottom-[calc(4rem+var(--safe-bottom))] z-[1000] md:bottom-0"
+            className="fixed inset-x-0 top-[calc(3.5rem+var(--offline-bar)+var(--safe-top))] bottom-[calc(4rem+var(--safe-bottom))] z-[1000] md:bottom-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
