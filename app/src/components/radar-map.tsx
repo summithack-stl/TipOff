@@ -3,14 +3,14 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import type { RadarPoint } from "@/components/hotspot-radar";
-import type { Hotspot } from "@/lib/hotspots";
+import type { MapHotspot } from "@/lib/hotspots";
+import type { VacantPoint } from "@/lib/map-data";
 import { CATEGORY_COLOR } from "@/lib/categories";
 import { riskColor } from "@/lib/risk";
 
 type Props = {
-  hotspots: Hotspot[];
-  vacant: RadarPoint[] | null; // null = layer off
+  hotspots: MapHotspot[];
+  vacant: VacantPoint[] | null; // null = layer off
   selected: { lat: number; lon: number } | null;
   onHotspot: (id: string) => void;
   onBuilding: (handle: string) => void;
@@ -65,18 +65,19 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
     const group = hotLayer.current;
     if (!group) return;
     group.clearLayers();
-    const maxReports = Math.max(1, ...hotspots.map((h) => h.report_count));
+    const maxReports = Math.max(1, ...hotspots.map((h) => h[6]));
     // Lowest score first so the worst paint on top. One type is shown at a time, so color = type,
     // size = report count, brightness = score.
-    const sorted = [...hotspots].sort((a, b) => a.score - b.score);
-    const pulse = new Set(sorted.slice(-PULSE_TOP).map((h) => h.id));
+    const sorted = [...hotspots].sort((a, b) => a[5] - b[5]);
+    const pulse = new Set(sorted.slice(-PULSE_TOP).map((h) => h[0]));
     for (const h of sorted) {
-      const color = CATEGORY_COLOR[h.category];
-      const radius = 4 + 12 * Math.sqrt(h.report_count / maxReports);
-      const label = `${h.top_address || h.category}: score ${h.score}, ${h.report_count} reports`;
-      if (pulse.has(h.id)) {
+      const [id, category, lat, lon, , score, reportCount, , address] = h;
+      const color = CATEGORY_COLOR[category];
+      const radius = 4 + 12 * Math.sqrt(reportCount / maxReports);
+      const label = `${address || category}: score ${score}, ${reportCount} reports`;
+      if (pulse.has(id)) {
         // Worst hotspots: a DOM marker so it can pulse with CSS. A handful of nodes is cheap.
-        L.marker([h.lat, h.lon], {
+        L.marker([lat, lon], {
           icon: L.divIcon({
             className: "",
             html: `<span class="radar-top" style="--c:${color};width:${radius * 2}px;height:${radius * 2}px"></span>`,
@@ -86,13 +87,13 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
           keyboard: true,
           zIndexOffset: 1000,
         })
-          .on("click", () => handlers.current.onHotspot(h.id))
+          .on("click", () => handlers.current.onHotspot(id))
           .addTo(group);
         continue;
       }
-      L.circleMarker([h.lat, h.lon], { radius, color, weight: 1, opacity: 0.9, fillColor: color, fillOpacity: 0.15 + 0.6 * (h.score / 100) })
+      L.circleMarker([lat, lon], { radius, color, weight: 1, opacity: 0.9, fillColor: color, fillOpacity: 0.15 + 0.6 * (score / 100) })
         .bindTooltip(label)
-        .on("click", () => handlers.current.onHotspot(h.id))
+        .on("click", () => handlers.current.onHotspot(id))
         .addTo(group);
     }
   }, [hotspots]);
