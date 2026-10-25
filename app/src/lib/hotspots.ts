@@ -40,15 +40,45 @@ export const HOUR_BLOCKS = [
   ["Evening 18-23", 18, 23],
 ] as const;
 
+// What the map needs for every hotspot, as one array per row to keep the payload small.
+// Full detail (monthly history, recent reports, reasons) is fetched per hotspot on click.
+export type MapHotspot = [
+  id: string,
+  category: HotspotCategory,
+  lat: number,
+  lon: number,
+  ward: number | null,
+  score: number,
+  reportCount: number,
+  /** activityMask(): bits 0-6 are busy weekdays (Sun first), bits 7-10 busy hour blocks. */
+  activity: number,
+  /** Nearest address, for the marker tooltip. The one text field worth its bytes. */
+  address: string,
+];
+
 // "Active" on a day or in an hour block = more reports there than an even spread would give.
-export function activeAt(h: Hotspot, day: number | null, block: number | null): boolean {
-  if (day !== null && h.by_dow[day] * 7 < h.report_count) return false;
-  if (block !== null) {
-    const [, from, to] = HOUR_BLOCKS[block];
-    const inBlock = h.by_hour.slice(from, to + 1).reduce((a, b) => a + b, 0);
-    if (inBlock * 24 < h.report_count * (to - from + 1)) return false;
+// Packed into one integer at build time so by_dow and by_hour never reach the browser.
+export function activityMask(h: Pick<Hotspot, "by_dow" | "by_hour" | "report_count">): number {
+  let mask = 0;
+  for (let day = 0; day < 7; day++) {
+    if (h.by_dow[day] * 7 >= h.report_count) mask |= 1 << day;
   }
+  HOUR_BLOCKS.forEach(([, from, to], i) => {
+    const inBlock = h.by_hour.slice(from, to + 1).reduce((a, b) => a + b, 0);
+    if (inBlock * 24 >= h.report_count * (to - from + 1)) mask |= 1 << (7 + i);
+  });
+  return mask;
+}
+
+export function maskActiveAt(mask: number, day: number | null, block: number | null): boolean {
+  if (day !== null && !(mask & (1 << day))) return false;
+  if (block !== null && !(mask & (1 << (7 + block)))) return false;
   return true;
+}
+
+// Kept for server code that still holds a whole Hotspot. Same answer as the packed mask.
+export function activeAt(h: Hotspot, day: number | null, block: number | null): boolean {
+  return maskActiveAt(activityMask(h), day, block);
 }
 
 export function formatHour(h: number): string {

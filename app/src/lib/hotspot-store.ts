@@ -2,18 +2,36 @@ import "server-only";
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Hotspot } from "@/lib/hotspots";
+import { activityMask, type Hotspot, type MapHotspot } from "@/lib/hotspots";
 
-// Server-side lookup for /api/plan. The browser gets hotspots via the page, never this file.
-// Read at runtime, not imported, so the build passes before data/scripts/build_hotspots.py has run;
-// until then every id is unknown (404).
-const FILE = join(process.cwd(), "data/clean/hotspots.json");
+// The only place server code reads the hotspot file. The browser gets the slim rows from
+// GET /api/hotspots and full detail from GET /api/hotspots/[id]; it never sees this file.
+// Read at runtime, not imported, so the build passes before data/scripts/build_hotspots.py has run.
+const REAL = join(process.cwd(), "data/clean/hotspots.json");
+const SAMPLE = join(process.cwd(), "data/sample/hotspots.sample.json");
 
+let all: Hotspot[] | undefined;
 let byId: Map<string, Hotspot> | undefined;
 
+/** True when the real city data is missing and the fake sample is standing in. */
+export function usingSample(): boolean {
+  return !existsSync(REAL);
+}
+
+export function allHotspots(): Hotspot[] {
+  if (!all) {
+    const file = usingSample() ? SAMPLE : REAL;
+    all = existsSync(file) ? (JSON.parse(readFileSync(file, "utf8")) as Hotspot[]) : [];
+  }
+  return all;
+}
+
 export function getHotspot(id: string): Hotspot | undefined {
-  byId ??= new Map(
-    existsSync(FILE) ? (JSON.parse(readFileSync(FILE, "utf8")) as Hotspot[]).map((h) => [h.id, h]) : [],
-  );
+  byId ??= new Map(allHotspots().map((h) => [h.id, h]));
   return byId.get(id);
+}
+
+// Everything the map draws and filters by, and nothing else: ~60 bytes a hotspot instead of ~2 KB.
+export function mapHotspots(): MapHotspot[] {
+  return allHotspots().map((h) => [h.id, h.category, h.lat, h.lon, h.ward, h.score, h.report_count, activityMask(h), h.top_address]);
 }

@@ -9,9 +9,8 @@ import { TypeToggle } from "@/components/type-toggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { CATEGORY_LABEL } from "@/lib/categories";
-import { activeAt, DAYS, HOUR_BLOCKS, type Hotspot, type HotspotCategory } from "@/lib/hotspots";
-
-export type RadarPoint = [handle: string, lat: number, lon: number, risk: number, ward: number | null];
+import { DAYS, HOUR_BLOCKS, maskActiveAt, type HotspotCategory } from "@/lib/hotspots";
+import { useMapHotspots, useVacantBuildings } from "@/lib/map-data";
 
 // Leaflet touches window on import, so the map only loads in the browser.
 const RadarMap = dynamic(() => import("@/components/radar-map"), {
@@ -42,36 +41,42 @@ function Filter({ label, value, onChange, items }: { label: string; value: strin
   );
 }
 
-// totals: every hotspot of each type citywide; the map only ships the strongest few hundred.
-export function HotspotRadar({ hotspots, totals, vacant }: { hotspots: Hotspot[]; totals: Record<string, number>; vacant: RadarPoint[] }) {
+// totals: every hotspot of each type citywide, from the nightly summary. The map now fetches all
+// of them from the static /api/hotspots rather than having them inlined into the page HTML, so the
+// tally no longer needs a "top N" caveat.
+export function HotspotRadar({ totals }: { totals: Record<string, number> }) {
+  const data = useMapHotspots();
+  const hotspots = data.hotspots;
   // One type at a time: dumping is the problem set, the others are a click away.
   const [category, setCategory] = useState<HotspotCategory>("dumping");
   const [ward, setWard] = useState(ANY);
   const [day, setDay] = useState(ANY);
   const [block, setBlock] = useState(ANY);
   const [showVacant, setShowVacant] = useState(false);
+  // 400 KB, off by default: fetched the first time it is switched on, and never otherwise.
+  const vacant = useVacantBuildings(showVacant);
   const [selected, setSelected] = useState<Selected>(null);
   const close = useCallback(() => setSelected(null), []);
   const pickHotspot = useCallback((id: string) => setSelected({ kind: "hotspot", id }), []);
   const pickBuilding = useCallback((id: string) => setSelected({ kind: "building", id }), []);
 
-  const wards = useMemo(() => [...new Set(hotspots.map((h) => h.ward).filter((w) => w !== null))].sort((a, b) => a - b), [hotspots]);
-  const ofType = useMemo(() => hotspots.filter((h) => h.category === category), [hotspots, category]);
+  const wards = useMemo(() => [...new Set(hotspots.map((h) => h[4]).filter((w) => w !== null))].sort((a, b) => a - b), [hotspots]);
+  const ofType = useMemo(() => hotspots.filter((h) => h[1] === category), [hotspots, category]);
   const shown = useMemo(
     () =>
       ofType.filter(
         (h) =>
-          (ward === ANY || String(h.ward) === ward) &&
-          activeAt(h, day === ANY ? null : Number(day), block === ANY ? null : Number(block)),
+          (ward === ANY || String(h[4]) === ward) &&
+          maskActiveAt(h[7], day === ANY ? null : Number(day), block === ANY ? null : Number(block)),
       ),
     [ofType, ward, day, block],
   );
   const vacantShown = useMemo(() => (showVacant ? vacant.filter((b) => ward === ANY || String(b[4]) === ward) : null), [vacant, showVacant, ward]);
 
-  const hotspot = selected?.kind === "hotspot" ? hotspots.find((h) => h.id === selected.id) : undefined;
+  const hotspot = selected?.kind === "hotspot" ? hotspots.find((h) => h[0] === selected.id) : undefined;
   const building = selected?.kind === "building" ? vacant.find((b) => b[0] === selected.id) : undefined;
   const at = useMemo(
-    () => (hotspot ? { lat: hotspot.lat, lon: hotspot.lon } : building ? { lat: building[1], lon: building[2] } : null),
+    () => (hotspot ? { lat: hotspot[2], lon: hotspot[3] } : building ? { lat: building[1], lon: building[2] } : null),
     [hotspot, building],
   );
 
@@ -93,14 +98,18 @@ export function HotspotRadar({ hotspots, totals, vacant }: { hotspots: Hotspot[]
           <span className="font-heading text-sm font-semibold tracking-wide text-muted-foreground uppercase">Vacant buildings</span>
         </label>
         <p className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
-          {shown.length === ofType.length ? `Top ${ofType.length}` : `${shown.length} of the top ${ofType.length}`} of {(totals[category] ?? ofType.length).toLocaleString("en-US")} {CATEGORY_LABEL[category].toLowerCase()} hotspots · size = reports, brightness = score
+          {data.state === "loading"
+            ? "Loading hotspots…"
+            : data.state === "error"
+              ? data.message
+              : `${shown.length.toLocaleString("en-US")} of ${(totals[category] ?? ofType.length).toLocaleString("en-US")} ${CATEGORY_LABEL[category].toLowerCase()} hotspots · size = reports, brightness = score`}
         </p>
       </div>
 
       <div className="relative isolate flex-1 overflow-hidden">
         <RadarMap hotspots={shown} vacant={vacantShown} selected={at} onHotspot={pickHotspot} onBuilding={pickBuilding} />
         <AnimatePresence>
-          {hotspot && <HotspotPanel key={hotspot.id} hotspot={hotspot} onClose={close} />}
+          {hotspot && <HotspotPanel key={hotspot[0]} id={hotspot[0]} onClose={close} />}
           {building && <BuildingPanel key={building[0]} handle={building[0]} onClose={close} />}
         </AnimatePresence>
       </div>

@@ -156,7 +156,7 @@ export function CrewBoard({ items, day, today, load, sample }: { items: CrewItem
             transition={{ duration: 0.15 }}
           >
             <button aria-label="Close plan" className="absolute inset-0 bg-black/40" onClick={close} />
-            <HotspotPanel hotspot={open} onClose={close} />
+            <HotspotPanel id={open.id} initial={open} onClose={close} />
           </motion.div>
         )}
       </AnimatePresence>

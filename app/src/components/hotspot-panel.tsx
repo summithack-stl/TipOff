@@ -10,6 +10,7 @@ import { friendlyError } from "@/lib/api-error";
 import { CATEGORY_LABEL, HOTSPOT_VAR } from "@/lib/categories";
 import { parseWindow, reportLabel } from "@/lib/crew";
 import { DAYS, type Hotspot } from "@/lib/hotspots";
+import { useHotspot } from "@/lib/map-data";
 import { nearestPhoto, type Photo } from "@/lib/photos";
 
 const PHOTO_RADIUS_M = 300;
@@ -79,7 +80,45 @@ function BarStrip({ values, labels, hot, color, name }: { values: number[]; labe
 
 const HOUR_LABELS = Array.from({ length: 24 }, (_, h) => (h % 6 === 0 ? ["12a", "6a", "12p", "6p"][h / 6] : ""));
 
-export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () => void }) {
+// The map holds only slim rows, so opening a hotspot fetches its detail. The crew board already has
+// the whole hotspot from the server and passes it as `initial`, which renders with no request.
+export function HotspotPanel({ id, initial, onClose }: { id: string; initial?: Hotspot; onClose: () => void }) {
+  const detail = useHotspot(id, initial);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  if (detail.state === "ready") return <HotspotDetail hotspot={detail.hotspot} onClose={onClose} />;
+
+  return (
+    <Drawer label="Hotspot details">
+      <div className="flex items-start justify-between gap-3 border-b p-4">
+        <h2 className="font-heading text-2xl leading-tight font-bold uppercase">
+          {detail.state === "loading" ? "Loading…" : "Unavailable"}
+        </h2>
+        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel">
+          <XIcon />
+        </Button>
+      </div>
+      <div className="flex flex-col gap-5 p-4" aria-busy={detail.state === "loading"}>
+        {detail.state === "loading" ? (
+          <>
+            <Skeleton className="h-20" />
+            <Skeleton className="h-24" />
+            <Skeleton className="h-32" />
+          </>
+        ) : (
+          <p className="text-sm text-destructive">{detail.message}</p>
+        )}
+      </div>
+    </Drawer>
+  );
+}
+
+function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () => void }) {
   const [near, setNear] = useState<{ photo: Photo; meters: number; exact: boolean } | null | undefined>(undefined);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [planState, setPlanState] = useState<"idle" | "loading" | "error">("idle");
@@ -88,12 +127,6 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
   useEffect(() => {
     nearestPhoto(h.lat, h.lon, PHOTO_RADIUS_M, h.id).then(setNear);
   }, [h.lat, h.lon, h.id]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
 
   const detections = near?.photo.after.detections ?? [];
   const color = HOTSPOT_VAR[h.category];
