@@ -6,6 +6,17 @@
 
 **Run it yourself** (Node 20+): `git clone https://github.com/summithack-stl/summithack && cd summithack/app && npm ci && npm run dev`, then open http://localhost:3000. The map, scores and crew list work with no keys; the AI plan and photo check need a free Groq key in `app/.env.local` (see [Run locally](#run-locally)).
 
+## Install it on a phone
+
+TipOff is a PWA: crews install it from the browser, with no app store and no account.
+
+- **iPhone / iPad:** open https://summithack-blond.vercel.app in **Safari**, tap Share, then **Add to Home Screen**.
+- **Android:** open it in **Chrome** and take the install prompt, or use the menu (⋮) → **Add to Home screen**.
+
+Installed, it runs full screen and opens straight to [`/crew`](https://summithack-blond.vercel.app/crew), today's list. Reading the map and plans never needs a login.
+
+The icons come from [`app/src/app/icon.svg`](app/src/app/icon.svg); see [`app/public/icons/README.md`](app/public/icons/README.md) to regenerate them.
+
 ## Problem
 
 Civic AI Hackathon, Problem Set #3: Illegal Dumping. The City raised the maximum dumping fine from $500 to $1,000 in 2022, but it still struggles to gather evidence: even where cameras are installed, footage often misses the plate or the face. The City asked for help to "proactively identify hotspots of dumping or likely areas/times that offenders frequent to target preventative action."

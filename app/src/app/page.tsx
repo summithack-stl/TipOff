@@ -1,5 +1,6 @@
 import Link from "next/link";
 import summary from "../../data/clean/hotspots_summary.json";
+import { InstallCard } from "@/components/install-card";
 
 // Landing page: what TipOff does, how to use it, and how a city team configures it.
 // Counts come from the nightly data build; the backtest numbers are the frozen run shown in our video.
@@ -159,6 +160,18 @@ export default function Landing() {
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{c.body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mt-24">
+        <Eyebrow>Install on your phone</Eyebrow>
+        <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">Crews carry it into the field.</h2>
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          TipOff installs from the browser: no app store, no account. It opens straight to today&apos;s crew list and
+          runs full screen.
+        </p>
+        <div className="mt-10">
+          <InstallCard />
         </div>
       </section>
 

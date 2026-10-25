@@ -48,7 +48,7 @@ export function HotspotRadar({ hotspots, vacant }: { hotspots: Hotspot[]; vacant
   );
 
   return (
-    <div className="relative h-[calc(100dvh-3.5rem)] w-full">
+    <div className="relative h-[var(--app-height)] w-full">
       <RadarMap hotspots={shown} vacant={vacantShown} selected={at} onHotspot={pickHotspot} onBuilding={pickBuilding} />
       {hotspot && <HotspotPanel key={hotspot.id} hotspot={hotspot} onClose={close} />}
       {building && <BuildingPanel key={building[0]} handle={building[0]} onClose={close} />}
