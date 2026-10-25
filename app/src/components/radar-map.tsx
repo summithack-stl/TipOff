@@ -16,7 +16,7 @@ type Props = {
   onBuilding: (handle: string) => void;
 };
 
-const PULSE_SCORE = 80;
+const PULSE_TOP = 10; // the strongest hotspots on screen pulse
 
 export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuilding }: Props) {
   const el = useRef<HTMLDivElement>(null);
@@ -34,7 +34,7 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
     // preferCanvas: ~10k circle markers draw on one canvas instead of 10k SVG nodes.
     const m = L.map(el.current, { preferCanvas: true, zoomControl: false }).setView([38.627, -90.24], 12);
     L.control.zoom({ position: "bottomright" }).addTo(m);
-    // OSM tiles, darkened in CSS (.radar-tiles) so the score colors pop.
+    // OSM tiles, darkened in CSS (.radar-tiles) in both themes so the type colors pop.
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
@@ -66,17 +66,20 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
     if (!group) return;
     group.clearLayers();
     const maxReports = Math.max(1, ...hotspots.map((h) => h.report_count));
-    // Lowest score first so the worst paint on top.
-    for (const h of [...hotspots].sort((a, b) => a.score - b.score)) {
-      const fill = riskColor(h.score);
-      const radius = 6 + 12 * Math.sqrt(h.report_count / maxReports); // area tracks report count
-      const label = `${h.category} hotspot, score ${h.score}, ${h.report_count} reports`;
-      if (h.score >= PULSE_SCORE) {
+    // Lowest score first so the worst paint on top. One type is shown at a time, so color = type,
+    // size = report count, brightness = score.
+    const sorted = [...hotspots].sort((a, b) => a.score - b.score);
+    const pulse = new Set(sorted.slice(-PULSE_TOP).map((h) => h.id));
+    for (const h of sorted) {
+      const color = CATEGORY_COLOR[h.category];
+      const radius = 4 + 12 * Math.sqrt(h.report_count / maxReports);
+      const label = `${h.top_address || h.category}: score ${h.score}, ${h.report_count} reports`;
+      if (pulse.has(h.id)) {
         // Worst hotspots: a DOM marker so it can pulse with CSS. A handful of nodes is cheap.
         L.marker([h.lat, h.lon], {
           icon: L.divIcon({
             className: "",
-            html: `<span class="radar-top" style="--c:${fill};--cat:${CATEGORY_COLOR[h.category]};width:${radius * 2}px;height:${radius * 2}px"></span>`,
+            html: `<span class="radar-top" style="--c:${color};width:${radius * 2}px;height:${radius * 2}px"></span>`,
             iconSize: [radius * 2, radius * 2],
           }),
           title: label,
@@ -87,8 +90,7 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
           .addTo(group);
         continue;
       }
-      // Fill = score, ring = issue type.
-      L.circleMarker([h.lat, h.lon], { radius, color: CATEGORY_COLOR[h.category], weight: 2, fillColor: fill, fillOpacity: 0.8 })
+      L.circleMarker([h.lat, h.lon], { radius, color, weight: 1, opacity: 0.9, fillColor: color, fillOpacity: 0.15 + 0.6 * (h.score / 100) })
         .bindTooltip(label)
         .on("click", () => handlers.current.onHotspot(h.id))
         .addTo(group);
@@ -104,5 +106,5 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
     m.panTo([selected.lat, selected.lon], { animate: true });
   }, [selected]);
 
-  return <div ref={el} className="h-full w-full bg-[#0e0e10]" />;
+  return <div ref={el} className="h-full w-full bg-[#0e0f11]" />;
 }

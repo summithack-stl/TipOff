@@ -2,28 +2,52 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
+import { AnimatePresence } from "motion/react";
 import { BuildingPanel } from "@/components/building-panel";
 import { HotspotPanel } from "@/components/hotspot-panel";
-import { CATEGORY_COLOR, CATEGORY_LABEL } from "@/lib/categories";
-import { activeAt, DAYS, HOTSPOT_CATEGORIES, HOUR_BLOCKS, type Hotspot, type HotspotCategory } from "@/lib/hotspots";
+import { TypeToggle } from "@/components/type-toggle";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { CATEGORY_LABEL } from "@/lib/categories";
+import { activeAt, DAYS, HOUR_BLOCKS, type Hotspot, type HotspotCategory } from "@/lib/hotspots";
 
 export type RadarPoint = [handle: string, lat: number, lon: number, risk: number, ward: number | null];
 
 // Leaflet touches window on import, so the map only loads in the browser.
 const RadarMap = dynamic(() => import("@/components/radar-map"), {
   ssr: false,
-  loading: () => <div className="h-full w-full animate-pulse bg-muted" />,
+  loading: () => <div className="h-full w-full animate-pulse bg-[#0e0f11]" />,
 });
 
 type Selected = { kind: "hotspot" | "building"; id: string } | null;
+const ANY = "any";
 
-const control = "h-8 rounded-md border bg-background px-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
+function Filter({ label, value, onChange, items }: { label: string; value: string; onChange: (v: string) => void; items: Record<string, string> }) {
+  return (
+    <label className="flex items-center gap-2">
+      <span className="font-heading text-sm font-semibold tracking-wide text-muted-foreground uppercase">{label}</span>
+      <Select value={value} onValueChange={(v) => onChange(v ?? ANY)} items={items}>
+        <SelectTrigger size="sm" className="min-w-20">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(items).map(([v, l]) => (
+            <SelectItem key={v} value={v}>
+              {l}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  );
+}
 
 export function HotspotRadar({ hotspots, vacant }: { hotspots: Hotspot[]; vacant: RadarPoint[] }) {
-  const [category, setCategory] = useState<HotspotCategory | "all">("all");
-  const [ward, setWard] = useState("all");
-  const [day, setDay] = useState<number | null>(null);
-  const [block, setBlock] = useState<number | null>(null);
+  // One type at a time: dumping is the problem set, the others are a click away.
+  const [category, setCategory] = useState<HotspotCategory>("dumping");
+  const [ward, setWard] = useState(ANY);
+  const [day, setDay] = useState(ANY);
+  const [block, setBlock] = useState(ANY);
   const [showVacant, setShowVacant] = useState(false);
   const [selected, setSelected] = useState<Selected>(null);
   const close = useCallback(() => setSelected(null), []);
@@ -31,14 +55,17 @@ export function HotspotRadar({ hotspots, vacant }: { hotspots: Hotspot[]; vacant
   const pickBuilding = useCallback((id: string) => setSelected({ kind: "building", id }), []);
 
   const wards = useMemo(() => [...new Set(hotspots.map((h) => h.ward).filter((w) => w !== null))].sort((a, b) => a - b), [hotspots]);
+  const ofType = useMemo(() => hotspots.filter((h) => h.category === category), [hotspots, category]);
   const shown = useMemo(
     () =>
-      hotspots.filter(
-        (h) => (category === "all" || h.category === category) && (ward === "all" || String(h.ward) === ward) && activeAt(h, day, block),
+      ofType.filter(
+        (h) =>
+          (ward === ANY || String(h.ward) === ward) &&
+          activeAt(h, day === ANY ? null : Number(day), block === ANY ? null : Number(block)),
       ),
-    [hotspots, category, ward, day, block],
+    [ofType, ward, day, block],
   );
-  const vacantShown = useMemo(() => (showVacant ? vacant.filter((b) => ward === "all" || String(b[4]) === ward) : null), [vacant, showVacant, ward]);
+  const vacantShown = useMemo(() => (showVacant ? vacant.filter((b) => ward === ANY || String(b[4]) === ward) : null), [vacant, showVacant, ward]);
 
   const hotspot = selected?.kind === "hotspot" ? hotspots.find((h) => h.id === selected.id) : undefined;
   const building = selected?.kind === "building" ? vacant.find((b) => b[0] === selected.id) : undefined;
@@ -48,68 +75,33 @@ export function HotspotRadar({ hotspots, vacant }: { hotspots: Hotspot[]; vacant
   );
 
   return (
-    <div className="relative h-[calc(100dvh-3.5rem)] w-full">
-      <RadarMap hotspots={shown} vacant={vacantShown} selected={at} onHotspot={pickHotspot} onBuilding={pickBuilding} />
-      {hotspot && <HotspotPanel key={hotspot.id} hotspot={hotspot} onClose={close} />}
-      {building && <BuildingPanel key={building[0]} handle={building[0]} onClose={close} />}
+    <div className="flex h-[calc(100dvh-3.5rem-4rem)] w-full flex-col md:h-[calc(100dvh-3.5rem)]">
+      <div className="z-[1050] flex flex-wrap items-center gap-x-5 gap-y-2 border-b bg-background px-4 py-2.5 text-sm">
+        <TypeToggle
+          value={category}
+          onChange={(c) => {
+          setCategory(c);
+          setSelected(null);
+        }}
+        />
+        <Filter label="Ward" value={ward} onChange={setWard} items={{ [ANY]: "All", ...Object.fromEntries(wards.map((w) => [String(w), String(w)])) }} />
+        <Filter label="Day" value={day} onChange={setDay} items={{ [ANY]: "Any", ...Object.fromEntries(DAYS.map((d, i) => [String(i), d])) }} />
+        <Filter label="Reported" value={block} onChange={setBlock} items={{ [ANY]: "Any time", ...Object.fromEntries(HOUR_BLOCKS.map(([l], i) => [String(i), l])) }} />
+        <label className="flex items-center gap-2">
+          <Switch checked={showVacant} onCheckedChange={setShowVacant} />
+          <span className="font-heading text-sm font-semibold tracking-wide text-muted-foreground uppercase">Vacant buildings</span>
+        </label>
+        <p className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
+          {shown.length} of {ofType.length} {CATEGORY_LABEL[category].toLowerCase()} hotspots · size = reports, brightness = score
+        </p>
+      </div>
 
-      <div className={`absolute top-3 left-3 z-[1000] flex max-w-[calc(100%-1.5rem)] flex-wrap ${selected ? "md:max-w-[calc(100%-420px-1.5rem)]" : ""} items-center gap-3 rounded-lg border bg-background/90 px-3 py-2 text-sm shadow-lg backdrop-blur`}>
-        <div>
-          <div className="font-semibold">311 Hotspots</div>
-          <div className="text-xs text-muted-foreground">
-            {shown.length} of {hotspots.length} repeat hotspots
-          </div>
-        </div>
-        <div className="flex gap-1" role="group" aria-label="Issue type">
-          {(["all", ...HOTSPOT_CATEGORIES] as const).map((c) => (
-            <button
-              key={c}
-              type="button"
-              aria-pressed={category === c}
-              onClick={() => setCategory(c)}
-              className="flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs aria-pressed:bg-foreground aria-pressed:text-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            >
-              {c !== "all" && <span className="size-2 rounded-full" style={{ background: CATEGORY_COLOR[c] }} />}
-              {c === "all" ? "All" : CATEGORY_LABEL[c]}
-            </button>
-          ))}
-        </div>
-        <label className="flex items-center gap-2">
-          Ward
-          <select value={ward} onChange={(e) => setWard(e.target.value)} className={control}>
-            <option value="all">All</option>
-            {wards.map((w) => (
-              <option key={w} value={w}>{w}</option>
-            ))}
-          </select>
-        </label>
-        <label className="flex items-center gap-2">
-          Day
-          <select value={day ?? ""} onChange={(e) => setDay(e.target.value === "" ? null : Number(e.target.value))} className={control}>
-            <option value="">Any</option>
-            {DAYS.map((d, i) => (
-              <option key={d} value={i}>{d}</option>
-            ))}
-          </select>
-        </label>
-        <label className="flex items-center gap-2">
-          Reported
-          <select value={block ?? ""} onChange={(e) => setBlock(e.target.value === "" ? null : Number(e.target.value))} className={control}>
-            <option value="">Any</option>
-            {HOUR_BLOCKS.map(([label], i) => (
-              <option key={label} value={i}>{label}</option>
-            ))}
-          </select>
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={showVacant} onChange={(e) => setShowVacant(e.target.checked)} className="size-4 accent-red-500" />
-          Nearby vacant buildings
-        </label>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground" aria-hidden>
-          score low
-          <span className="h-2 w-20 rounded-full bg-[linear-gradient(90deg,#6b7280,#eab308_35%,#f97316_55%,#dc2626_72%,#991b1b)]" />
-          high
-        </div>
+      <div className="relative isolate flex-1 overflow-hidden">
+        <RadarMap hotspots={shown} vacant={vacantShown} selected={at} onHotspot={pickHotspot} onBuilding={pickBuilding} />
+        <AnimatePresence>
+          {hotspot && <HotspotPanel key={hotspot.id} hotspot={hotspot} onClose={close} />}
+          {building && <BuildingPanel key={building[0]} handle={building[0]} onClose={close} />}
+        </AnimatePresence>
       </div>
     </div>
   );

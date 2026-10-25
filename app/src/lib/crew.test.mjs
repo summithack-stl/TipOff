@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { busyDays, cityToday, parseWindow, todaysHotspots, watchWindow, whatsThere } from './crew.ts';
+import { busyDays, cityToday, parseWindow, todaysHotspots, watchColumn, watchWindow, whatsThere } from './crew.ts';
 
 const base = {
   id: 'dumping-1_-1', category: 'dumping', lat: 38.6, lon: -90.2, ward: 13, score: 78, rank: 1,
@@ -50,4 +50,12 @@ test('today keeps only hotspots busy today, strongest first, capped per category
   const weaker = { ...base, id: 'dumping-3_-3', score: 40 };
   const list = todaysHotspots([weaker, quiet, base], 'Wed', 1);
   assert.deepEqual(list.map((h) => h.id), ['dumping-1_-1']);
+});
+
+test('board column follows the watch window start', () => {
+  // Reports 8am-11am, so dumping is watched from 8pm: Evening.
+  assert.equal(watchColumn(base), 3);
+  // Potholes use the report window itself: 8am is Morning.
+  assert.equal(watchColumn({ ...base, category: 'pothole' }), 1);
+  assert.equal(watchColumn({ ...base, report_window: 'soon' }), 0);
 });

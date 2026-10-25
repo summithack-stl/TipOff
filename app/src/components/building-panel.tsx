@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 import type { Building } from "@/lib/buildings";
+import { Drawer } from "@/components/drawer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrackerOverlay } from "@/components/tracker-overlay";
@@ -58,13 +59,10 @@ export function BuildingPanel({ handle, onClose }: { handle: string; onClose: ()
   };
 
   return (
-    <aside
-      aria-label="Building details"
-      className="absolute inset-y-0 right-0 z-[1001] flex w-[420px] max-w-full flex-col overflow-y-auto border-l bg-background/95 shadow-2xl backdrop-blur"
-    >
+    <Drawer label="Building details">
       <div className="flex items-start justify-between gap-3 border-b p-4">
         <div>
-          <h2 className="text-lg font-semibold">{building?.address ?? (error || "Loading…")}</h2>
+          <h2 className="font-heading text-2xl leading-tight font-bold uppercase">{building?.address ?? (error || "Loading…")}</h2>
           {building && (
             <p className="text-sm text-muted-foreground">
               Ward {building.ward ?? "?"} · Rank {building.risk_rank.toLocaleString()} of 9,884
@@ -147,6 +145,6 @@ export function BuildingPanel({ handle, onClose }: { handle: string; onClose: ()
           </section>
         </div>
       )}
-    </aside>
+    </Drawer>
   );
 }

@@ -71,3 +71,19 @@ export function todaysHotspots(all: Hotspot[], day: Day, perCategory = 10): Hots
       return n < perCategory;
     });
 }
+
+// Board columns on the crew page, six hours each.
+export const WATCH_COLUMNS = ["Overnight", "Morning", "Afternoon", "Evening"] as const;
+
+// Hour the crew should start watching: the suggested watch window for dumping, the report window for the rest.
+export function watchStartHour(h: Hotspot): number | null {
+  const w = parseWindow(h.report_window);
+  if (!w) return null;
+  return h.category === "dumping" ? (w[0] + 12) % 24 : w[0];
+}
+
+// 0-3 index into WATCH_COLUMNS; unknown windows go to the first column.
+export function watchColumn(h: Hotspot): number {
+  const start = watchStartHour(h);
+  return start === null ? 0 : Math.floor(start / 6);
+}
