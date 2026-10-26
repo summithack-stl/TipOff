@@ -4,7 +4,7 @@ import { z } from "zod";
 import { detectFrame, type Detection } from "@/lib/detect";
 import { cellOf, fieldHotspots, inStLouis, MIN_REPORTS, type FieldReport } from "@/lib/field-reports";
 import { dumping311PerCell, listReports, saveReport, storeConfigured } from "@/lib/field-store";
-import { clientKey, rateLimit, upstreamError } from "@/lib/guard";
+import { clientKey, dailyQuota, rateLimit, upstreamError } from "@/lib/guard";
 import { loadHotspots } from "@/lib/hotspot-data";
 import type { Hotspot } from "@/lib/hotspots";
 
@@ -66,6 +66,10 @@ export async function POST(request: Request) {
   if ((await listReports()).some((r) => r.photoHash === photoHash)) {
     return NextResponse.json({ error: "This photo has already been reported. Thanks!" }, { status: 409 });
   }
+  // The photo check spends the same shared vision tier as /api/frames, so it draws on the same daily
+  // budget. Charged only now, after the free checks above, so a wrong pin or a repeat costs nothing.
+  const spent = dailyQuota(request, "frames");
+  if (spent) return spent;
   const dataUrl = `data:${image.type};base64,${Buffer.from(bytes).toString("base64")}`;
   const bestDumping = (ds: Detection[]) => ds.filter((d) => d.category === "dumping" && d.confidence >= MIN_CONFIDENCE).sort((a, b) => b.confidence - a.confidence)[0];
   let detections: Detection[];
