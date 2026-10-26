@@ -13,6 +13,7 @@ cd "$(dirname "$0")/../.."
 DB="${TIPOFF_TEST_DB:-tipoff_rls_test}"
 psql -v ON_ERROR_STOP=1 -q -d postgres -c "drop database if exists $DB;" -c "create database $DB;"
 psql -v ON_ERROR_STOP=1 -q -d "$DB" -f supabase/tests/00_auth_shim.sql
-psql -v ON_ERROR_STOP=1 -q -d "$DB" -f supabase/migrations/0001_crew_status.sql
-psql -v ON_ERROR_STOP=1 -d "$DB" -f supabase/tests/01_rls_test.sql 2>&1 |
-  grep -E "NOTICE:  ok|ERROR|FAILED|ALL RLS" | sed 's/psql:[^ ]* //'
+for m in supabase/migrations/*.sql; do psql -v ON_ERROR_STOP=1 -q -d "$DB" -f "$m"; done
+for t in supabase/tests/0[1-9]_*_test.sql; do
+  psql -v ON_ERROR_STOP=1 -d "$DB" -f "$t" 2>&1 | grep -E "NOTICE:  ok|ERROR|FAILED|ALL RLS|ALL CREW" | sed 's/psql:[^ ]* //'
+done

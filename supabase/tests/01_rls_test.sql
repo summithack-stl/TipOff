@@ -90,7 +90,9 @@ select test_assert(
 set role anon;
 select set_config('request.jwt.claim.sub', '', false);
 
-select test_assert((select count(*) from public.hotspot_status) = 0, 'anon reads status (none yet)');
+-- 0002: the raw table (notes, who) is team-only; the public reads hotspot_public instead.
+select test_denied($$select 1 from public.hotspot_status$$, 'anon reading raw status, with its notes');
+select test_assert((select count(*) from public.hotspot_public) = 0, 'anon reads public status (none yet)');
 select test_denied(
   $$insert into public.hotspot_status (hotspot_id, team_id, status, updated_by)
     values ('dumping-27654_-50128', 'aaaaaaaa-0000-0000-0000-000000000001', 'cleaned',
@@ -198,7 +200,8 @@ select test_assert(
 -- ---------------------------------------------------------------- the other team
 select set_config('request.jwt.claim.sub', '44444444-4444-4444-4444-444444444444', false);
 select test_assert((select count(*) from public.assignments) = 0, 'another team sees no assignments');
-select test_assert((select count(*) from public.hotspot_status) = 1, 'but status is public, so they see it');
+select test_assert((select count(*) from public.hotspot_status) = 0, 'another team cannot read the notes');
+select test_assert((select count(*) from public.hotspot_public) = 1, 'but the public status shows the block');
 
 -- ---------------------------------------------------------------- current status view
 select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', false);
