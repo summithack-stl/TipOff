@@ -76,6 +76,24 @@ Full table and method, exactly as shown in our video: [`data/backtest/2026-10-14
 
 `data/scripts/build_hotspots.py` splits the city into squares about 155 m on a side (roughly a block). A square is a hotspot once it has 5 or more reports of one type since January 2024. Each hotspot gets a 0-100 score from its last 12 months: report volume (ranked against hotspots of the same type) 40%, how many different weeks it was reported in 30%, trend against the 12 months before 15%, vacant buildings within 150 m 15%. The score orders where to look first; it does not predict crime and never identifies people.
 
+## Several people, one picture (shared crew status)
+
+A crew in the field marks a block cleaned; the supervisor at a desk and the next crew see it. The
+data model and its row-level security live in [`supabase/`](supabase/) — see
+[`supabase/README.md`](supabase/README.md) for why Supabase over Vercel KV/Postgres, what the tables
+are, and how to apply the migration.
+
+Two things worth knowing here:
+
+- **Reading never needs a login.** Judges and the public see the map and the plans exactly as today.
+  Status is public too, but names are not: a logged-out visitor sees "cleaned on Tuesday", never who.
+- **Roles are enforced by the database.** The app hands every phone a public anon key, so "crew can
+  write, viewer cannot" is a row-level security policy, not a hidden button. There are 31 tests for
+  that; `./supabase/tests/run.sh` runs them against any local Postgres, no Supabase project needed.
+
+Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `app/.env.local` to turn it on.
+Without them TipOff runs read-only, exactly as before.
+
 ## How AI is used
 
 - **Plans** (`POST /api/plan`, gpt-oss-120b on Groq): turns a hotspot's sourced facts into a plan (what we know, where and when to watch, actions, evidence for a citation). The prompt allows only the given facts: no invented dates, counts, people, vehicles or causes.
