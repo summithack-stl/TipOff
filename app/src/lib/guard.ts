@@ -48,7 +48,7 @@ export function upstreamError(route: string, error: unknown, extra: Record<strin
   }
   const busy = error instanceof Error && error.name === "RateLimitError";
   return Response.json(
-    { error: busy ? "The AI service is busy. Try again in a minute." : "The AI service failed. Try again.", ...extra },
+    { error: busy ? "That service is busy. Try again in a minute." : "That service failed. Try again.", ...extra },
     { status: busy ? 503 : 502 },
   );
 }

@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   // (public/ is served from the CDN, not the function's disk).
   outputFileTracingIncludes: {
     "/api/plan": ["./data/clean/hotspots.json"],
+    "/api/reports": ["./data/clean/hotspots.json", "./data/clean/street_reports.json"],
     "/crew": ["./data/clean/hotspots.json", "./data/sample/hotspots.sample.json", "./public/photos/index.json"],
   },
   // Basic hardening for every response. Same-origin framing still works for our own views.
