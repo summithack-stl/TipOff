@@ -169,6 +169,24 @@ Errors: `400` bad input, `404` unknown building or hotspot, `413` image too larg
 
 Groq's free vision tier allows about 200,000 tokens a day, which is roughly 95 photos (about 2,100 tokens each), shared by every key in the same Groq organization. When it runs out, `/api/frames` falls back to Gemini for the whole frame. For demos, use the saved detections in `public/photos/index.json` or set `DEMO_CACHE=1`.
 
+That is a *daily* limit for the whole organization, so a few people using the photo check would
+exhaust it before lunch. The per-minute rate limit in `app/src/lib/guard.ts` does nothing about it,
+so each AI route also has a daily budget (`DAILY_LIMITS`), counted per client **and** for the whole
+deployment, resetting at midnight in St. Louis:
+
+| Route | Per client | Whole deployment |
+| --- | ---: | ---: |
+| `POST /api/frames` | 5 a day | 90 a day |
+| `POST /api/plan` | 20 a day | 400 a day |
+
+A refused call charges neither budget, so one phone that is already over its allowance cannot burn
+the team's. `GET /api/health` reports what is left, so a supervisor can see it before sending crews
+out. Plans are cached per hotspot and nightly build, so **a whole crew opening the same block costs
+one LLM call** — and a cached plan is not charged against anyone's budget, because no AI was spent.
+
+Both budgets are in memory per server instance, like the rate limiter, so on Vercel they are a
+floor on protection rather than a hard cap. Vercel KV would make them exact.
+
 ## Run locally
 
 ```bash

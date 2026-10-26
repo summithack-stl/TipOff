@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { rateLimit, upstreamError } from "@/lib/guard";
-import { getHotspot } from "@/lib/hotspot-store";
+import { dailyQuota, rateLimit, upstreamError } from "@/lib/guard";
+import { createHash } from "node:crypto";
+import { shared, sharedHit, type Shared } from "@/lib/cache";
+import { dataVersion, getHotspot } from "@/lib/hotspot-store";
 import { CATEGORIES } from "@/lib/issues";
 import { chatJSON } from "@/lib/llm";
 import { planFacts } from "@/lib/plan";
@@ -38,6 +40,20 @@ Phrase facts as "311 reports show" or "photo shows". Plain words, no jargon. Ret
 
 export const maxDuration = 30;
 
+type Plan = z.infer<typeof planSchema>;
+
+// Ten crew members opening the same block cost one LLM call. Keyed by the hotspot, the nightly
+// build it came from, and the photo findings sent with it, so a rebuild or a new detection gets a
+// fresh plan rather than yesterday's answer about different numbers.
+// ponytail: in-memory per server instance, like the rate limiter. Vercel KV would make it shared.
+const plans = new Map<string, Shared<Plan>>();
+const PLAN_TTL_MS = 6 * 60 * 60 * 1000;
+
+function planKey(id: string, detections: unknown): string {
+  const findings = createHash("sha256").update(JSON.stringify(detections)).digest("hex").slice(0, 16);
+  return `${id}:${dataVersion()}:${findings}`;
+}
+
 // One hotspot + latest photo findings in, a short camera/cleanup plan out.
 export async function POST(request: Request) {
   const limited = rateLimit(request, "plan", 20);
@@ -52,13 +68,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "unknown hotspot id" }, { status: 404 });
   }
 
+  const key = planKey(hotspot.id, parsed.data.detections);
+  // The daily budget exists to protect the AI spend, so only a real call is charged for. A whole
+  // crew reading a plan that is already written costs nothing and should count as nothing.
+  if (!sharedHit(plans, key, PLAN_TTL_MS)) {
+    const spent = dailyQuota(request, "plan");
+    if (spent) return spent;
+  }
+
   try {
-    const plan = await chatJSON(
-      [
-        { role: "system", content: SYSTEM },
-        { role: "user", content: JSON.stringify(planFacts(hotspot, parsed.data.detections)) },
-      ],
-      planSchema,
+    const plan = await shared(plans, key, PLAN_TTL_MS, () =>
+      chatJSON(
+        [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: JSON.stringify(planFacts(hotspot, parsed.data.detections)) },
+        ],
+        planSchema,
+      ),
     );
     return NextResponse.json({ id: hotspot.id, ...plan });
   } catch (error) {

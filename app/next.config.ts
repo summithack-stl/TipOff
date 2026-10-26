@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   // These routes read files at request time; Vercel only ships files the bundle is told about
   // (public/ is served from the CDN, not the function's disk).
   outputFileTracingIncludes: {
-    "/api/plan": ["./data/clean/hotspots.json"],
+    "/api/plan": ["./data/clean/hotspots.json", "./data/clean/hotspots_summary.json"],
     "/api/hotspots/[id]": ["./data/clean/hotspots.json", "./data/sample/hotspots.sample.json"],
     "/api/vacant": ["./data/clean/vacant_buildings_lite.json"],
     "/crew": ["./data/clean/hotspots.json", "./data/sample/hotspots.sample.json", "./public/photos/index.json"],

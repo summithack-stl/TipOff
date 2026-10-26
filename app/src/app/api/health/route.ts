@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { rateLimit } from "@/lib/guard";
+import { quotaStatus, rateLimit } from "@/lib/guard";
 import { chat, llmInfo } from "@/lib/llm";
 
 // Each check spends a real LLM call, so reuse the last answer for a minute.
@@ -8,7 +8,8 @@ let last: { at: number; body: Record<string, unknown> } | undefined;
 export async function GET(request: Request) {
   const limited = rateLimit(request, "health", 10);
   if (limited) return limited;
-  if (last && Date.now() - last.at < 60_000) return NextResponse.json({ ...last.body, cached: true });
+  // Quota is read fresh even on a cached health check: it is the number that moves.
+  if (last && Date.now() - last.at < 60_000) return NextResponse.json({ ...last.body, quota: quotaStatus(), cached: true });
 
   const start = Date.now();
   const { provider, model } = llmInfo();
@@ -28,5 +29,5 @@ export async function GET(request: Request) {
     body = { ok: false, provider, model, vision, error: message, ms: Date.now() - start };
   }
   last = { at: Date.now(), body };
-  return NextResponse.json(body);
+  return NextResponse.json({ ...body, quota: quotaStatus() });
 }
