@@ -10,7 +10,9 @@ export type FieldReport = {
   at: string; // ISO time the report was sent
   confidence: number; // the photo check's confidence that it shows dumping, 0-1
   note: string; // what the photo check saw
-  photo: string | null; // public URL of the stored photo
+  photo: string | null; // URL of the stored photo; never sent back to browsers
+  reporter: string; // salted hash of the sender's connection, so one person counts once per block
+  photoHash: string; // sha256 of the photo bytes, so the same photo can't be sent twice
 };
 
 // Same grid as data/scripts/build_hotspots.py (CELL_LAT, CELL_LON, Python floor division).
@@ -46,7 +48,8 @@ export function fieldHotspots(reports: FieldReport[], existing: Map<string, Hots
   const out: Hotspot[] = [];
   for (const [cell, rs] of byCell) {
     const id = `dumping-${cell}`;
-    const n = rs.length;
+    // One person counts once per block, however many photos they send.
+    const n = new Set(rs.map((r) => r.reporter || r.id)).size;
     const reason = `${plural(n, "photo report")} from the TipOff app`;
     const known = existing.get(id);
     if (known) {
@@ -57,8 +60,10 @@ export function fieldHotspots(reports: FieldReport[], existing: Map<string, Hots
     const fromCity = city?.count ?? 0;
     if (fromCity + n < MIN_REPORTS) continue;
     const newest = [...rs].sort((a, b) => b.at.localeCompare(a.at));
-    const lat = rs.reduce((s, r) => s + r.lat, 0) / n;
-    const lon = rs.reduce((s, r) => s + r.lon, 0) / n;
+    // Block-level position only: the cell center, never a reporter's exact spot.
+    const [cy, cx] = cell.split("_").map(Number);
+    const lat = Math.round((cy + 0.5) * CELL_LAT * 1e5) / 1e5;
+    const lon = Math.round((cx + 0.5) * CELL_LON * 1e5) / 1e5;
     const dow = Array(7).fill(0) as number[];
     const hours = Array(24).fill(0) as number[];
     for (const r of rs) {
@@ -90,7 +95,7 @@ export function fieldHotspots(reports: FieldReport[], existing: Map<string, Hots
       top_address: city?.address ?? `Near ${lat.toFixed(4)}, ${lon.toFixed(4)}`,
       vacant_within_150m: 0,
       nearest_vacant_m: null,
-      recent: newest.slice(0, 5).map((r) => ({ opened: r.at.slice(0, 10), code: "TipOff photo report", address: `${r.lat.toFixed(5)}, ${r.lon.toFixed(5)}` })),
+      recent: newest.slice(0, 5).map((r) => ({ opened: r.at.slice(0, 10), code: "TipOff photo report", address: city?.address ?? "This block" })),
       reasons: [`New hotspot: ${reason}`, `${plural(fromCity, "311 report")} on this block since 2024`],
       field_reports: n,
       source: "field",

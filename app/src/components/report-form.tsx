@@ -6,7 +6,7 @@ import Link from "next/link";
 import { CameraIcon, LocateFixedIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { friendlyError } from "@/lib/api-error";
-import { inStLouis, type FieldReport } from "@/lib/field-reports";
+import { inStLouis } from "@/lib/field-reports";
 import type { Hotspot } from "@/lib/hotspots";
 
 const PinMap = dynamic(() => import("@/components/pin-map"), { ssr: false, loading: () => <div className="h-64 w-full animate-pulse rounded-lg border bg-muted" /> });
@@ -25,7 +25,7 @@ async function shrink(file: File): Promise<Blob> {
   return new Promise((ok, fail) => canvas.toBlob((b) => (b ? ok(b) : fail(new Error("Couldn't read that photo."))), "image/jpeg", 0.85));
 }
 
-type Result = { report: FieldReport; hotspot: Hotspot | null; onBlock: number; needed: number };
+type Result = { report: { confidence: number; note: string }; hotspot: Hotspot | null; onBlock: number; needed: number };
 
 // UI: Sarthak
 export function ReportForm() {
@@ -103,7 +103,7 @@ export function ReportForm() {
         {h ? (
           <p className="rounded-lg border bg-card p-4">
             {h.source === "field" ? <strong className="text-hot">New hotspot. </strong> : <strong>Added to a known hotspot. </strong>}
-            This block now has {result.onBlock} reports{h.field_reports ? `, ${h.field_reports} of them photos from TipOff` : ""}.
+            This block now has {result.onBlock} reports{h.field_reports ? `, ${h.field_reports} of them from TipOff photo reporters` : ""}.
           </p>
         ) : (
           <p className="rounded-lg border bg-card p-4">

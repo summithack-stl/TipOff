@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { cellOf, fieldHotspots, inStLouis } from './field-reports.ts';
 
-const at = (lat, lon, when = '2026-10-26T14:00:00Z') => ({ id: `r-${lat}-${lon}-${when}`, lat, lon, at: when, confidence: 0.9, note: 'mattress and bags', photo: null });
+const at = (lat, lon, when = '2026-10-26T14:00:00Z', reporter = `p-${lat}-${lon}-${when}`) => ({ id: `r-${lat}-${lon}-${when}-${reporter}`, lat, lon, at: when, confidence: 0.9, note: 'mattress and bags', photo: null, reporter, photoHash: reporter });
 
 test('cells match the Python grid, including negative longitudes', () => {
   // build_hotspots.py: lat // 0.0014, lon // 0.0018 (floor division)
@@ -38,4 +38,21 @@ test('a block becomes a new hotspot only once 311 plus photo reports reach 5', (
   assert.equal(out[0].ward, 10);
   // 3 city reports + 1 photo is still under the bar
   assert.equal(fieldHotspots([at(38.62, -90.21)], new Map(), new Map([[cell, { count: 3, address: null, ward: null }]])).length, 0);
+});
+
+test('one person sending many photos counts once', () => {
+  const cell = cellOf(38.62, -90.21);
+  const city = new Map([[cell, { count: 3, address: null, ward: null }]]);
+  const same = [at(38.62, -90.21, '2026-10-26T14:00:00Z', 'me'), at(38.62, -90.21, '2026-10-26T14:01:00Z', 'me'), at(38.62, -90.21, '2026-10-26T14:02:00Z', 'me')];
+  assert.equal(fieldHotspots(same, new Map(), city).length, 0);
+  const two = [...same, at(38.62, -90.21, '2026-10-26T15:00:00Z', 'you')];
+  assert.equal(fieldHotspots(two, new Map(), city)[0].field_reports, 2);
+});
+
+test("new hotspots never expose a reporter's exact spot or time", () => {
+  const cell = cellOf(38.62012, -90.21034);
+  const [h] = fieldHotspots([at(38.62012, -90.21034, '2026-10-26T14:37:12Z')], new Map(), new Map([[cell, { count: 4, address: '1 MAIN ST', ward: 5 }]]));
+  assert.notEqual(h.lat, 38.62012);
+  assert.equal(cellOf(h.lat, h.lon), cell);
+  assert.deepEqual(h.recent[0], { opened: '2026-10-26', code: 'TipOff photo report', address: '1 MAIN ST' });
 });

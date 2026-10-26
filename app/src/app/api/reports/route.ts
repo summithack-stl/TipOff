@@ -1,10 +1,10 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { detectFrame, type Detection } from "@/lib/detect";
 import { cellOf, fieldHotspots, inStLouis, MIN_REPORTS, type FieldReport } from "@/lib/field-reports";
 import { dumping311PerCell, listReports, saveReport, storeConfigured } from "@/lib/field-store";
-import { rateLimit, upstreamError } from "@/lib/guard";
+import { clientKey, rateLimit, upstreamError } from "@/lib/guard";
 import { loadHotspots } from "@/lib/hotspot-data";
 import type { Hotspot } from "@/lib/hotspots";
 
@@ -21,13 +21,13 @@ const fieldsSchema = z.object({
 let byId: Map<string, Hotspot> | null = null;
 const existing = () => (byId ??= new Map(loadHotspots().hotspots.filter((h) => h.category === "dumping").map((h) => [h.id, h])));
 
-// Everything the map needs: the photo reports and the hotspots they changed or created.
+// What the map needs: only the hotspots photo reports changed or created, at block level.
+// Individual reports (exact place, time, photo) never leave the server.
 export async function GET(request: Request) {
   const limited = rateLimit(request, "reports-read", 60);
   if (limited) return limited;
   try {
-    const reports = await listReports();
-    return NextResponse.json({ reports, hotspots: fieldHotspots(reports, existing(), dumping311PerCell()) });
+    return NextResponse.json({ hotspots: fieldHotspots(await listReports(), existing(), dumping311PerCell()) });
   } catch (error) {
     return upstreamError("reports", error);
   }
@@ -56,6 +56,10 @@ export async function POST(request: Request) {
   }
 
   const bytes = await image.arrayBuffer();
+  const photoHash = createHash("sha256").update(Buffer.from(bytes)).digest("hex");
+  if ((await listReports()).some((r) => r.photoHash === photoHash)) {
+    return NextResponse.json({ error: "This photo has already been reported. Thanks!" }, { status: 409 });
+  }
   const dataUrl = `data:${image.type};base64,${Buffer.from(bytes).toString("base64")}`;
   const bestDumping = (ds: Detection[]) => ds.filter((d) => d.category === "dumping" && d.confidence >= MIN_CONFIDENCE).sort((a, b) => b.confidence - a.confidence)[0];
   let detections: Detection[];
@@ -87,13 +91,22 @@ export async function POST(request: Request) {
     confidence: Math.round(dumping.confidence * 100) / 100,
     note: dumping.note.slice(0, 200),
     photo: null,
+    // Salted so the stored value can't be turned back into an address.
+    reporter: createHash("sha256").update(`${process.env.REPORT_SALT ?? "tipoff"}:${clientKey(request)}`).digest("hex").slice(0, 16),
+    photoHash,
   };
   try {
     const saved = await saveReport(report, { bytes, type: image.type });
     const cell = cellOf(saved.lat, saved.lon);
-    const hotspot = fieldHotspots(await listReports(), existing(), dumping311PerCell()).find((h) => h.id === `dumping-${cell}`) ?? null;
-    const onBlock = (dumping311PerCell().get(cell)?.count ?? 0) + (await listReports()).filter((r) => cellOf(r.lat, r.lon) === cell).length;
-    return NextResponse.json({ report: saved, hotspot, onBlock, needed: Math.max(0, MIN_REPORTS - onBlock) }, { status: 201 });
+    const all = await listReports();
+    const hotspot = fieldHotspots(all, existing(), dumping311PerCell()).find((h) => h.id === `dumping-${cell}`) ?? null;
+    const reporters = new Set(all.filter((r) => cellOf(r.lat, r.lon) === cell).map((r) => r.reporter || r.id)).size;
+    const onBlock = (dumping311PerCell().get(cell)?.count ?? 0) + reporters;
+    // The sender sees what was found, not the stored record (no photo URL, no reporter hash).
+    return NextResponse.json(
+      { report: { confidence: saved.confidence, note: saved.note }, hotspot, onBlock, needed: Math.max(0, MIN_REPORTS - onBlock) },
+      { status: 201 },
+    );
   } catch (error) {
     return upstreamError("reports", error);
   }
