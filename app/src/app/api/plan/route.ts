@@ -3,7 +3,7 @@ import { z } from "zod";
 import { dailyQuota, rateLimit, upstreamError } from "@/lib/guard";
 import { createHash } from "node:crypto";
 import { shared, sharedHit, type Shared } from "@/lib/cache";
-import { dataVersion, getHotspot } from "@/lib/hotspot-store";
+import { hotspotData } from "@/lib/hotspot-store";
 import { CATEGORIES } from "@/lib/issues";
 import { chatJSON } from "@/lib/llm";
 import { planFacts } from "@/lib/plan";
@@ -49,9 +49,9 @@ type Plan = z.infer<typeof planSchema>;
 const plans = new Map<string, Shared<Plan>>();
 const PLAN_TTL_MS = 6 * 60 * 60 * 1000;
 
-function planKey(id: string, detections: unknown): string {
+function planKey(id: string, version: string, detections: unknown): string {
   const findings = createHash("sha256").update(JSON.stringify(detections)).digest("hex").slice(0, 16);
-  return `${id}:${dataVersion()}:${findings}`;
+  return `${id}:${version}:${findings}`;
 }
 
 // One hotspot + latest photo findings in, a short camera/cleanup plan out.
@@ -63,12 +63,13 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: z.prettifyError(parsed.error) }, { status: 400 });
   }
-  const hotspot = getHotspot(parsed.data.id);
+  const data = await hotspotData();
+  const hotspot = data.byId.get(parsed.data.id);
   if (!hotspot) {
     return NextResponse.json({ error: "unknown hotspot id" }, { status: 404 });
   }
 
-  const key = planKey(hotspot.id, parsed.data.detections);
+  const key = planKey(hotspot.id, data.version, parsed.data.detections);
   // The daily budget exists to protect the AI spend, so only a real call is charged for. A whole
   // crew reading a plan that is already written costs nothing and should count as nothing.
   if (!sharedHit(plans, key, PLAN_TTL_MS)) {

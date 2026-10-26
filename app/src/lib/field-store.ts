@@ -1,9 +1,10 @@
 import "server-only";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { list, put } from "@vercel/blob";
 import { cellOf, type CellInfo, type FieldReport } from "@/lib/field-reports";
+import { hotspotData, streetReportsText } from "@/lib/hotspot-store";
 
 // Where photo reports live. On Vercel: Blob storage (BLOB_READ_WRITE_TOKEN is added when a Blob store is
 // connected to the project). Locally without a token: app/.data/reports, so the feature works on a fresh clone.
@@ -59,14 +60,15 @@ export async function listReports(): Promise<FieldReport[]> {
 }
 
 // 311 dumping and debris reports per grid cell, so a block near the bar can tip into a hotspot,
-// plus its most-reported address and ward to label a new one.
-let cells: Map<string, CellInfo> | null = null;
-export function dumping311PerCell(): Map<string, CellInfo> {
-  if (cells) return cells;
+// plus its most-reported address and ward to label a new one. From the same build as the hotspots.
+let cells: { version: string; byCell: Map<string, CellInfo> } | null = null;
+export async function dumping311PerCell(): Promise<Map<string, CellInfo>> {
+  const { version } = await hotspotData();
+  if (cells?.version === version) return cells.byCell; // 10 MB of text: read once per build, not per request
+  const source = await streetReportsText();
   const tally = new Map<string, { n: number; addr: Map<string, number>; ward: Map<number, number> }>();
-  const file = join(process.cwd(), "data/clean/street_reports.json");
-  if (existsSync(file)) {
-    const rows = JSON.parse(readFileSync(file, "utf8")) as { type: string; lat: number; lon: number; address?: string; ward?: number | null }[];
+  if (source) {
+    const rows = JSON.parse(source.text) as { type: string; lat: number; lon: number; address?: string; ward?: number | null }[];
     for (const r of rows) {
       if (r.type !== "dumping") continue;
       const c = cellOf(r.lat, r.lon);
@@ -78,6 +80,6 @@ export function dumping311PerCell(): Map<string, CellInfo> {
     }
   }
   const top = <K,>(m: Map<K, number>): K | null => [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
-  cells = new Map([...tally].map(([c, t]) => [c, { count: t.n, address: top(t.addr), ward: top(t.ward) }]));
-  return cells;
+  cells = { version, byCell: new Map([...tally].map(([c, t]) => [c, { count: t.n, address: top(t.addr), ward: top(t.ward) }])) };
+  return cells.byCell;
 }

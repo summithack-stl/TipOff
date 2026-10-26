@@ -14,11 +14,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const parsed = idSchema.safeParse((await params).id);
   if (!parsed.success) return NextResponse.json({ error: "bad hotspot id" }, { status: 400 });
 
-  const hotspot = getHotspot(parsed.data);
+  const hotspot = await getHotspot(parsed.data);
   if (!hotspot) return NextResponse.json({ error: "unknown hotspot id" }, { status: 404 });
 
-  // Immutable until the nightly rebuild redeploys, same as the slim list.
+  // Changes once a night, same as the slim list, which sets the same lifetimes.
   return NextResponse.json(hotspot, {
-    headers: { "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800" },
+    headers: { "cache-control": "public, max-age=600, s-maxage=3600, stale-while-revalidate=86400" },
   });
 }

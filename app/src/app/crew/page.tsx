@@ -3,7 +3,9 @@ import { join } from "node:path";
 import { connection } from "next/server";
 import { CrewBoard, type CrewItem, type DayLoad } from "@/components/crew-list";
 import { busyDays, cityToday, todaysHotspots, watchColumn, watchWindow, whatsThere, type Day, type Finding } from "@/lib/crew";
-import { loadHotspots } from "@/lib/hotspot-data";
+import { hotspotData } from "@/lib/hotspot-store";
+import { EMPTY_STATUS, freshness } from "@/lib/refresh/status";
+import { readStatus } from "@/lib/refresh/store";
 import { DAYS, HOTSPOT_CATEGORIES } from "@/lib/hotspots";
 
 function photoFindings(): Map<string, Finding[]> {
@@ -17,7 +19,7 @@ export default async function CrewPage({ searchParams }: { searchParams: Promise
   await connection(); // "today" depends on the request time, so this page is never prerendered
   const today = cityToday();
   const day: Day = (DAYS as readonly string[]).includes(asked ?? "") ? (asked as Day) : today;
-  const { hotspots, sample } = loadHotspots();
+  const [{ hotspots, summary, source }, { status }] = await Promise.all([hotspotData(), readStatus().catch(() => ({ status: EMPTY_STATUS }))]);
   const findings = photoFindings();
 
   const items: CrewItem[] = todaysHotspots(hotspots, day).map((h) => ({
@@ -34,5 +36,5 @@ export default async function CrewPage({ searchParams }: { searchParams: Promise
     return { day: d, counts: Object.fromEntries(HOTSPOT_CATEGORIES.map((c) => [c, busy.filter((h) => h.category === c).length])) as DayLoad["counts"] };
   });
 
-  return <CrewBoard items={items} day={day} today={today} load={load} sample={sample} />;
+  return <CrewBoard items={items} day={day} today={today} load={load} sample={source === "sample"} fresh={freshness(summary.window_end, source, status)} />;
 }

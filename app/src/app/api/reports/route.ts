@@ -5,7 +5,7 @@ import { detectFrame, type Detection } from "@/lib/detect";
 import { cellOf, fieldHotspots, inStLouis, MIN_REPORTS, type FieldReport } from "@/lib/field-reports";
 import { dumping311PerCell, listReports, saveReport, storeConfigured } from "@/lib/field-store";
 import { clientKey, dailyQuota, rateLimit, upstreamError } from "@/lib/guard";
-import { loadHotspots } from "@/lib/hotspot-data";
+import { hotspotData } from "@/lib/hotspot-store";
 import type { Hotspot } from "@/lib/hotspots";
 
 const MAX_BYTES = 4 * 1024 * 1024; // Vercel rejects bodies over 4.5 MB
@@ -24,8 +24,13 @@ const fieldsSchema = z.object({
 const REPORTER_KEY = process.env.REPORT_SALT || process.env.BLOB_READ_WRITE_TOKEN || randomBytes(32).toString("hex");
 const reporterOf = (request: Request) => createHmac("sha256", REPORTER_KEY).update(clientKey(request)).digest("hex").slice(0, 24);
 
-let byId: Map<string, Hotspot> | null = null;
-const existing = () => (byId ??= new Map(loadHotspots().hotspots.filter((h) => h.category === "dumping").map((h) => [h.id, h])));
+// Dumping hotspots by id, rebuilt when a newer refresh is picked up.
+let dumping: { version: string; byId: Map<string, Hotspot> } | null = null;
+async function existing(): Promise<Map<string, Hotspot>> {
+  const d = await hotspotData();
+  if (dumping?.version !== d.version) dumping = { version: d.version, byId: new Map(d.hotspots.filter((h) => h.category === "dumping").map((h) => [h.id, h])) };
+  return dumping.byId;
+}
 
 // What the map needs: only the hotspots photo reports changed or created, at block level.
 // Individual reports (exact place, time, photo) never leave the server.
@@ -33,7 +38,7 @@ export async function GET(request: Request) {
   const limited = rateLimit(request, "reports-read", 60);
   if (limited) return limited;
   try {
-    return NextResponse.json({ hotspots: fieldHotspots(await listReports(), existing(), dumping311PerCell()) });
+    return NextResponse.json({ hotspots: fieldHotspots(await listReports(), await existing(), await dumping311PerCell()) });
   } catch (error) {
     return upstreamError("reports", error);
   }
@@ -108,9 +113,10 @@ export async function POST(request: Request) {
     const saved = await saveReport(report, { bytes, type: image.type });
     const cell = cellOf(saved.lat, saved.lon);
     const all = await listReports();
-    const hotspot = fieldHotspots(all, existing(), dumping311PerCell()).find((h) => h.id === `dumping-${cell}`) ?? null;
+    const base311 = await dumping311PerCell();
+    const hotspot = fieldHotspots(all, await existing(), base311).find((h) => h.id === `dumping-${cell}`) ?? null;
     const reporters = new Set(all.filter((r) => cellOf(r.lat, r.lon) === cell).map((r) => r.reporter || r.id)).size;
-    const onBlock = (dumping311PerCell().get(cell)?.count ?? 0) + reporters;
+    const onBlock = (base311.get(cell)?.count ?? 0) + reporters;
     // The sender sees what was found, not the stored record (no photo URL, no reporter hash).
     return NextResponse.json(
       { report: { confidence: saved.confidence, note: saved.note }, hotspot, onBlock, needed: Math.max(0, MIN_REPORTS - onBlock) },

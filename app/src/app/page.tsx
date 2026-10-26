@@ -1,5 +1,4 @@
 import Link from "next/link";
-import summary from "../../data/clean/hotspots_summary.json";
 import { InstallCard } from "@/components/install-card";
 import { Hero } from "@/components/landing/hero";
 import type { HeroPoint } from "@/components/landing/hero-map";
@@ -7,14 +6,15 @@ import { DotMatrix, WeightBars } from "@/components/landing/reveal";
 import { ScrollStory, type StoryCrew, type StoryFocus, type StoryPlan } from "@/components/landing/scroll-story";
 import { Wordmark } from "@/components/wordmark";
 import { parseWindow, todaysHotspots, watchColumn, watchWindow } from "@/lib/crew";
-import { loadHotspots } from "@/lib/hotspot-data";
+import type { Hotspot } from "@/lib/hotspots";
+import { pageData } from "@/lib/hotspot-store";
 
 // Landing page: what TipOff does, proof it works, how to use it, and how a city team configures it.
 // Counts come from the nightly data build; the backtest numbers are the frozen run shown in our video.
 
 const REPO = "https://github.com/summithack-stl/summithack";
 const BACKTEST = `${REPO}/blob/main/data/backtest/2026-10-14-video-RESULTS.md`;
-const asOf = new Date(`${summary.window_end}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+const asOfDate = (windowEnd: string) => new Date(`${windowEnd}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
 const BACKTEST_ROWS = [
   { top: 10, hits: 9 },
@@ -29,9 +29,9 @@ const METHOD = [
   "Counted how many of the top-ranked blocks got dumping or debris reports again in those 12 months.",
 ];
 
-const ROLES = [
+const roles = (dumping: number) => [
   { who: "Refuse crews", what: "A daily board of the blocks that usually get reports today, sorted by when to watch them." },
-  { who: "Camera placement", what: `A ranked list of ${summary.counts.dumping.toLocaleString("en-US")} dumping hotspots, so the few cameras go where dumping keeps coming back.` },
+  { who: "Camera placement", what: `A ranked list of ${dumping.toLocaleString("en-US")} dumping hotspots, so the few cameras go where dumping keeps coming back.` },
   { who: "Code enforcement", what: "Each block's plan lists the evidence a citation needs." },
 ];
 
@@ -84,8 +84,7 @@ function Heading({ children }: { children: React.ReactNode }) {
   return <h2 className="mt-3 font-heading text-4xl leading-none font-bold tracking-tight text-balance uppercase sm:text-5xl">{children}</h2>;
 }
 
-function landingData() {
-  const { hotspots } = loadHotspots();
+function landingData(hotspots: Hotspot[]) {
   const dumping = hotspots.filter((h) => h.category === "dumping").sort((a, b) => b.score - a.score);
   const points: HeroPoint[] = dumping.slice(0, 400).map((h) => [h.lat, h.lon, h.score, h.report_count]);
 
@@ -120,8 +119,10 @@ function landingData() {
   return { points, focus, plan, crew };
 }
 
-export default function Landing() {
-  const { points, focus, plan, crew } = landingData();
+export default async function Landing() {
+  const { summary, hotspots } = await pageData();
+  const { points, focus, plan, crew } = landingData(hotspots);
+  const asOf = asOfDate(summary.window_end);
 
   return (
     <div>
@@ -185,7 +186,7 @@ export default function Landing() {
         <Eyebrow>Who it helps</Eyebrow>
         <Heading>Built for city staff, not residents</Heading>
         <div className="mt-12 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-3">
-          {ROLES.map((r) => (
+          {roles(summary.counts.dumping ?? 0).map((r) => (
             <div key={r.who} className="bg-background p-6">
               <h3 className="font-heading text-2xl font-semibold tracking-wide uppercase">{r.who}</h3>
               <p className="mt-2 text-muted-foreground">{r.what}</p>
