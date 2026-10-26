@@ -50,7 +50,7 @@ const CONFIG = [
     wide: true,
   },
   {
-    title: "Swap the AI model",
+    title: "Swap the plan-writing API",
     where: "app/.env.local",
     body: "Any OpenAI-compatible provider works. Ours is Groq, with Gemini as the fallback.",
     wide: false,

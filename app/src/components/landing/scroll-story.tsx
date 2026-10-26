@@ -29,7 +29,7 @@ export type StoryPlan = { headline: string; sections: { title: string; lines: st
 const STEPS = [
   { title: "Open the map", body: "Every dot is a block where dumping reports keep coming back, scored 0 to 100." },
   { title: "Click a hotspot", body: "See its report history, the hours reports come in, and the vacant buildings nearby." },
-  { title: "Write the plan", body: "One click. The AI uses only that block's facts: where to put a camera, when to watch, what a citation needs." },
+  { title: "Write the plan", body: "One click. The Groq API writes it from that block's facts only: where to put a camera, when to watch, what a citation needs." },
   { title: "Send the crews", body: "Each morning the crew board sorts today's blocks by when to watch them." },
 ];
 
