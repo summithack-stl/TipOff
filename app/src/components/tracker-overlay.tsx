@@ -290,7 +290,7 @@ export function TrackerOverlay({ keyframes, video, loop = false, className }: Pr
       style={{ aspectRatio: aspect, maxWidth: `calc(75vh * ${aspect})` }}
       tabIndex={video ? undefined : 0}
       role={video ? undefined : "img"}
-      aria-label={video ? undefined : `${keyframes.length} street photo${keyframes.length === 1 ? "" : "s"} with AI hazard boxes. Space pauses, arrow keys step.`}
+      aria-label={video ? undefined : `${keyframes.length} street photo${keyframes.length === 1 ? "" : "s"} with hazard boxes. Space pauses, arrow keys step.`}
       onClick={video ? undefined : togglePause}
       onKeyDown={(e) => {
         if (video) return;
