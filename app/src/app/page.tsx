@@ -270,10 +270,7 @@ export default function Landing() {
       </section>
 
       <footer className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm text-muted-foreground sm:px-8">
-        <span className="flex items-center gap-4">
-          <Wordmark />
-          Civic AI Hackathon 2026 · Problem Set #3 · MIT
-        </span>
+        <Wordmark />
         <a href={REPO} className="hover:text-foreground">
           Source and setup on GitHub
         </a>
