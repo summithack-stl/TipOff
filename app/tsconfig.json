@@ -6,6 +6,9 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    // Lets one lib module import another with an explicit .ts extension, which is what lets
+    // node --test load it (guard.ts imports quota.ts; refresh/*.ts import each other). Safe with
+    // noEmit, and the bundler resolves the extension.
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
