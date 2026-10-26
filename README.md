@@ -76,6 +76,13 @@ Full table and method, exactly as shown in our video: [`data/backtest/2026-10-14
 
 `data/scripts/build_hotspots.py` splits the city into squares about 155 m on a side (roughly a block). A square is a hotspot once it has 5 or more reports of one type since January 2024. Each hotspot gets a 0-100 score from its last 12 months: report volume (ranked against hotspots of the same type) 40%, how many different weeks it was reported in 30%, trend against the 12 months before 15%, vacant buildings within 150 m 15%. The score orders where to look first; it does not predict crime and never identifies people.
 
+### Reading the map on a phone
+
+`/map` draws every repeat hotspot, so at city zoom it clusters them: a grid in screen pixels, one
+marker per cell, labelled with its count and coloured by the worst score in it. Tapping a cluster
+zooms in. Past zoom 13 every hotspot draws as itself. The rule is `clusterHotspots()` in
+[`app/src/lib/cluster.ts`](app/src/lib/cluster.ts) — about 40 lines, rather than another dependency.
+
 ## Several people, one picture (shared crew status)
 
 A crew in the field marks a block cleaned; the supervisor at a desk and the next crew see it. The
