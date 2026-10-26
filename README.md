@@ -88,7 +88,7 @@ Two things worth knowing here:
 - **Reading never needs a login.** Judges and the public see the map and the plans exactly as today.
   Status is public too, but names are not: a logged-out visitor sees "cleaned on Tuesday", never who.
 - **Roles are enforced by the database.** The app hands every phone a public anon key, so "crew can
-  write, viewer cannot" is a row-level security policy, not a hidden button. There are 30 tests for
+  write, viewer cannot" is a row-level security policy, not a hidden button. There are 31 tests for
   that; `./supabase/tests/run.sh` runs them against any local Postgres, no Supabase project needed.
 
 Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `app/.env.local` to turn it on.

@@ -25,7 +25,7 @@ Supabase was also already chosen during the hackathon. See `app/.env.example` fo
 | --- | --- |
 | `migrations/0001_crew_status.sql` | teams, join codes, profiles/roles, append-only `hotspot_status`, assignments, and every RLS policy |
 | `tests/00_auth_shim.sql` | **test only.** Stands up the `auth` schema and the `anon`/`authenticated` roles a plain Postgres lacks, so the migration can be run unchanged |
-| `tests/01_rls_test.sql` | 30 assertions about what each role can and cannot do |
+| `tests/01_rls_test.sql` | 31 assertions about what each role can and cannot do |
 | `tests/run.sh` | applies both to a throwaway database and runs the tests |
 
 ## The model
