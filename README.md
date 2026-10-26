@@ -96,7 +96,11 @@ Standing on a block, a crew gets **Directions** (Apple Maps on iOS, Google Maps 
 
 ## Keeping the data fresh
 
-`.github/workflows/refresh-data.yml` runs every night: it downloads the City's latest 311 file, rebuilds the hotspots and the backtest, and commits the result; Vercel redeploys on its own. To connect the City's own 311 database instead of the public CSV, replace the download step in `data/scripts/fetch_311.py` with a query that returns the same columns (request ID, problem code, location, time opened, status). Nothing else changes.
+Every night a Vercel Cron calls `/api/cron/refresh` (`app/vercel.json`). It downloads only the 2024-2026 entries of the City's 311 zip (byte ranges, ~28 MB of the 128 MB file), rebuilds the hotspots and the backtest in TypeScript (`app/src/lib/refresh/`), checks the result against what is published, and publishes it to Blob storage, outside git. A refresh that comes out wrong (a truncated file, half the hotspots gone, older data than what is up) is refused and yesterday's data stays. `GET /api/refresh` says when the data last refreshed and why the last try failed, if it did.
+
+The TypeScript build is a port of `data/scripts/*.py`, and `node app/scripts/refresh-parity.mjs <checkout>` checks it against the Python output field by field. Until the cron has proven itself in production, the original `.github/workflows/refresh-data.yml` keeps running too: it rebuilds with Python, commits `app/data/clean/`, and Vercel redeploys. That bundled data is also the fallback when no Blob store is connected.
+
+To connect the City's own 311 database instead of the public CSV, replace `fetchStreetReports` in `app/src/lib/refresh/source.ts` (and the download step in `data/scripts/fetch_311.py` while both run) with a query that returns the same columns (request ID, problem code, location, time opened, status). Nothing else changes.
 
 ## Data sources
 
