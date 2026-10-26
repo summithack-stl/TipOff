@@ -86,22 +86,32 @@ function drawDetection(ctx: CanvasRenderingContext2D, d: Detection, r: Rect, alp
   const text = `${CATEGORY_LABEL[d.category]} ${Math.round(d.confidence * 100)}%${d.confirmed ? "" : " ?"}`;
   ctx.font = "600 12px ui-sans-serif, system-ui, sans-serif";
   const tw = ctx.measureText(text).width + 10;
+  // The context is scaled by devicePixelRatio, so canvas.width is device pixels while everything
+  // drawn here is in CSS pixels. Undo that to get the edges the viewer actually sees.
+  const dpr = ctx.getTransform().a || 1;
+  const viewW = ctx.canvas.width / dpr;
+  const viewH = ctx.canvas.height / dpr;
+  // Pull the chip back inside the picture. A box near the right edge used to run its label off it:
+  // "Open entry 90%" on the /watch demo was cut in half.
+  const chipX = Math.max(0, Math.min(x, viewW - tw));
   // Above the box, else below it; if both collide with another label, the brackets alone carry it.
-  const chip = [y - 20, y + h + 2].map((cy) => ({ x, y: cy, w: tw, h: 18 })).find((c) => c.y >= 0 && !chips.some((o) => overlaps(o, c)));
+  const chip = [y - 20, y + h + 2]
+    .map((cy) => ({ x: chipX, y: cy, w: tw, h: 18 }))
+    .find((c) => c.y >= 0 && c.y + c.h <= viewH && !chips.some((o) => overlaps(o, c)));
   if (!chip) return;
   chips.push(chip);
   const ty = chip.y;
   if (d.confirmed) {
     ctx.fillStyle = color;
-    ctx.fillRect(x, ty, tw, 18);
+    ctx.fillRect(chip.x, ty, tw, 18);
     ctx.fillStyle = "#0b0b0c";
   } else {
     ctx.fillStyle = "rgba(11,11,12,0.75)";
-    ctx.fillRect(x, ty, tw, 18);
-    ctx.strokeRect(x + 0.5, ty + 0.5, tw - 1, 17);
+    ctx.fillRect(chip.x, ty, tw, 18);
+    ctx.strokeRect(chip.x + 0.5, ty + 0.5, tw - 1, 17);
     ctx.fillStyle = color;
   }
-  ctx.fillText(text, x + 5, ty + 13);
+  ctx.fillText(text, chip.x + 5, ty + 13);
 }
 
 function drawScan(ctx: CanvasRenderingContext2D, y: number, width: number) {
