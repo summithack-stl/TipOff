@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from "node:crypto";
+import { createHash, createHmac, randomBytes, randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { detectFrame, type Detection } from "@/lib/detect";
@@ -17,6 +17,12 @@ const fieldsSchema = z.object({
   lat: z.coerce.number().min(-90).max(90),
   lon: z.coerce.number().min(-180).max(180),
 });
+
+// Key for the reporter hash. An HMAC with a secret key can't be brute-forced back to an IP the way a plain
+// salted hash of the small IPv4 space can. REPORT_SALT if set; else the Blob token, which is already a secret
+// on Vercel; else (local dev only) a random key for this process.
+const REPORTER_KEY = process.env.REPORT_SALT || process.env.BLOB_READ_WRITE_TOKEN || randomBytes(32).toString("hex");
+const reporterOf = (request: Request) => createHmac("sha256", REPORTER_KEY).update(clientKey(request)).digest("hex").slice(0, 24);
 
 let byId: Map<string, Hotspot> | null = null;
 const existing = () => (byId ??= new Map(loadHotspots().hotspots.filter((h) => h.category === "dumping").map((h) => [h.id, h])));
@@ -91,8 +97,7 @@ export async function POST(request: Request) {
     confidence: Math.round(dumping.confidence * 100) / 100,
     note: dumping.note.slice(0, 200),
     photo: null,
-    // Salted so the stored value can't be turned back into an address.
-    reporter: createHash("sha256").update(`${process.env.REPORT_SALT ?? "tipoff"}:${clientKey(request)}`).digest("hex").slice(0, 16),
+    reporter: reporterOf(request),
     photoHash,
   };
   try {
