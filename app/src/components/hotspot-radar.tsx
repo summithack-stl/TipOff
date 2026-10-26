@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { BuildingPanel } from "@/components/building-panel";
 import { HotspotPanel } from "@/components/hotspot-panel";
@@ -43,7 +43,7 @@ function Filter({ label, value, onChange, items }: { label: string; value: strin
 }
 
 // totals: every hotspot of each type citywide; the map only ships the strongest few hundred.
-export function HotspotRadar({ hotspots, totals, vacant }: { hotspots: Hotspot[]; totals: Record<string, number>; vacant: RadarPoint[] }) {
+export function HotspotRadar({ hotspots: base, totals, vacant }: { hotspots: Hotspot[]; totals: Record<string, number>; vacant: RadarPoint[] }) {
   // One type at a time: dumping is the problem set, the others are a click away.
   const [category, setCategory] = useState<HotspotCategory>("dumping");
   const [ward, setWard] = useState(ANY);
@@ -54,6 +54,31 @@ export function HotspotRadar({ hotspots, totals, vacant }: { hotspots: Hotspot[]
   const close = useCallback(() => setSelected(null), []);
   const pickHotspot = useCallback((id: string) => setSelected({ kind: "hotspot", id }), []);
   const pickBuilding = useCallback((id: string) => setSelected({ kind: "building", id }), []);
+  // Photo reports from phones (/api/reports) update known hotspots and add new ones without waiting for the nightly build.
+  const [fromField, setFromField] = useState<Hotspot[]>([]);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/reports")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { hotspots?: Hotspot[] } | null) => {
+        if (!live) return;
+        if (d?.hotspots) setFromField(d.hotspots);
+        // /map?h=<id> opens that hotspot, e.g. after sending a photo report.
+        const id = new URLSearchParams(window.location.search).get("h");
+        if (id && (base.some((h) => h.id === id) || d?.hotspots?.some((h) => h.id === id))) setSelected({ kind: "hotspot", id });
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [base]);
+  const hotspots = useMemo(() => {
+    if (!fromField.length) return base;
+    const over = new Map(fromField.map((h) => [h.id, h]));
+    const known = new Set(base.map((h) => h.id));
+    return [...base.map((h) => over.get(h.id) ?? h), ...fromField.filter((h) => !known.has(h.id))];
+  }, [base, fromField]);
+
 
   const wards = useMemo(() => [...new Set(hotspots.map((h) => h.ward).filter((w) => w !== null))].sort((a, b) => a - b), [hotspots]);
   const ofType = useMemo(() => hotspots.filter((h) => h.category === category), [hotspots, category]);

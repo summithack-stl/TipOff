@@ -30,6 +30,9 @@ export type Hotspot = {
   nearest_vacant_m: number | null;
   recent: { opened: string; code: string; address: string }[];
   reasons: string[];
+  // Photo reports from the app (src/lib/field-reports.ts). "field" = the block became a hotspot because of them.
+  field_reports?: number;
+  source?: "field";
 };
 
 // Hour blocks for the time filter: [label, first hour, last hour].

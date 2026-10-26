@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { ClipboardListIcon, HouseIcon, MapIcon, MoonIcon, SunIcon } from "lucide-react";
+import { CameraIcon, ClipboardListIcon, HouseIcon, MapIcon, MoonIcon, SunIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
 
@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/", label: "Overview", icon: HouseIcon },
   { href: "/map", label: "Map", icon: MapIcon },
   { href: "/crew", label: "Crew", icon: ClipboardListIcon },
+  { href: "/report", label: "Report", icon: CameraIcon },
 ] as const;
 
 function ThemeToggle() {
@@ -59,7 +60,7 @@ export function MobileTabs() {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-[1100] grid h-[calc(4rem+var(--safe-bottom))] grid-cols-3 border-t bg-background/95 pb-[var(--safe-bottom)] backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-[1100] grid h-[calc(4rem+var(--safe-bottom))] grid-cols-4 border-t bg-background/95 pb-[var(--safe-bottom)] backdrop-blur-md md:hidden"
     >
       {LINKS.map(({ href, label, icon: Icon }) => (
         <Link

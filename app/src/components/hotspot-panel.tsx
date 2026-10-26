@@ -139,7 +139,7 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
             {h.top_address || `${CATEGORY_LABEL[h.category]} hotspot`}
           </h2>
           <p className="text-sm text-muted-foreground">
-            #{h.rank} of {CATEGORY_LABEL[h.category].toLowerCase()} hotspots · Ward {h.ward ?? "?"}
+            {h.source === "field" ? "New from photo reports" : `#${h.rank} of ${CATEGORY_LABEL[h.category].toLowerCase()} hotspots`} · Ward {h.ward ?? "?"}
           </p>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel">
@@ -156,7 +156,7 @@ export function HotspotPanel({ hotspot: h, onClose }: { hotspot: Hotspot; onClos
             <div className="mt-1 text-xs text-muted-foreground">score / 100</div>
           </div>
           <div className="grid flex-1 grid-cols-2 gap-3 text-sm">
-            {stat("311 reports", h.report_count.toLocaleString())}
+            {stat(h.field_reports ? "Reports (311 + photo)" : "311 reports", (h.report_count + (h.source === "field" ? 0 : h.field_reports ?? 0)).toLocaleString())}
             {/* With no reports the year before, a % is meaningless (0 → 7 reads as +700%). */}
             {stat(
               "Trend, last 12 mo",
