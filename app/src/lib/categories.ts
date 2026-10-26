@@ -1,11 +1,12 @@
 import type { Category } from "@/lib/issues";
 
 // One color per category, used by the tracker overlay, map pins and legends.
-// Street issues are cool/bright; building hazards are warm and alarming. Sarthak owns the final hex codes.
+// The three hotspot types match the --cat-* tokens in globals.css (dark-theme values, since the map and photos are dark).
+// Building hazards are warm and alarming.
 export const CATEGORY_COLOR: Record<Category, string> = {
-  pothole: "#f5b301", // amber
-  graffiti: "#e040fb", // magenta
-  dumping: "#a3e635", // lime
+  pothole: "#3ab0f5", // sky
+  graffiti: "#b48cff", // violet
+  dumping: "#ff6a2b", // TipOff orange
   streetlight_out: "#22d3ee", // cyan
   broken_curb: "#94a3b8", // slate
   sidewalk_damage: "#60a5fa", // blue
@@ -27,3 +28,10 @@ export const CATEGORY_LABEL: Record<Category, string> = {
   wall_damage: "Wall damage",
   fire_damage: "Fire damage",
 };
+
+// Theme-aware version of the hotspot colors for page UI (switches with light and dark).
+export const HOTSPOT_VAR = {
+  dumping: "var(--cat-dumping)",
+  pothole: "var(--cat-pothole)",
+  graffiti: "var(--cat-graffiti)",
+} as const;

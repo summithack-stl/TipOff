@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>TipOff</string>
+    <key>CFBundleDisplayName</key>
+    <string>TipOff</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <!-- No asset catalog in the SwiftPM build, so the icons are loose PNGs at
+         the .app root and iOS resolves <base>@2x.png / @3x.png itself. -->
+    <key>CFBundleIcons</key>
+    <dict>
+        <key>CFBundlePrimaryIcon</key>
+        <dict>
+            <key>CFBundleIconFiles</key>
+            <array><string>AppIcon60x60</string></array>
+            <key>CFBundleIconName</key>
+            <string>AppIcon</string>
+        </dict>
+    </dict>
+    <!-- The site asks for these when a crew reports from the field; WKWebView refuses without them. -->
+    <key>NSCameraUsageDescription</key>
+    <string>TipOff uses the camera only when you take a photo of a dumping site to report it.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>TipOff opens your photos only when you pick one to attach to a report.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>TipOff uses your location only to place a report on the right block.</string>
+    <key>UILaunchScreen</key>
+    <dict/>
+    <key>UIStatusBarStyle</key>
+    <string>UIStatusBarStyleDarkContent</string>
+</dict>
+</plist>

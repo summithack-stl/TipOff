@@ -10,8 +10,8 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="space-y-4" role="alert">
-      <h1 className="text-xl font-semibold">Something went wrong</h1>
+    <div className="mx-auto w-full max-w-6xl space-y-4 px-5 py-10 sm:px-8" role="alert">
+      <h1 className="font-heading text-3xl font-bold uppercase">Something went wrong</h1>
       <p className="text-muted-foreground">{error.message}</p>
       <Button onClick={reset}>Try again</Button>
     </div>
