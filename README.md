@@ -2,7 +2,7 @@
 
 > Finds the St. Louis blocks where illegal dumping keeps coming back, shows when it gets reported, and writes a camera and cleanup plan for city staff.
 
-**Try it:** https://summithack-blond.vercel.app (no login). Pick **Dumping**, click a hotspot, press **Write plan**. The morning crew list is at [`/crew`](https://summithack-blond.vercel.app/crew).
+**Try it:** https://tipoff-stl.vercel.app (no login). Pick **Dumping**, click a hotspot, press **Write plan**. The morning crew list is at [`/crew`](https://tipoff-stl.vercel.app/crew).
 
 **Run it yourself** (Node 20+): `git clone https://github.com/summithack-stl/summithack && cd summithack/app && npm ci && npm run dev`, then open http://localhost:3000. The map, scores and crew list work with no keys; the AI plan and photo check need a free Groq key in `app/.env.local` (see [Run locally](#run-locally)).
 
@@ -10,10 +10,10 @@
 
 TipOff is a PWA: crews install it from the browser, with no app store and no account.
 
-- **iPhone / iPad:** open https://summithack-blond.vercel.app in **Safari**, tap Share, then **Add to Home Screen**.
+- **iPhone / iPad:** open https://tipoff-stl.vercel.app in **Safari**, tap Share, then **Add to Home Screen**.
 - **Android:** open it in **Chrome** and take the install prompt, or use the menu (⋮) → **Add to Home screen**.
 
-Installed, it runs full screen and opens straight to [`/crew`](https://summithack-blond.vercel.app/crew), today's list. Reading the map and plans never needs a login.
+Installed, it runs full screen and opens straight to [`/crew`](https://tipoff-stl.vercel.app/crew), today's list. Reading the map and plans never needs a login.
 
 The icons come from [`app/src/app/icon.svg`](app/src/app/icon.svg); see [`app/public/icons/README.md`](app/public/icons/README.md) to regenerate them.
 
@@ -38,7 +38,7 @@ City staff, not residents. Residents keep reporting through 311 exactly as they 
 
 ## Demo
 
-- Live app: https://summithack-blond.vercel.app (overview and setup guide; hotspot map at `/map`, crew list at `/crew`)
+- Live app: https://tipoff-stl.vercel.app (overview and setup guide; hotspot map at `/map`, crew list at `/crew`)
 - Demo video: https://youtu.be/z5E3rEblO9o
 
 ## Does it work? (backtest)

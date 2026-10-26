@@ -6,7 +6,9 @@ import WebKit
 /// crew board, like the installed web app (manifest start_url).
 /// ponytail: no offline copy. The site needs the network for the map anyway;
 /// bundle a static export if the demo has to run without signal.
-let site = URL(string: "https://summithack-blond.vercel.app")!
+let site = URL(string: "https://tipoff-stl.vercel.app")!
+/// The old address redirects here; keep its links in the app too.
+let ownHosts: Set<String?> = [site.host, "summithack-blond.vercel.app"]
 let home = site.appending(path: "crew")
 
 @main
@@ -46,7 +48,7 @@ struct Site: UIViewRepresentable {
         func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
                      decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void) {
             guard let url = action.request.url, action.navigationType == .linkActivated,
-                  url.host != site.host else { return decisionHandler(.allow) }
+                  !ownHosts.contains(url.host) else { return decisionHandler(.allow) }
             UIApplication.shared.open(url)
             decisionHandler(.cancel)
         }
