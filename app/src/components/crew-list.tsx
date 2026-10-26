@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { HotspotPanel } from "@/components/hotspot-panel";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -80,18 +79,13 @@ export function CrewList({
 }) {
   const [open, setOpen] = useState<Hotspot | null>(null);
   const close = useCallback(() => setOpen(null), []);
-  // The server rendered St. Louis time, possibly hours ago. The phone knows better.
+  // The server rendered St. Louis time, possibly hours ago, so "(today)" could be yesterday.
+  // The phone knows its own weekday and keeps knowing it across midnight.
   const today = useDeviceDay(serverToday);
-  const router = useRouter();
-  const corrected = useRef(false);
-
-  useEffect(() => {
-    // Nobody picked a day, and the phone has rolled past midnight into another one: show that one.
-    // Once only, so a disagreement we cannot resolve can never become a redirect loop.
-    if (picked || today === day || corrected.current) return;
-    corrected.current = true;
-    router.replace(`/crew?day=${today}`);
-  }, [picked, today, day, router]);
+  // The phone and the city disagree: either it is past midnight in one of them, or whoever is
+  // looking is not in St. Louis. Offer the phone's day rather than silently swapping the list:
+  // these are St. Louis reports, so the city's day is the honest default to render.
+  const elsewhere = !picked && today !== day;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-4">
@@ -107,6 +101,16 @@ export function CrewList({
           </p>
         )}
       </div>
+
+      {elsewhere && (
+        <p className="text-sm text-muted-foreground">
+          It is {today} on this phone and {day} in St. Louis.{" "}
+          <Link href={`/crew?day=${today}`} className="underline underline-offset-2 hover:text-foreground">
+            Show {today}&apos;s hotspots
+          </Link>
+          .
+        </p>
+      )}
 
       <nav aria-label="Day" className="flex flex-wrap gap-1">
         {DAYS.map((d) => (
