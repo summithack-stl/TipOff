@@ -6,6 +6,9 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    // Lets a lib module import another with an explicit .ts extension, which is what lets
+    // node --test load it. Safe with noEmit: true; the bundler resolves the extension fine.
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

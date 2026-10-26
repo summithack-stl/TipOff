@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { HotspotPanel } from "@/components/hotspot-panel";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CATEGORY_COLOR, CATEGORY_LABEL } from "@/lib/categories";
-import type { Day } from "@/lib/crew";
+import type { Day, Watch } from "@/lib/crew";
+import { useDeviceDay } from "@/lib/device-day";
 import { DAYS, HOTSPOT_CATEGORIES, type Hotspot } from "@/lib/hotspots";
 
-export type CrewItem = { hotspot: Hotspot; watch: string; busyDays: Day[]; there: string[] };
+export type CrewItem = { hotspot: Hotspot; watch: Watch; busyDays: Day[]; there: string[] };
 
 function HotspotCard({ item, onOpen }: { item: CrewItem; onOpen: () => void }) {
   const h = item.hotspot;
@@ -34,8 +36,11 @@ function HotspotCard({ item, onOpen }: { item: CrewItem; onOpen: () => void }) {
           {dumping && (
             <>
               <dt className="text-muted-foreground">Suggested watch</dt>
-              <dd className="font-medium">
-                {item.watch}, ahead of busy days ({item.busyDays.join(", ") || h.peak_day})
+              {/* No window means the data is too thin to name hours; the note says why. */}
+              <dd className={item.watch.window ? "font-medium" : "text-muted-foreground"}>
+                {item.watch.window
+                  ? `${item.watch.window}, ahead of busy days (${item.busyDays.join(", ") || h.peak_day})`
+                  : `${item.watch.note} (${item.busyDays.join(", ") || h.peak_day})`}
               </dd>
             </>
           )}
@@ -59,9 +64,34 @@ function HotspotCard({ item, onOpen }: { item: CrewItem; onOpen: () => void }) {
   );
 }
 
-export function CrewList({ items, day, today, sample }: { items: CrewItem[]; day: Day; today: Day; sample: boolean }) {
+export function CrewList({
+  items,
+  day,
+  today: serverToday,
+  sample,
+  picked,
+}: {
+  items: CrewItem[];
+  day: Day;
+  today: Day;
+  sample: boolean;
+  /** True when the day came from ?day=, so it is the user's choice and we leave it alone. */
+  picked: boolean;
+}) {
   const [open, setOpen] = useState<Hotspot | null>(null);
   const close = useCallback(() => setOpen(null), []);
+  // The server rendered St. Louis time, possibly hours ago. The phone knows better.
+  const today = useDeviceDay(serverToday);
+  const router = useRouter();
+  const corrected = useRef(false);
+
+  useEffect(() => {
+    // Nobody picked a day, and the phone has rolled past midnight into another one: show that one.
+    // Once only, so a disagreement we cannot resolve can never become a redirect loop.
+    if (picked || today === day || corrected.current) return;
+    corrected.current = true;
+    router.replace(`/crew?day=${today}`);
+  }, [picked, today, day, router]);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-4">

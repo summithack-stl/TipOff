@@ -76,6 +76,20 @@ Full table and method, exactly as shown in our video: [`data/backtest/2026-10-14
 
 `data/scripts/build_hotspots.py` splits the city into squares about 155 m on a side (roughly a block). A square is a hotspot once it has 5 or more reports of one type since January 2024. Each hotspot gets a 0-100 score from its last 12 months: report volume (ranked against hotspots of the same type) 40%, how many different weeks it was reported in 30%, trend against the 12 months before 15%, vacant buildings within 150 m 15%. The score orders where to look first; it does not predict crime and never identifies people.
 
+### The suggested watch window
+
+311 timestamps are when a resident *reported* a problem, not when it happened. Dumping happens
+before someone finds it, so the crew list suggests the **6 hours before a block's report window
+opens** — for a block reported mostly 12pm-3pm, that is 6am-12pm. It is capped at 6 hours because a
+crew has to be able to staff it; the earlier rule suggested the 12 hours before, which printed
+advice like "12am-12pm".
+
+Where the data cannot support an hour, TipOff says so instead of inventing one: a block needs at
+least 8 reports, and its 3-hour report window has to hold at least 1.5x what an even spread across
+the day would give. About half of dumping hotspots clear that bar; the rest say "too few to pick an
+hour, watch on the busy days". The rule lives in `watchWindow()` in
+[`app/src/lib/crew.ts`](app/src/lib/crew.ts).
+
 ## How AI is used
 
 - **Plans** (`POST /api/plan`, gpt-oss-120b on Groq): turns a hotspot's sourced facts into a plan (what we know, where and when to watch, actions, evidence for a citation). The prompt allows only the given facts: no invented dates, counts, people, vehicles or causes.

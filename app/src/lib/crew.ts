@@ -1,4 +1,5 @@
 import type { DAYS, Hotspot } from "@/lib/hotspots";
+import { reportLabel } from "./report-codes.ts";
 
 // Helpers for the crew view ("today's hotspots"). Type-only import, so node:test can load this file.
 
@@ -29,13 +30,44 @@ export function busyDays(h: Hotspot): Day[] {
   return WEEK.filter((_, i) => busyOn(h, i));
 }
 
-// 311 times are when people REPORT dumping, not when it happens. Our assumption (not measured): the drop
-// happens in the hours before reports start, so suggested drive-bys cover the 12 hours before the report window.
-export function watchWindow(h: Hotspot): string {
-  const w = parseWindow(h.report_window);
-  if (!w) return `Before ${h.report_window}`;
-  const start = w[0];
-  return `${hourLabel((start + 12) % 24)}–${hourLabel(start)}`;
+// A hotspot needs this many reports before its busiest report hours mean anything.
+const MIN_REPORTS_FOR_WINDOW = 8;
+// ...and its 3-hour report window has to hold this much more than an even spread would give.
+// Below that the "peak" is just noise, and naming an hour would be making it up.
+const MIN_CONCENTRATION = 1.5;
+// A window a crew can actually staff. The old rule said "the 12 hours before reports start", which
+// for the #1 hotspot printed "12am-12pm": true to the assumption, useless as advice.
+const WATCH_HOURS = 6;
+
+export type Watch =
+  /** A window worth driving: "2am-8am". */
+  | { window: string; note: null }
+  /** Not enough signal to name hours. Say so instead of inventing one. */
+  | { window: null; note: string };
+
+/** Share of reports landing in the 3-hour report window, against an even spread across the day. */
+function concentration(h: Hotspot, start: number): number {
+  const total = h.by_hour.reduce((a, b) => a + b, 0);
+  if (!total) return 0;
+  const inWindow = [0, 1, 2].reduce((n, i) => n + h.by_hour[(start + i) % 24], 0);
+  return (inWindow / total) / (3 / 24);
+}
+
+// 311 times are when people REPORT dumping, not when it happens. Our assumption (not measured): the
+// drop happens in the hours before reports start, so a drive-by covers the WATCH_HOURS before the
+// report window opens. Where the data is too thin to place that window, say so.
+export function watchWindow(h: Hotspot): Watch {
+  const parsed = parseWindow(h.report_window);
+  if (!parsed) return { window: null, note: `Reports are logged ${h.report_window}; no clear window to watch.` };
+
+  if (h.report_count < MIN_REPORTS_FOR_WINDOW) {
+    return { window: null, note: `Only ${h.report_count} reports here, too few to pick an hour. Watch on the busy days.` };
+  }
+  const start = parsed[0];
+  if (concentration(h, start) < MIN_CONCENTRATION) {
+    return { window: null, note: "Reports come in right through the day here, so no hours stand out. Watch on the busy days." };
+  }
+  return { window: `${hourLabel((start - WATCH_HOURS + 24) % 24)}\u2013${hourLabel(start)}`, note: null };
 }
 
 export type Finding = { category: string; severity: string; note: string };
@@ -51,7 +83,7 @@ export function whatsThere(h: Hotspot, photoFindings: Finding[] | undefined): st
     lines.push("Street photo on file, nothing flagged in it");
   }
   const last = h.recent[0];
-  if (last) lines.push(`Latest 311: ${last.code}, ${last.opened}`);
+  if (last) lines.push(`Latest 311: ${reportLabel(last.code)}, ${last.opened}`);
   if (h.category === "dumping" && h.vacant_within_150m > 0) {
     lines.push(`${h.vacant_within_150m} vacant building${h.vacant_within_150m === 1 ? "" : "s"} within 150 m`);
   }

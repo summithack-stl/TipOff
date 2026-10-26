@@ -17,7 +17,8 @@ function photoFindings(): Map<string, Finding[]> {
 export default async function CrewPage({ searchParams }: { searchParams: Promise<{ day?: string }> }) {
   const { day: asked } = await searchParams;
   const today = cityToday();
-  const day: Day = (DAYS as readonly string[]).includes(asked ?? "") ? (asked as Day) : today;
+  const picked = (DAYS as readonly string[]).includes(asked ?? "");
+  const day: Day = picked ? (asked as Day) : today;
   const findings = photoFindings();
 
   const items: CrewItem[] = todaysHotspots(allHotspots(), day).map((h) => ({
@@ -27,5 +28,5 @@ export default async function CrewPage({ searchParams }: { searchParams: Promise
     there: whatsThere(h, findings.get(h.id)),
   }));
 
-  return <CrewList items={items} day={day} today={today} sample={usingSample()} />;
+  return <CrewList items={items} day={day} today={today} sample={usingSample()} picked={picked} />;
 }
