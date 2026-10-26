@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { BuildingPanel } from "@/components/building-panel";
@@ -55,10 +56,17 @@ export function HotspotRadar({ totals }: { totals: Record<string, number> }) {
   const [showVacant, setShowVacant] = useState(false);
   // 400 KB, off by default: fetched the first time it is switched on, and never otherwise.
   const vacant = useVacantBuildings(showVacant);
-  const [selected, setSelected] = useState<Selected>(null);
-  const close = useCallback(() => setSelected(null), []);
-  const pickHotspot = useCallback((id: string) => setSelected({ kind: "hotspot", id }), []);
-  const pickBuilding = useCallback((id: string) => setSelected({ kind: "building", id }), []);
+
+  // /map?h=<id> opens that hotspot, which is what "Share this block" sends. undefined means nobody
+  // has touched the map yet, so the link still decides; derived rather than set in an effect, so
+  // the panel is open on the very first render instead of popping in after one.
+  const shared = useSearchParams().get("h");
+  const [picked, setPicked] = useState<Selected | undefined>(undefined);
+  const selected: Selected = picked !== undefined ? picked : shared ? { kind: "hotspot", id: shared } : null;
+
+  const close = useCallback(() => setPicked(null), []);
+  const pickHotspot = useCallback((id: string) => setPicked({ kind: "hotspot", id }), []);
+  const pickBuilding = useCallback((id: string) => setPicked({ kind: "building", id }), []);
 
   const wards = useMemo(() => [...new Set(hotspots.map((h) => h[4]).filter((w) => w !== null))].sort((a, b) => a - b), [hotspots]);
   const ofType = useMemo(() => hotspots.filter((h) => h[1] === category), [hotspots, category]);
@@ -87,7 +95,7 @@ export function HotspotRadar({ totals }: { totals: Record<string, number> }) {
           value={category}
           onChange={(c) => {
           setCategory(c);
-          setSelected(null);
+          setPicked(null);
         }}
         />
         <Filter label="Ward" value={ward} onChange={setWard} items={{ [ANY]: "All", ...Object.fromEntries(wards.map((w) => [String(w), String(w)])) }} />

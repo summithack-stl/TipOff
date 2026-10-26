@@ -83,6 +83,9 @@ marker per cell, labelled with its count and coloured by the worst score in it. 
 zooms in. Past zoom 13 every hotspot draws as itself. The rule is `clusterHotspots()` in
 [`app/src/lib/cluster.ts`](app/src/lib/cluster.ts) — about 40 lines, rather than another dependency.
 
+Standing on a block, a crew gets **Directions** (Apple Maps on iOS, Google Maps elsewhere) and
+**Share this block**, which sends a `/map?h=<id>` link that opens straight on that hotspot.
+
 ## Several people, one picture (shared crew status)
 
 A crew in the field marks a block cleaned; the supervisor at a desk and the next crew see it. The
