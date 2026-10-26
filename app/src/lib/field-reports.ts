@@ -20,8 +20,26 @@ const CELL_LAT = 0.0014;
 const CELL_LON = 0.0018;
 export const MIN_REPORTS = 5;
 
+/**
+ * Python's float floor division (lat // 0.0014), which works from fmod. Math.floor(lat / 0.0014)
+ * is not the same: the division rounds first, so a coordinate just under a cell edge can floor
+ * into the next cell. That happens to 197 of the 81,404 coordinates in the 311 file.
+ */
+export function pyFloorDiv(a: number, b: number): number {
+  let mod = a % b;
+  let div = (a - mod) / b;
+  if (mod && b < 0 !== mod < 0) {
+    mod += b;
+    div -= 1;
+  }
+  if (!div) return 0;
+  let floored = Math.floor(div);
+  if (div - floored > 0.5) floored += 1;
+  return floored;
+}
+
 export function cellOf(lat: number, lon: number): string {
-  return `${Math.floor(lat / CELL_LAT)}_${Math.floor(lon / CELL_LON)}`;
+  return `${pyFloorDiv(lat, CELL_LAT)}_${pyFloorDiv(lon, CELL_LON)}`;
 }
 
 // The City of St. Louis, with a little margin. Reports outside it are refused.
