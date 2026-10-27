@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { detectFrame } from "@/lib/detect";
-import { rateLimit, upstreamError } from "@/lib/guard";
+import { dailyQuota, rateLimit, upstreamError } from "@/lib/guard";
 
 // Vercel rejects request bodies over 4.5 MB, so stay under that.
 const MAX_BYTES = 4 * 1024 * 1024;
@@ -25,6 +25,9 @@ export async function POST(request: Request) {
   // Free-tier vision quota is ~30 images/min shared by everyone, so cap each client.
   const limited = rateLimit(request, "frames", 20);
   if (limited) return limited;
+  // ...and ~95 images a DAY for the whole organisation, which the per-minute cap does nothing about.
+  const spent = dailyQuota(request, "frames");
+  if (spent) return spent;
 
   const form = await request.formData().catch(() => null);
   if (!form) return NextResponse.json({ error: "send multipart/form-data" }, { status: 400 });
