@@ -65,3 +65,23 @@ export function refuseSnapshot(next: SnapshotFacts, prev: SnapshotFacts | null):
   }
   return null;
 }
+
+const cityTime = (iso: string, withTime: boolean) =>
+  new Date(withTime ? iso : `${iso}T12:00:00Z`).toLocaleString("en-US", {
+    timeZone: "America/Chicago", month: "short", day: "numeric", ...(withTime ? { hour: "numeric", minute: "2-digit" } : {}),
+  });
+
+/**
+ * What a supervisor reads about the data on screen: how recent it is, where it came from, and, when
+ * the newest refresh attempt failed, that it failed and why. The data shown stays the last good one.
+ */
+export function freshness(windowEnd: string, source: "refresh" | "bundled" | "sample", s: RefreshStatus): { line: string; problem: string | null } {
+  const through = windowEnd ? `311 reports through ${cityTime(windowEnd, false)}` : "No 311 data";
+  const when = source === "refresh" && s.lastSuccess ? `refreshed ${cityTime(s.lastSuccess.at, true)}` : source === "bundled" ? "from the last deploy" : "sample data";
+  const failed = s.lastAttempt && !s.lastAttempt.ok && (!s.lastSuccess || s.lastAttempt.at > s.lastSuccess.at) ? s.lastAttempt : null;
+  const why = (failed?.error ?? "no reason recorded").replace(/([^.!?])$/, "$1.");
+  return {
+    line: `${through} · ${when}`,
+    problem: failed ? `The last refresh (${cityTime(failed.at, true)}) failed: ${why} These are the last good data.` : null,
+  };
+}

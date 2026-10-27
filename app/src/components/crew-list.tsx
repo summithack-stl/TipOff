@@ -89,7 +89,7 @@ function WeekStrip({ load, day, today, category }: { load: DayLoad[]; day: Day; 
   );
 }
 
-export function CrewBoard({ items, day, today, load, sample }: { items: CrewItem[]; day: Day; today: Day; load: DayLoad[]; sample: boolean }) {
+export function CrewBoard({ items, day, today, load, sample, fresh }: { items: CrewItem[]; day: Day; today: Day; load: DayLoad[]; sample: boolean; fresh: { line: string; problem: string | null } }) {
   const [category, setCategory] = useState<HotspotCategory>("dumping");
   const [open, setOpen] = useState<Hotspot | null>(null);
   const close = useCallback(() => setOpen(null), []);
@@ -108,12 +108,15 @@ export function CrewBoard({ items, day, today, load, sample }: { items: CrewItem
             The strongest of {busy} {CATEGORY_LABEL[category].toLowerCase()} hotspots that usually get reports on {day}, sorted by when to
             watch them. Places and times only: we never identify people, faces or license plates.
           </p>
+          <p className="mt-2 font-mono text-xs text-muted-foreground">{fresh.line}</p>
         </div>
         <TypeToggle
           value={category}
           onChange={setCategory}
         />
       </header>
+
+      {fresh.problem && <p className="rounded-md border border-destructive/50 p-3 text-sm text-destructive">{fresh.problem}</p>}
 
       {sample && (
         <p className="rounded-md border border-destructive/50 p-3 text-sm text-destructive">

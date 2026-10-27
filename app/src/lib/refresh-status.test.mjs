@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { canStart, EMPTY_STATUS, finished, HISTORY, refuseSnapshot, STALE_MS, started } from './refresh/status.ts';
+import { canStart, EMPTY_STATUS, finished, freshness, HISTORY, refuseSnapshot, STALE_MS, started } from './refresh/status.ts';
 
 const now = Date.parse('2026-10-26T10:00:00Z');
 
@@ -39,4 +39,15 @@ test('a build that went wrong quietly is refused, and says why', () => {
   assert.match(refuseSnapshot(facts({ counts: { dumping: 10, pothole: 10 } }), null), /No graffiti hotspots/);
   assert.match(refuseSnapshot(facts({ windowEnd: '2026-10-01' }), facts()), /older than the data already published/);
   assert.match(refuseSnapshot(facts({ counts: { dumping: 500, pothole: 600, graffiti: 100 } }), facts()), /under half/);
+});
+
+test('freshness says how recent the data is, and owns up to a failed refresh', () => {
+  const good = { at: '2026-10-26T10:00:20Z', by: 'cron', ok: true };
+  const bad = { at: '2026-10-27T10:00:05Z', by: 'cron', ok: false, error: 'The city answered 503.' };
+  const ok = freshness('2026-10-25', 'refresh', finished(EMPTY_STATUS, good));
+  assert.equal(ok.line, '311 reports through Oct 25 · refreshed Oct 26, 5:00 AM');
+  assert.equal(ok.problem, null);
+  const failing = freshness('2026-10-25', 'refresh', finished(finished(EMPTY_STATUS, good), bad));
+  assert.equal(failing.problem, 'The last refresh (Oct 27, 5:00 AM) failed: The city answered 503. These are the last good data.');
+  assert.equal(freshness('2026-10-25', 'bundled', EMPTY_STATUS).line, '311 reports through Oct 25 · from the last deploy');
 });
