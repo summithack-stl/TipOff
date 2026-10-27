@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { MapHotspot } from "@/lib/hotspots";
 import type { VacantPoint } from "@/lib/map-data";
 import { CATEGORY_COLOR } from "@/lib/categories";
+import { clusterHotspots } from "@/lib/cluster";
 import { riskColor } from "@/lib/risk";
 
 type Props = {
@@ -17,9 +18,12 @@ type Props = {
 };
 
 const PULSE_TOP = 10; // the strongest hotspots on screen pulse
+const INITIAL_ZOOM = 12;
 
 export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuilding }: Props) {
   const el = useRef<HTMLDivElement>(null);
+  // Clusters are a grid in screen pixels, so they have to be rebuilt whenever the zoom changes.
+  const [zoom, setZoom] = useState(INITIAL_ZOOM);
   const map = useRef<L.Map | null>(null);
   const hotLayer = useRef<L.LayerGroup | null>(null);
   const vacantLayer = useRef<L.LayerGroup | null>(null);
@@ -32,7 +36,8 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
   useEffect(() => {
     if (!el.current) return;
     // preferCanvas: ~10k circle markers draw on one canvas instead of 10k SVG nodes.
-    const m = L.map(el.current, { preferCanvas: true, zoomControl: false }).setView([38.627, -90.24], 12);
+    const m = L.map(el.current, { preferCanvas: true, zoomControl: false }).setView([38.627, -90.24], INITIAL_ZOOM);
+    m.on("zoomend", () => setZoom(m.getZoom()));
     L.control.zoom({ position: "bottomright" }).addTo(m);
     // OSM tiles, darkened in CSS (.radar-tiles) in both themes so the type colors pop.
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -66,12 +71,32 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
     if (!group) return;
     group.clearLayers();
     const maxReports = Math.max(1, ...hotspots.map((h) => h[6]));
-    // Lowest score first so the worst paint on top. One type is shown at a time, so color = type,
+    // Grid clustering, so a city-wide view is readable instead of a wall of overlapping circles.
+    // Weakest first, so the worst still paint on top. One type is shown at a time, so color = type,
     // size = report count, brightness = score.
-    const sorted = [...hotspots].sort((a, b) => a[5] - b[5]);
-    const pulse = new Set(sorted.slice(-PULSE_TOP).map((h) => h[0]));
-    for (const h of sorted) {
-      const [id, category, lat, lon, , score, reportCount, , address] = h;
+    const clusters = clusterHotspots(hotspots, zoom);
+    const singles = clusters.filter((c) => c.items.length === 1);
+    const pulse = new Set(singles.slice(-PULSE_TOP).map((c) => c.items[0][0]));
+    for (const cluster of clusters) {
+      if (cluster.items.length > 1) {
+        const { lat, lon, items, score } = cluster;
+        const fill = riskColor(score);
+        const radius = 14 + Math.min(10, Math.log2(items.length) * 3);
+        L.marker([lat, lon], {
+          icon: L.divIcon({
+            className: "",
+            html: `<span class="radar-cluster" style="--c:${fill};width:${radius * 2}px;height:${radius * 2}px">${items.length}</span>`,
+            iconSize: [radius * 2, radius * 2],
+          }),
+          title: `${items.length} hotspots here, worst score ${score}. Zoom in to open one.`,
+          keyboard: true,
+        })
+          // A cluster is not a place, so it opens no panel: it zooms to show what is inside.
+          .on("click", () => map.current?.setView([lat, lon], Math.min(19, map.current.getZoom() + 3)))
+          .addTo(group);
+        continue;
+      }
+      const [id, category, lat, lon, , score, reportCount, , address] = cluster.items[0];
       const color = CATEGORY_COLOR[category];
       const radius = 4 + 12 * Math.sqrt(reportCount / maxReports);
       const label = `${address || category}: score ${score}, ${reportCount} reports`;
@@ -96,7 +121,7 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
         .on("click", () => handlers.current.onHotspot(id))
         .addTo(group);
     }
-  }, [hotspots]);
+  }, [hotspots, zoom]);
 
   useEffect(() => {
     ring.current?.remove();
