@@ -25,3 +25,14 @@ test('planFacts passes photo findings through and states the rank', () => {
   assert.deepEqual(f.photo_findings, [{ category: 'dumping', severity: 'high', note: 'mattresses and tires' }]);
   assert.equal(f.priority, '91/100 (#1 of dumping hotspots)');
 });
+
+test('photo-only plans do not turn missing annual history into zero reports or a ranked claim', () => {
+  const f = planFacts({ ...h, source: 'field', rank: 0, field_reports: 5, report_count: 5 }, []);
+  assert.equal(f.reports_on_block, 5);
+  assert.equal(f.annual_311_history, 'Not available for this photo-report hotspot');
+  assert.ok(!('reports_year_before' in f));
+  assert.ok(!('vacant_buildings_within_150m' in f));
+  assert.ok(!('reports_mostly_come_in' in f));
+  assert.match(f.priority, /provisional/);
+  assert.equal(f.evidence_source, 'TipOff photo reports; reporters are not verified residents');
+});

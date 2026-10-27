@@ -6,7 +6,7 @@ import Link from "next/link";
 import { CameraIcon, LocateFixedIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { friendlyError } from "@/lib/api-error";
-import { inStLouis } from "@/lib/field-reports";
+import { inServiceArea, SERVICE_AREAS } from "@/lib/service-area";
 import type { Hotspot } from "@/lib/hotspots";
 
 const PinMap = dynamic(() => import("@/components/pin-map"), { ssr: false, loading: () => <div className="h-64 w-full animate-pulse rounded-lg border bg-muted" /> });
@@ -50,8 +50,8 @@ export function ReportForm() {
     navigator.geolocation.getCurrentPosition(
       (p) => {
         setLocating(false);
-        if (!inStLouis(p.coords.latitude, p.coords.longitude)) {
-          setError("You're outside the City of St. Louis. Tap the map where the photo was taken.");
+        if (!inServiceArea(p.coords.latitude, p.coords.longitude)) {
+          setError("You're outside St. Louis City, Ballwin and Chesterfield. Tap the map where the photo was taken.");
           return;
         }
         pick(p.coords.latitude, p.coords.longitude);
@@ -75,6 +75,7 @@ export function ReportForm() {
   const send = async () => {
     if (!photo) return setError("Add a photo first.");
     if (!placed) return setError("Set where the photo was taken: use your location or tap the map.");
+    if (!inServiceArea(at.lat, at.lon)) return setError("Choose a location in St. Louis City, Ballwin or Chesterfield.");
     setBusy(true);
     setError(null);
     try {
@@ -146,6 +147,9 @@ export function ReportForm() {
             <LocateFixedIcon aria-hidden /> {locating ? "Finding you…" : "Use my location"}
           </Button>
         </div>
+        <div className="flex flex-wrap gap-2" aria-label="Center the report map">
+          {Object.values(SERVICE_AREAS).map(area => <Button key={area.label} variant="outline" size="sm" onClick={() => { setAt(area.center); setPlaced(false); setError(null); }}>{area.label}</Button>)}
+        </div>
         <PinMap at={at} onPick={pick} />
         <p className="text-xs text-muted-foreground">{placed ? `Pin at ${at.lat.toFixed(5)}, ${at.lon.toFixed(5)}. Tap the map to move it.` : "Tap the map where the photo was taken."}</p>
       </div>
@@ -156,7 +160,7 @@ export function ReportForm() {
         {busy ? "Checking the photo…" : "Send report"}
       </Button>
       <p className="text-xs text-muted-foreground">
-        The photo is checked for dumping before it&apos;s saved. Only photos that show dumping, taken inside the City of St. Louis, are kept. TipOff never looks for faces or license plates.
+        The photo is checked for dumping before it&apos;s saved. Locations must be in St. Louis City, Ballwin or Chesterfield. TipOff never looks for faces or license plates.
       </p>
     </div>
   );

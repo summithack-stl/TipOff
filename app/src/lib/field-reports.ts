@@ -1,4 +1,5 @@
 import type { Hotspot } from "@/lib/hotspots";
+import { areaForPoint } from "./service-area.ts";
 
 // Photo reports sent from phones, and how they join the 311 hotspots.
 // Type-only import, so node:test can load this file.
@@ -42,10 +43,7 @@ export function cellOf(lat: number, lon: number): string {
   return `${pyFloorDiv(lat, CELL_LAT)}_${pyFloorDiv(lon, CELL_LON)}`;
 }
 
-// The City of St. Louis, with a little margin. Reports outside it are refused.
-export function inStLouis(lat: number, lon: number): boolean {
-  return lat >= 38.53 && lat <= 38.78 && lon >= -90.33 && lon <= -90.16;
-}
+export { inStLouis } from "./service-area.ts";
 
 // What the city's own records say about one grid cell.
 export type CellInfo = { count: number; address: string | null; ward: number | null };
@@ -114,7 +112,7 @@ export function fieldHotspots(reports: FieldReport[], existing: Map<string, Hots
       vacant_within_150m: 0,
       nearest_vacant_m: null,
       recent: newest.slice(0, 5).map((r) => ({ opened: r.at.slice(0, 10), code: "TipOff photo report", address: city?.address ?? "This block" })),
-      reasons: [`New hotspot: ${reason}`, `${plural(fromCity, "311 report")} on this block since 2024`],
+      reasons: [`New hotspot: ${reason}`, areaForPoint(rs[0].lat, rs[0].lon) === "stl" ? `${plural(fromCity, "311 report")} on this block since 2024` : "Municipal 311 history is not connected"],
       field_reports: n,
       source: "field",
     });

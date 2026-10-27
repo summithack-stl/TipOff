@@ -3,6 +3,7 @@ import { z } from "zod";
 import { dailyQuota, rateLimit, upstreamError } from "@/lib/guard";
 import { createHash } from "node:crypto";
 import { shared, sharedHit, type Shared } from "@/lib/cache";
+import { findHotspot } from "@/lib/field-store";
 import { hotspotData } from "@/lib/hotspot-store";
 import { CATEGORIES } from "@/lib/issues";
 import { chatJSON } from "@/lib/llm";
@@ -32,6 +33,9 @@ Report times are when residents REPORTED the problem, not when it happened: say 
 Dumping happens BEFORE it is reported, so never tell staff to watch only during the report window: cameras should record around the clock, and drive-bys go the evening and night before the busiest report day.
 Nearby vacant buildings are context, not a proven cause: never call them the source.
 Phrase facts as "311 reports show" or "photo shows". Plain words, no jargon. Return JSON only:
+When evidence_source says TipOff photo reports, attribute those facts to "TipOff photo reports show", not 311. Photo reporters are not verified residents.
+Missing annual_311_history is unavailable data, not zero reports. A provisional photo-report score is not a validated historical rank.
+An empty photo_findings list means no findings were supplied. Never infer that cleanup happened, no cleanup happened, or a place is clean from an empty list.
 {"headline":"one line, under 15 words",
  "what_we_know":["up to 5 sourced facts"],
  "watch":["up to 3: where to point a camera and when to schedule drive-bys"],
@@ -64,7 +68,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: z.prettifyError(parsed.error) }, { status: 400 });
   }
   const data = await hotspotData();
-  const hotspot = data.byId.get(parsed.data.id);
+  // Photo-only hotspots (Ballwin, Chesterfield, or a new St. Louis block) exist only in the field reports.
+  const hotspot = await findHotspot(parsed.data.id);
   if (!hotspot) {
     return NextResponse.json({ error: "unknown hotspot id" }, { status: 404 });
   }

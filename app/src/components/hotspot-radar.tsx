@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { CATEGORY_LABEL } from "@/lib/categories";
 import { DAYS, HOUR_BLOCKS, maskActiveAt, toMapHotspot, type Hotspot, type HotspotCategory } from "@/lib/hotspots";
 import { useMapHotspots, useVacantBuildings } from "@/lib/map-data";
+import { areaForPoint, SERVICE_AREAS, type ServiceArea } from "@/lib/service-area";
 
 // Leaflet touches window on import, so the map only loads in the browser.
 const RadarMap = dynamic(() => import("@/components/radar-map"), {
@@ -51,6 +52,7 @@ export function HotspotRadar({ totals }: { totals: Record<string, number> }) {
   // One type at a time: dumping is the problem set, the others are a click away.
   const [category, setCategory] = useState<HotspotCategory>("dumping");
   const [ward, setWard] = useState(ANY);
+  const [area, setArea] = useState<ServiceArea | "all">("all");
   const [day, setDay] = useState(ANY);
   const [block, setBlock] = useState(ANY);
   const [showVacant, setShowVacant] = useState(false);
@@ -95,9 +97,10 @@ export function HotspotRadar({ totals }: { totals: Record<string, number> }) {
       ofType.filter(
         (h) =>
           (ward === ANY || String(h[4]) === ward) &&
+          (area === "all" || areaForPoint(h[2], h[3]) === area) &&
           maskActiveAt(h[7], day === ANY ? null : Number(day), block === ANY ? null : Number(block)),
       ),
-    [ofType, ward, day, block],
+    [ofType, ward, day, block, area],
   );
   const vacantShown = useMemo(() => (showVacant ? vacant.filter((b) => ward === ANY || String(b[4]) === ward) : null), [vacant, showVacant, ward]);
 
@@ -118,6 +121,7 @@ export function HotspotRadar({ totals }: { totals: Record<string, number> }) {
           setPicked(null);
         }}
         />
+        <Filter label="Area" value={area} onChange={(value) => { setArea(value as ServiceArea | "all"); setWard(ANY); setPicked(null); setShowVacant(false); }} items={{ all: "All areas", ...Object.fromEntries(Object.entries(SERVICE_AREAS).map(([id, place]) => [id, place.label])) }} />
         <Filter label="Ward" value={ward} onChange={setWard} items={{ [ANY]: "All", ...Object.fromEntries(wards.map((w) => [String(w), String(w)])) }} />
         <Filter label="Day" value={day} onChange={setDay} items={{ [ANY]: "Any", ...Object.fromEntries(DAYS.map((d, i) => [String(i), d])) }} />
         <Filter label="Reported" value={block} onChange={setBlock} items={{ [ANY]: "Any time", ...Object.fromEntries(HOUR_BLOCKS.map(([l], i) => [String(i), l])) }} />
@@ -130,12 +134,16 @@ export function HotspotRadar({ totals }: { totals: Record<string, number> }) {
             ? "Loading hotspots…"
             : data.state === "error"
               ? data.message
-              : `${shown.length.toLocaleString("en-US")} of ${(totals[category] ?? ofType.length).toLocaleString("en-US")} ${CATEGORY_LABEL[category].toLowerCase()} hotspots · size = reports, brightness = score`}
+              : area === "ballwin" || area === "chesterfield"
+                ? `${shown.length} photo-report hotspots shown · size = reports, brightness = score`
+                : `${shown.length.toLocaleString("en-US")} of ${(totals[category] ?? ofType.length).toLocaleString("en-US")} ${CATEGORY_LABEL[category].toLowerCase()} hotspots · size = reports, brightness = score`}
         </p>
       </div>
+      <p className="border-b bg-background px-4 py-2 text-xs text-muted-foreground">St. Louis City: 311 history and photo reports. Ballwin and Chesterfield: photo reports only; municipal 311 history is not connected.</p>
 
       <div className="relative isolate flex-1 overflow-hidden">
-        <RadarMap hotspots={shown} vacant={vacantShown} selected={at} onHotspot={pickHotspot} onBuilding={pickBuilding} />
+        <RadarMap hotspots={shown} vacant={vacantShown} selected={at} area={area} onHotspot={pickHotspot} onBuilding={pickBuilding} />
+        {shown.length === 0 && (area === "ballwin" || area === "chesterfield") ? <p role="status" className="absolute top-4 left-4 z-[500] max-w-xs rounded-lg border bg-background p-3 text-sm">No photo-report hotspots match these filters. Municipal 311 history is not connected.</p> : null}
         <AnimatePresence>
           {hotspot && <HotspotPanel key={hotspot[0]} id={hotspot[0]} initial={fieldById.get(hotspot[0])} onClose={close} />}
           {building && <BuildingPanel key={building[0]} handle={building[0]} onClose={close} />}
