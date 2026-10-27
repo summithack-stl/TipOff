@@ -14,3 +14,7 @@ Same rules as `CLAUDE.md`, for Codex and other agents that read `AGENTS.md`.
 - Small PRs, under 300 changed lines, one concern each. CI (lint, typecheck, build) must pass before merge.
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`.
 - Reuse existing shadcn components before writing custom UI.
+
+- CAC entry: TipOff; video lives in `~/Projects/tipoff-video`. Preserve the three-person CAC team and original hackathon credits separately.
+- Ballwin/Chesterfield support is map + photo reporting; municipal 311 history is unavailable there.
+- Report photos/records currently use public Blob URLs. Never describe them as private or claim reporter hashes verify people/residency.

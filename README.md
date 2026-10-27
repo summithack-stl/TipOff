@@ -4,7 +4,9 @@
 
 **Try it:** https://tipoff-stl.vercel.app (no login). Pick **Dumping**, click a hotspot, press **Write plan**. The morning crew list is at [`/crew`](https://tipoff-stl.vercel.app/crew).
 
-**Run it yourself** (Node 20+): `git clone https://github.com/summithack-stl/summithack && cd summithack/app && npm ci && npm run dev`, then open http://localhost:3000. The map, scores and crew list work with no keys; the AI plan and photo check need a free Groq key in `app/.env.local` (see [Run locally](#run-locally)).
+Congressional App Challenge entry by Prahlad Venugopalan, Vedant Pawankar and Sarthak Chaudhary.
+
+**Run it yourself** (Node 20+): `git clone https://github.com/summithack-stl/TipOff.git && cd TipOff/app && npm ci && npm run dev`, then open http://localhost:3000. The map, scores and crew list work with no keys; the AI plan and photo check need a free Groq key in `app/.env.local` (see [Run locally](#run-locally)).
 
 ## Install it on a phone
 
@@ -16,6 +18,10 @@ TipOff is a PWA: crews install it from the browser, with no app store and no acc
 Installed, it runs full screen and opens straight to [`/crew`](https://tipoff-stl.vercel.app/crew), today's list. Reading the map and plans never needs a login.
 
 The icons come from [`app/src/app/icon.svg`](app/src/app/icon.svg); see [`app/public/icons/README.md`](app/public/icons/README.md) to regenerate them.
+
+### SwiftUI iPhone app
+
+[`ios/TipOff/`](ios/TipOff/) also contains an iOS 16+ app written in Swift, using SwiftUI and WebKit. It opens the live crew board in a `WKWebView`, supports pull-to-refresh and back gestures, and sends external links to the system browser or Maps. This is a native shell around the web app, not a separate native implementation of the map. Its Swift package and `xtool.yml` describe the build; installing it requires iOS signing. The browser PWA above is the public installation path. The shell has no bundled offline copy and needs a connection to load the site.
 
 ### It keeps working with no signal
 
@@ -42,7 +48,7 @@ Civic AI Hackathon, Problem Set #3: Illegal Dumping. The City raised the maximum
 
 ## Who it helps
 
-City staff, not residents. Residents keep reporting through 311 exactly as they do now; those reports feed TipOff.
+City staff use TipOff to prioritize work. Residents can keep using 311 or submit a dumping photo through TipOff’s report page. TipOff photo reports do not create an official municipal 311 ticket.
 
 - **Citizens' Service Bureau / refuse crews:** a daily list of the blocks that usually get reports on today's weekday, with a suggested watch window and a plan. Crews can clean on a schedule instead of waiting for complaints (35% of dumping and debris reports stay open more than a week; median 3.2 days).
 - **Whoever places the city's cameras:** a ranked list of 1,186 repeat dumping blocks, so the few cameras go to the blocks where dumping keeps coming back, recording around the clock.
@@ -59,6 +65,14 @@ City staff, not residents. Residents keep reporting through 311 exactly as they 
 
 - Live app: https://tipoff-stl.vercel.app (overview and setup guide; hotspot map at `/map`, crew list at `/crew`)
 - Demo video: https://youtu.be/z5E3rEblO9o
+
+## Photo reports and geographic coverage
+
+At [`/report`](https://tipoff-stl.vercel.app/report), take or attach a JPEG, PNG or WebP photo (up to 4 MB), then use GPS or place a pin. The server checks that the location is in St. Louis City, Ballwin or Chesterfield and uses the Groq/Gemini vision pipeline to look for dumping before saving it. Exact duplicate photos are rejected. A secret-keyed HMAC of the sender’s connection groups repeat submissions so one reporter counts once per block; it does not verify a person or residency.
+
+A block becomes a dumping hotspot once its historical 311 reports plus distinct photo reporters reach five. Photo-only scores are provisional. The public map shows block-level hotspots rather than individual report records, photos or reporter hashes. Production reports and photos are stored in Vercel Blob using public object URLs; that storage is not access-controlled private storage. Locally they are saved under `app/.data/reports/`. Never include faces, plates or other sensitive information in demo uploads.
+
+The map’s area selector covers **St. Louis City, Ballwin and Chesterfield**, using the same map library. Ballwin and Chesterfield are checked against Census city boundaries. **Historical municipal 311 data is connected only for St. Louis City.** The county areas start from TipOff photo reports; missing history is labelled as unavailable, not zero, and the St. Louis backtest does not validate those photo-only scores.
 
 ## Does it work? (backtest)
 
@@ -92,7 +106,8 @@ Standing on a block, a crew gets **Directions** (Apple Maps on iOS, Google Maps 
 - **Street photos** (`POST /api/frames`): a fast vision model on Groq flags dumping, potholes, graffiti and curb or sidewalk damage; Gemini double-checks anything uncertain or severe. On 53 hand-labeled test photos it found 11 of 13 street problems (2 of 4 dumping piles), so the 311 history does the heavy lifting.
 - No face or license-plate recognition anywhere.
 - **Not AI:** the hotspot score is a plain formula (see [How a block becomes a hotspot](#how-a-block-becomes-a-hotspot)), not a model. The backtest uses that same formula.
-- **Demo video:** every voice is a real team member. Edits only cut words out; no voice was AI-generated or cloned.
+- **Development assistance:** we used Claude and Codex to help implement code, troubleshoot failures, review changes and prepare documentation/video code. The team chose the product direction, integrated the work and checked the results. These development tools are separate from the Groq and Gemini APIs called by the running app.
+- **Demo video:** every voice is a real team member; no voice was AI-generated or cloned.
 
 ## Keeping the data fresh
 
@@ -113,9 +128,16 @@ To connect the City's own 311 database instead of the public CSV, replace `fetch
 | Mapillary street-level imagery | https://www.mapillary.com | Street photos at the top 311 hotspots and the riskiest vacant buildings (CC BY-SA 4.0, credited in `app/public/photos/index.json`). |
 | Wikimedia Commons | https://commons.wikimedia.org | Street-issue test photos for the accuracy check (licenses in `app/eval/sources.json`). |
 
-Python scripts in `data/scripts/` download and clean the city data into `app/data/clean/`. The app only reads those files; it never calls city APIs live.
+Python scripts in `data/scripts/` download and clean the city data into `app/data/clean/`. The server reads refreshed Blob data when available and otherwise uses those bundled files. Interactive map requests do not query city APIs; the scheduled refresh downloads the public source file.
 
-## Architecture
+## Languages and architecture
+
+- **TypeScript / JavaScript:** Next.js and React pages, Leaflet map, server API routes, nightly refresh, and browser service worker.
+- **Python with pandas:** original data download, cleaning, hotspot scoring and backtest pipeline.
+- **Swift with SwiftUI / WebKit:** the iPhone shell.
+- **CSS / Tailwind and shadcn/ui:** styling and interface components.
+- **Services:** Vercel hosting, Blob storage and Cron; Groq and Gemini model APIs, called only from the server.
+
 
 ```
 city open data ──(data/scripts/*.py)──> app/data/clean/*.json ──┐
@@ -141,6 +163,9 @@ Before Problem Set #3 was announced we built a vacant-building inspection map; i
 | --- | --- | --- |
 | `POST /api/frames` | multipart form: `image` (JPEG/PNG/WebP, max 4 MB), `camera_id`, optional `lat`, `lon`, `captured_at`, `confirm` (`1` default, `0` skips the second model), `precise` (`1` sends the whole frame to the second model for tighter boxes) | `{ detections: [{ category, box: {x,y,w,h} (0–1), confidence, severity, note, confirmed }], ms }` |
 | `POST /api/plan` | JSON `{ id: "hotspot id, e.g. dumping-27654_-50128", detections?: [{ category, severity, note }] }` | `{ id, headline, what_we_know[], watch[], actions[], evidence[] }` |
+| `POST /api/reports` | multipart `image`, `lat`, `lon` | Accepted photo finding, block hotspot if qualified, report count and reports still needed; does not create a city 311 ticket. |
+| `GET /api/reports` | none | Block-level hotspots created or changed by photo reports; no individual report records. |
+| `GET /api/refresh` | none | Latest refresh status and failure reason, if any. |
 | `POST /api/brief` (earlier direction) | JSON `{ handle: "11-digit parcel handle", detections?: [{ category, severity, note }] }` | `{ handle, headline, hazards[], crew_notes[] }` |
 | `GET /api/health` | none | `{ ok, provider, model, vision: { fast, confirm }, reply, ms }` |
 | `GET /api/hotspots` | none | Every hotspot the map draws, one array a row: `[id, category, lat, lon, ward, score, report_count, activity, address]`. `activity` packs the busy weekdays (bits 0-6, Sunday first) and busy report-hour blocks (bits 7-10). Cached hard; rebuilt by the nightly refresh. |
@@ -216,8 +241,8 @@ Run these from `app/`:
 
 | Name | Role |
 | --- | --- |
-| Prahlad Venugopalan | Tech lead / AI |
-| Arjun Arun | Data (311 extract, hotspots) |
-| Aarnav Baddam | DevOps |
-| Vedant Pawankar | Frontend (map, overlay) |
-| Sarthak Chaudhary | Presenter, crew view, video |
+| Prahlad Venugopalan | Tech lead: app, data/scoring integration, backend and model APIs, iPhone shell |
+| Vedant Pawankar | Frontend: hotspot map, overlays and panels; animated video scenes |
+| Sarthak Chaudhary | Crew board, app redesign and feature integrations; presentation and video |
+
+TipOff began at the St. Louis Civic AI Hackathon. **Original-version credits:** Arjun Arun contributed the 311 data extract and hotspots; Aarnav Baddam contributed DevOps/deployment. They are credited for that work separately from the three-person Congressional App Challenge team.
