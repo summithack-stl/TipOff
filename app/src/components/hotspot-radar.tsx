@@ -56,7 +56,7 @@ export function HotspotRadar({ totals }: { totals: Record<string, number> }) {
   const [showVacant, setShowVacant] = useState(false);
   // 400 KB, off by default: fetched the first time it is switched on, and never otherwise.
   const vacant = useVacantBuildings(showVacant);
-  // /map?h=<id> opens that hotspot (sent after a photo report). undefined means nobody has touched
+  // /map?h=<id> opens that hotspot: "Share this block" sends it, and so does a photo report. undefined means nobody has touched
   // the map yet, so the link still decides; derived rather than set in an effect, so the panel opens
   // as soon as the rows holding that hotspot arrive.
   const shared = useSearchParams().get("h");

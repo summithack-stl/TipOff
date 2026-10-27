@@ -83,6 +83,9 @@ marker per cell, labelled with its count and coloured by the worst score in it. 
 zooms in. Past zoom 13 every hotspot draws as itself. The rule is `clusterHotspots()` in
 [`app/src/lib/cluster.ts`](app/src/lib/cluster.ts) — about 40 lines, rather than another dependency.
 
+Standing on a block, a crew gets **Directions** (Apple Maps on iOS, Google Maps elsewhere) and
+**Share this block**, which sends a `/map?h=<id>` link that opens straight on that hotspot.
+
 ## How AI is used
 
 - **Plans** (`POST /api/plan`, gpt-oss-120b on Groq): turns a hotspot's sourced facts into a plan (what we know, where and when to watch, actions, evidence for a citation). The prompt allows only the given facts: no invented dates, counts, people, vehicles or causes.

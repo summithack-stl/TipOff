@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { XIcon } from "lucide-react";
+import { MapPinnedIcon, Share2Icon, XIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Drawer } from "@/components/drawer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +10,8 @@ import { TrackerOverlay } from "@/components/tracker-overlay";
 import { friendlyError } from "@/lib/api-error";
 import { CATEGORY_LABEL, HOTSPOT_VAR } from "@/lib/categories";
 import { parseWindow, reportLabel } from "@/lib/crew";
+import { directionsUrl, hotspotLink, shareHotspot } from "@/lib/field-actions";
+import { isIos } from "@/lib/install-prompt";
 import { DAYS, type Hotspot } from "@/lib/hotspots";
 import { useHotspot } from "@/lib/map-data";
 import { nearestPhoto, type Photo } from "@/lib/photos";
@@ -184,6 +187,34 @@ function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () 
       </div>
 
       <div className="flex flex-col gap-5 p-4">
+        {/* UI: Sarthak — the two things a crew does standing on the block. */}
+        <section className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            render={
+              <a href={directionsUrl(h.lat, h.lon, isIos(), h.top_address)} target="_blank" rel="noopener noreferrer">
+                <MapPinnedIcon />
+                Directions
+              </a>
+            }
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const where = h.top_address || `${CATEGORY_LABEL[h.category]} hotspot`;
+              void shareHotspot(`TipOff: ${where}`, hotspotLink(h.id)).then((result) => {
+                if (result === "copied") toast.success("Link copied. Paste it to whoever needs this block.");
+                if (result === "failed") toast.error("Could not share this block. Copy the address bar instead.");
+              });
+            }}
+          >
+            <Share2Icon />
+            Share this block
+          </Button>
+        </section>
+
         <section className="flex items-center gap-5">
           <div className="text-center">
             <div className="font-mono text-6xl leading-none font-semibold tabular-nums" style={{ color }}>
