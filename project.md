@@ -9,3 +9,5 @@ Updated 2026-10-26 for the Congressional App Challenge.
 - Shared crew-status PRs #41/#59 remain outside this change.
 - Next: review/merge the README PR; copy the security reflection into the submission; handle private report storage before sensitive public uploads.
 - Validation: TypeScript typecheck and whitespace checks passed for this documentation-only change.
+
+- Submission review links: root README points to the dedicated video source/script and security reflection. Old five-person video drafts are explicitly marked historical.
