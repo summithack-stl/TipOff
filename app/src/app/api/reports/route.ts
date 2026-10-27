@@ -2,7 +2,8 @@ import { createHash, createHmac, randomBytes, randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { detectFrame, type Detection } from "@/lib/detect";
-import { cellOf, fieldHotspots, inStLouis, MIN_REPORTS, type FieldReport } from "@/lib/field-reports";
+import { cellOf, fieldHotspots, MIN_REPORTS, type FieldReport } from "@/lib/field-reports";
+import { inServiceArea } from "@/lib/service-area";
 import { dumping311PerCell, listReports, saveReport, storeConfigured } from "@/lib/field-store";
 import { clientKey, dailyQuota, rateLimit, upstreamError } from "@/lib/guard";
 import { hotspotData } from "@/lib/hotspot-store";
@@ -44,7 +45,7 @@ export async function GET(request: Request) {
   }
 }
 
-// One phone photo in. It is kept only if the photo check finds dumping and the place is in St. Louis.
+// One phone photo in. It is kept only if the photo check finds dumping in a supported area.
 export async function POST(request: Request) {
   const limited = rateLimit(request, "reports", 6);
   if (limited) return limited;
@@ -62,8 +63,8 @@ export async function POST(request: Request) {
   const fields = fieldsSchema.safeParse({ lat: form.get("lat") ?? undefined, lon: form.get("lon") ?? undefined });
   if (!fields.success) return NextResponse.json({ error: "Set where the photo was taken." }, { status: 400 });
   const { lat, lon } = fields.data;
-  if (!inStLouis(lat, lon)) {
-    return NextResponse.json({ error: "TipOff only takes reports inside the City of St. Louis. Move the pin to where the photo was taken." }, { status: 422 });
+  if (!inServiceArea(lat, lon)) {
+    return NextResponse.json({ error: "TipOff takes reports in St. Louis City, Ballwin and Chesterfield. Move the pin to where the photo was taken." }, { status: 422 });
   }
 
   const bytes = await image.arrayBuffer();

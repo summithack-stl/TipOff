@@ -3,7 +3,8 @@ import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { list, put } from "@vercel/blob";
-import { cellOf, type CellInfo, type FieldReport } from "@/lib/field-reports";
+import { cellOf, fieldHotspots, type CellInfo, type FieldReport } from "./field-reports.ts";
+import type { Hotspot } from "@/lib/hotspots";
 import { hotspotData, streetReportsText } from "@/lib/hotspot-store";
 
 // Where photo reports live. On Vercel: Blob storage (BLOB_READ_WRITE_TOKEN is added when a Blob store is
@@ -82,4 +83,11 @@ export async function dumping311PerCell(): Promise<Map<string, CellInfo>> {
   const top = <K,>(m: Map<K, number>): K | null => [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
   cells = { version, byCell: new Map([...tally].map(([c, t]) => [c, { count: t.n, address: top(t.addr), ward: top(t.ward) }])) };
   return cells.byCell;
+}
+
+/** A hotspot by id, including photo-only ones that exist only in the field reports (e.g. Ballwin, Chesterfield). */
+export async function findHotspot(id: string): Promise<Hotspot | undefined> {
+  const { byId } = await hotspotData();
+  if (!id.startsWith("dumping-")) return byId.get(id);
+  return fieldHotspots(await listReports(), byId, await dumping311PerCell()).find((h) => h.id === id) ?? byId.get(id);
 }

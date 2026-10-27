@@ -178,7 +178,7 @@ function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () 
             {h.top_address || `${CATEGORY_LABEL[h.category]} hotspot`}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {h.source === "field" ? "New from photo reports" : `#${h.rank} of ${CATEGORY_LABEL[h.category].toLowerCase()} hotspots`} · Ward {h.ward ?? "?"}
+            {h.source === "field" ? "Photo-report hotspot" : `#${h.rank} of ${CATEGORY_LABEL[h.category].toLowerCase()} hotspots`}{h.ward != null ? ` · Ward ${h.ward}` : ""}
           </p>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel">
@@ -220,18 +220,18 @@ function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () 
             <div className="font-mono text-6xl leading-none font-semibold tabular-nums" style={{ color }}>
               {h.score}
             </div>
-            <div className="mt-1 text-xs text-muted-foreground">score / 100</div>
+            <div className="mt-1 text-xs text-muted-foreground">{h.source === "field" ? "provisional score / 100" : "score / 100"}</div>
           </div>
           <div className="grid flex-1 grid-cols-2 gap-3 text-sm">
-            {stat(h.field_reports ? "Reports (311 + photo)" : "311 reports", (h.report_count + (h.source === "field" ? 0 : h.field_reports ?? 0)).toLocaleString())}
+            {stat(h.source === "field" ? "Reports on block" : h.field_reports ? "Reports (311 + photo)" : "311 reports", (h.report_count + (h.source === "field" ? 0 : h.field_reports ?? 0)).toLocaleString())}
             {/* With no reports the year before, a % is meaningless (0 → 7 reads as +700%). */}
-            {stat(
+            {h.source === "field" ? stat("Annual 311 history", "Not available") : stat(
               "Trend, last 12 mo",
               h.reports_prev_12m === 0 && h.reports_12m > 0 ? "New this year" : `${trendPct > 0 ? "↑" : trendPct < 0 ? "↓" : "→"} ${Math.abs(trendPct)}%`,
             )}
-            {stat("Most reports on", h.peak_day)}
+            {h.source !== "field" && stat("Most reports on", h.peak_day)}
             {/* 311 times are when people report, not when dumping happens. */}
-            {stat("Reports mostly come in", h.report_window)}
+            {h.source !== "field" && stat("Reports mostly come in", h.report_window)}
           </div>
         </section>
 
@@ -244,7 +244,7 @@ function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () 
           </ul>
         </section>
 
-        <section>
+        {h.source !== "field" && <section>
           {/* 311 times are when people report, not when it happens. */}
           <h3 className={heading}>When reports come in</h3>
           <BarStrip values={h.by_hour} labels={HOUR_LABELS} hot={inWindow} color={color} name={`Reports by hour, busiest ${h.report_window}`} />
@@ -257,12 +257,12 @@ function HotspotDetail({ hotspot: h, onClose }: { hotspot: Hotspot; onClose: () 
               name={`Reports by weekday, busiest ${h.peak_day}`}
             />
           </div>
-        </section>
+        </section>}
 
-        <section>
+        {h.source !== "field" && <section>
           <h3 className={heading}>311 reports per month</h3>
           <Timeline months={h.monthly} color={color} />
-        </section>
+        </section>}
 
         <section>
           <h3 className={heading}>Latest reports</h3>

@@ -8,11 +8,13 @@ import type { VacantPoint } from "@/lib/map-data";
 import { CATEGORY_COLOR } from "@/lib/categories";
 import { clusterHotspots } from "@/lib/cluster";
 import { riskColor } from "@/lib/risk";
+import { SERVICE_AREAS, SERVICE_BOUNDS, type ServiceArea } from "@/lib/service-area";
 
 type Props = {
   hotspots: MapHotspot[];
   vacant: VacantPoint[] | null; // null = layer off
   selected: { lat: number; lon: number } | null;
+  area: ServiceArea | "all";
   onHotspot: (id: string) => void;
   onBuilding: (handle: string) => void;
 };
@@ -20,7 +22,7 @@ type Props = {
 const PULSE_TOP = 10; // the strongest hotspots on screen pulse
 const INITIAL_ZOOM = 12;
 
-export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuilding }: Props) {
+export default function RadarMap({ hotspots, vacant, selected, area, onHotspot, onBuilding }: Props) {
   const el = useRef<HTMLDivElement>(null);
   // Clusters are a grid in screen pixels, so they have to be rebuilt whenever the zoom changes.
   const [zoom, setZoom] = useState(INITIAL_ZOOM);
@@ -36,7 +38,8 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
   useEffect(() => {
     if (!el.current) return;
     // preferCanvas: ~10k circle markers draw on one canvas instead of 10k SVG nodes.
-    const m = L.map(el.current, { preferCanvas: true, zoomControl: false }).setView([38.627, -90.24], INITIAL_ZOOM);
+    const m = L.map(el.current, { preferCanvas: true, zoomControl: false }).fitBounds(SERVICE_BOUNDS, { padding: [24, 24] });
+    setZoom(m.getZoom());
     m.on("zoomend", () => setZoom(m.getZoom()));
     L.control.zoom({ position: "bottomright" }).addTo(m);
     // OSM tiles, darkened in CSS (.radar-tiles) in both themes so the type colors pop.
@@ -53,6 +56,10 @@ export default function RadarMap({ hotspots, vacant, selected, onHotspot, onBuil
       map.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    map.current?.fitBounds(area === "all" ? SERVICE_BOUNDS : SERVICE_AREAS[area].bounds, { padding: [24, 24], animate: false });
+  }, [area]);
 
   useEffect(() => {
     const group = vacantLayer.current;

@@ -4,6 +4,17 @@ import type { Hotspot } from "@/lib/hotspots";
 export type PlanDetection = { category: string; severity: "low" | "medium" | "high"; note: string };
 
 export function planFacts(h: Hotspot, detections: PlanDetection[]): Record<string, unknown> {
+  if (h.source === "field") return {
+    issue_type: h.category,
+    near_address: h.top_address,
+    priority: `${h.score}/100 (provisional photo-report score; not a historical rank)`,
+    reports_on_block: h.report_count,
+    photo_reporters: h.field_reports,
+    evidence_source: "TipOff photo reports; reporters are not verified residents",
+    annual_311_history: "Not available for this photo-report hotspot",
+    latest_reports: h.recent.slice(0, 5),
+    photo_findings: detections,
+  };
   return {
     issue_type: h.category,
     near_address: h.top_address,

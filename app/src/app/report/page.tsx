@@ -10,8 +10,9 @@ export default function ReportPage() {
       <p className="font-mono text-xs tracking-[0.18em] text-hot uppercase">Report dumping</p>
       <h1 className="mt-3 font-heading text-4xl leading-none font-bold tracking-tight uppercase">Seen a pile? Send a photo.</h1>
       <p className="mt-4 text-muted-foreground">
-        Your photo joins the city&apos;s 311 reports for that block. Once a block reaches five reports, it shows up on the map as a hotspot.
+        Report dumping in St. Louis City, Ballwin or Chesterfield. Five reports on a block create a hotspot; one photo reporter counts once per block.
       </p>
+      <p className="mt-3 text-sm text-muted-foreground">St. Louis City includes 311 history. Ballwin and Chesterfield currently use TipOff photo reports only; municipal history is not connected.</p>
       <div className="mt-8">
         <ReportForm />
       </div>
