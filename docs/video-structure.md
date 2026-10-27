@@ -1,3 +1,5 @@
+> **Historical hackathon draft.** This five-person script predates the three-person CAC submission. Use the [current CAC script](https://github.com/Glitch-spec266/tipoff-video/blob/main/CAC-SCRIPT.md) and the root README for current team, features and figures.
+
 # 2-minute video: structure (not the script)
 
 Problem Set #3, Illegal Dumping. Everyone records their own part remotely and sends raw clips to Sarthak (editor). Prahlad and Claude build the animated parts in Remotion. Sarthak combines everything.

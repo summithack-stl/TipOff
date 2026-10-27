@@ -1,3 +1,5 @@
+> **Historical hackathon draft.** This five-person script predates the three-person CAC submission. Use the [current CAC script](https://github.com/Glitch-spec266/tipoff-video/blob/main/CAC-SCRIPT.md) and the root README for current team, features and figures.
+
 # TipOff: 2-minute video script
 
 **One sentence (everyone should be able to say this):** TipOff turns St. Louis's 311 reports into a daily tip-off: where illegal dumping keeps coming back, when it gets reported, and what a crew should do about it.

@@ -65,6 +65,8 @@ City staff use TipOff to prioritize work. Residents can keep using 311 or submit
 
 - Live app: https://tipoff-stl.vercel.app (overview and setup guide; hotspot map at `/map`, crew list at `/crew`)
 - Demo video: https://youtu.be/z5E3rEblO9o
+- CAC video source and current script: [TipOff video repository](https://github.com/Glitch-spec266/tipoff-video), [script](https://github.com/Glitch-spec266/tipoff-video/blob/main/CAC-SCRIPT.md). Raw team media is excluded from Git; the repository contains the edit, code walkthroughs and validation scripts.
+- Submission cybersecurity reflection: [implemented protections and known limits](docs/cac-security-reflection.md).
 
 ## Photo reports and geographic coverage
 
