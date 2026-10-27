@@ -1,7 +1,7 @@
 # Backtest results
 
-Hotspots were scored using only 311 reports up to **2025-10-25**, with the same 0-100 formula as the app.
-Then we counted dumping and debris reports in the next 12 months (to 2026-10-25), which the score never saw.
+Hotspots were scored using only 311 reports up to **2025-10-27**, with the same 0-100 formula as the app.
+Then we counted dumping and debris reports in the next 12 months (to 2026-10-27), which the score never saw.
 
 | Top N | Got reports again | 3+ reports again |
 | --- | --- | --- |
