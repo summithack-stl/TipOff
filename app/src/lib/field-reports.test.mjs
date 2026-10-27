@@ -10,6 +10,13 @@ test('cells match the Python grid, including negative longitudes', () => {
   assert.equal(cellOf(38.6, -90.0001), '27571_-50001');
 });
 
+test('a coordinate on a cell edge lands where Python puts it, not where Math.floor would', () => {
+  // 38.6652 / 0.0014 rounds to exactly 27618.0, but Python's 38.6652 // 0.0014 is 27617.0.
+  // Real 311 coordinates; Math.floor put 197 of them in the neighbouring cell.
+  assert.equal(cellOf(38.6652, -90.2106), '27617_-50118');
+  assert.equal(cellOf(38.5644, -90.2), '27545_-50112');
+});
+
 test('only St. Louis locations are accepted', () => {
   assert.equal(inStLouis(38.627, -90.199), true);
   assert.equal(inStLouis(38.59, -90.52), false); // Ballwin
