@@ -1,18 +1,18 @@
 {
-  "generated": "2026-11-02",
-  "window_end": "2026-11-02",
+  "generated": "2026-11-03",
+  "window_end": "2026-11-03",
   "counts": {
-    "dumping": 1195,
-    "graffiti": 350,
-    "pothole": 1424
+    "dumping": 1196,
+    "graffiti": 352,
+    "pothole": 1425
   },
   "top": {
     "dumping": [
       "dumping-27654_-50128",
       "dumping-27555_-50149",
       "dumping-27641_-50138",
-      "dumping-27531_-50145",
       "dumping-27563_-50134",
+      "dumping-27531_-50145",
       "dumping-27553_-50158",
       "dumping-27620_-50157",
       "dumping-27644_-50146",
@@ -22,14 +22,14 @@
     "graffiti": [
       "graffiti-27592_-50109",
       "graffiti-27572_-50135",
-      "graffiti-27592_-50171",
       "graffiti-27567_-50133",
+      "graffiti-27592_-50171",
+      "graffiti-27562_-50125",
       "graffiti-27594_-50111",
       "graffiti-27594_-50110",
       "graffiti-27594_-50112",
       "graffiti-27593_-50110",
-      "graffiti-27560_-50146",
-      "graffiti-27579_-50123"
+      "graffiti-27560_-50146"
     ],
     "pothole": [
       "pothole-27650_-50141",
@@ -41,7 +41,7 @@
       "pothole-27589_-50143",
       "pothole-27581_-50131",
       "pothole-27644_-50137",
-      "pothole-27562_-50171"
+      "pothole-27590_-50143"
     ]
   }
 }
