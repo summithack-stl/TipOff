@@ -1,10 +1,10 @@
 {
-  "generated": "2026-11-20",
-  "window_end": "2026-11-19",
+  "generated": "2026-11-21",
+  "window_end": "2026-11-21",
   "counts": {
-    "dumping": 1212,
-    "graffiti": 358,
-    "pothole": 1441
+    "dumping": 1214,
+    "graffiti": 359,
+    "pothole": 1443
   },
   "top": {
     "dumping": [
@@ -16,20 +16,20 @@
       "dumping-27550_-50140",
       "dumping-27560_-50133",
       "dumping-27642_-50144",
-      "dumping-27650_-50142",
-      "dumping-27568_-50129"
+      "dumping-27568_-50129",
+      "dumping-27557_-50146"
     ],
     "graffiti": [
       "graffiti-27592_-50109",
       "graffiti-27572_-50135",
       "graffiti-27594_-50110",
       "graffiti-27594_-50111",
+      "graffiti-27566_-50135",
       "graffiti-27593_-50110",
       "graffiti-27592_-50171",
       "graffiti-27562_-50125",
       "graffiti-27567_-50133",
-      "graffiti-27594_-50112",
-      "graffiti-27560_-50146"
+      "graffiti-27591_-50107"
     ],
     "pothole": [
       "pothole-27549_-50139",
