@@ -1,10 +1,10 @@
 {
-  "generated": "2026-11-24",
+  "generated": "2026-11-25",
   "window_end": "2026-11-24",
   "counts": {
-    "dumping": 1216,
-    "graffiti": 359,
-    "pothole": 1445
+    "dumping": 1219,
+    "graffiti": 360,
+    "pothole": 1448
   },
   "top": {
     "dumping": [
@@ -27,9 +27,9 @@
       "graffiti-27566_-50135",
       "graffiti-27593_-50110",
       "graffiti-27592_-50171",
-      "graffiti-27562_-50125",
       "graffiti-27567_-50133",
-      "graffiti-27591_-50107"
+      "graffiti-27591_-50107",
+      "graffiti-27560_-50146"
     ],
     "pothole": [
       "pothole-27549_-50139",
